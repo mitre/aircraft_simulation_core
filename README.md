@@ -33,9 +33,9 @@ If you need to do deeper, [read the docs](https://mitre.github.io/aircraft_simul
 
 ## Mathematical Model
 
-📓 This software is built using [this mathematical model](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf) which derives the kinematics, dynamics, and control for a point-mass aircraft operating in a wind field and moving along a WGS84 ellipsoid.
-The model is a system of equations that connects the state variables of true airspeed, flight path angle, and heading angle.
-Then coordinate frame transformations are used to derive 3-dimensional motion on a plane and an ellipsoid, providing propogation of altitide and position.s
+📓 This software is built using [this mathematical model](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf) which derives the kinematics, dynamics, and control for a point-mass aircraft operating in a wind field and moving across a surface.
+The mathematical model is a system of equations that connects the state variables of true airspeed, flight path angle, and heading angle.
+Then, coordinate frame transformations are used to derive 3-dimensional motion on a plane and an ellipsoid, providing propogation of altitide and position.
 
 🧮 If you need to do deeper into the maths, [read the paper](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf).
 
