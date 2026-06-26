@@ -26,20 +26,20 @@ If this code is used in a deployment or embedded within another project, it is r
 
 This codebase is _not_ an application; it is a library.
 We use it to enable a larger simulation framework (e.g., the [MOPS Aircraft and Control Model](https://github.com/mitre/FMACM)).
-The public-facing surface is large, providing interfaces (as C++ structs) and null implementations where reasonable.
-Some classes also fully-functional algorithms (e.g. [ThreeDOFDynamics]()) and are tested.
+The public-facing surface of this codebase is large, providing interfaces (as C++ structs) and null implementations where reasonable.
+Some classes are also fully-functional algorithms (e.g. [ThreeDOFDynamics]()) with [tests]().
 
-TODO fill out a separate area of markdown for how to use this code. Make sure those are part of pages.
-- Aircraft Performance needed...leave some implementation placeholder ideas/examples
-- 
+If you need to do deeper, [read the docs](https://mitre.github.io/aircraft_simulation_core/).
 
 ## Mathematical Model
 
 📓 This software is built using [this mathematical model](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf) which derives the kinematics, dynamics, and control for a point-mass aircraft operating in a wind field and moving along a WGS84 ellipsoid.
+The model is a system of equations that connects the state variables of true airspeed, flight path angle, and heading angle.
+Then coordinate frame transformations are used to derive 3-dimensional motion on a plane and an ellipsoid, providing propogation of altitide and position.s
 
-TODO Quickly define the key mathematical points.
+🧮 If you need to do deeper into the maths, [read the paper](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf).
 
-TODO basic mermaid block diagram
+👨‍💻 If you need the software implementation, [read the docs](./docs/README.md).
 
 ---
 
