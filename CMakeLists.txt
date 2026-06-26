@@ -20,14 +20,29 @@ option(SIMCORE_BUILD_TESTING "Build aircraft_simulation_core tests" ${SIMCORE_TO
 
 include(${PROJECT_SOURCE_DIR}/cmake/get_cpm.cmake)
 
-if(NOT TARGET mitre::fsloader)
+if(NOT TARGET mitre::cppuom)
    CPMAddPackage(
-      NAME fsloader
-      GIT_REPOSITORY https://github.com/mitre/fsloader.git
-      GIT_TAG 1.1.0
+      NAME cppuom
+      GIT_REPOSITORY https://github.com/mitre/cppuom.git
+      GIT_TAG 2.2
       OPTIONS
-         "FSLOADER_BUILD_EXAMPLE OFF"
+         "BUILD_EXAMPLE OFF"
+         "BUILD_TESTING OFF"
+   )
+endif()
+
+set(SIMCORE_USE_STATIC_LOG4CPLUS OFF)
+if(NOT TARGET log4cplus::log4cplus)
+   set(SIMCORE_USE_STATIC_LOG4CPLUS ON)
+   CPMAddPackage(
+      NAME log4cplus
+      GITHUB_REPOSITORY log4cplus/log4cplus
+      GIT_TAG REL_2_1_2
+      OPTIONS
          "BUILD_SHARED_LIBS FALSE"
+         "LOG4CPLUS_BUILD_TESTING FALSE"
+         "LOG4CPLUS_BUILD_LOGGINGSERVER FALSE"
+         "WITH_UNIT_TESTS FALSE"
    )
 endif()
 
@@ -158,13 +173,16 @@ target_include_directories(simcore
 )
 target_link_libraries(simcore
    PUBLIC
-      mitre::fsloader
+      mitre::cppuom
       geolib
       log4cplus::log4cplus
       minicsv::minicsv
       nlohmann_json::nlohmann_json
       "$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.1>>:-lstdc++fs>"
 )
+if(SIMCORE_USE_STATIC_LOG4CPLUS)
+   target_compile_definitions(simcore PUBLIC LOG4CPLUS_STATIC)
+endif()
 
 if(SIMCORE_BUILD_TESTING)
    enable_testing()

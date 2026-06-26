@@ -38,12 +38,6 @@
 #include "utility/BoundedValue.h"
 #include "utility/UtilityConstants.h"
 
-namespace aaesim {
-namespace loaders {
-class AircraftIntentLoader;
-}  // namespace loaders
-}  // namespace aaesim
-
 class AircraftIntent {
   public:
    enum WaypointPhaseOfFlight { ASCENT, CRUISE, DESCENT };
@@ -200,7 +194,6 @@ class AircraftIntent {
 
    void DeleteRouteDataContent();
    void AddWaypointsToRouteDataVectors(const std::vector<Waypoint> &waypoints, enum WaypointPhaseOfFlight add_as_phase);
-   friend class aaesim::loaders::AircraftIntentLoader;
    friend std::ostream &operator<<(std::ostream &out, const AircraftIntent &intent);
    int m_id{-1};
 };
