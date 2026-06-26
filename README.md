@@ -41,6 +41,28 @@ Then, coordinate frame transformations are used to derive 3-dimensional motion o
 
 👨‍💻 If you need the software implementation, [read the docs](./docs/README.md).
 
+## Build
+
+Configure and build the library with CMake:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+```
+
+Run the public test suite:
+
+```sh
+cmake --build build --target run_simcore_tests --parallel
+```
+
+If you only need the library target and want to skip test dependencies:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIMCORE_BUILD_TESTING=OFF
+cmake --build build --target simcore --parallel
+```
+
 ---
 
 Happy Simulating!

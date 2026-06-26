@@ -1,0 +1,3 @@
+#pragma once
+
+#define AAESIM_VERSION_STR "@SIMCORE_VERSION@"
