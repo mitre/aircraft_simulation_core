@@ -78,7 +78,6 @@ set(SIMCORE_SOURCE_FILES
    src/AircraftCalculations.cpp
    src/AircraftControl.cpp
    src/AircraftIntent.cpp
-   src/AircraftIntentLoader.cpp
    src/AircraftSpeed.cpp
    src/AircraftState.cpp
    src/AlongPathDistanceCalculator.cpp
@@ -135,7 +134,6 @@ set(SIMCORE_SOURCE_FILES
    src/VerticalPath.cpp
    src/VerticalPredictor.cpp
    src/Waypoint.cpp
-   src/WaypointLoader.cpp
    src/WeatherEstimate.cpp
    src/WeatherPrediction.cpp
    src/WeatherTruth.cpp
