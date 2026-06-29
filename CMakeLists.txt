@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 
 project(aircraft_simulation_core VERSION 1.0.0.0 LANGUAGES CXX)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -20,6 +23,7 @@ option(SIMCORE_BUILD_TESTING "Build aircraft_simulation_core tests" ${SIMCORE_TO
 
 include(${PROJECT_SOURCE_DIR}/cmake/get_cpm.cmake)
 
+set(SIMCORE_INSTALL_CPPUOM_COMPAT OFF)
 if(NOT TARGET mitre::cppuom)
    CPMAddPackage(
       NAME cppuom
@@ -29,6 +33,7 @@ if(NOT TARGET mitre::cppuom)
          "BUILD_EXAMPLE OFF"
          "BUILD_TESTING OFF"
    )
+   set(SIMCORE_INSTALL_CPPUOM_COMPAT ON)
 endif()
 
 set(SIMCORE_USE_STATIC_LOG4CPLUS OFF)
@@ -46,34 +51,50 @@ if(NOT TARGET log4cplus::log4cplus)
    )
 endif()
 
+set(SIMCORE_INSTALL_GEOLIB_COMPAT OFF)
 if(NOT TARGET geolib)
    CPMAddPackage(
       NAME geolib_idealab
       GIT_REPOSITORY https://github.com/mitre/geodetic_library.git
       GIT_TAG v3.2.9
    )
+   set(SIMCORE_INSTALL_GEOLIB_COMPAT ON)
+endif()
+if(TARGET testGeolib)
+   set_target_properties(testGeolib PROPERTIES EXCLUDE_FROM_ALL ON)
+endif()
+if(TARGET geolib)
+   set_target_properties(geolib PROPERTIES
+      ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+      RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin
+   )
 endif()
 
+set(SIMCORE_INSTALL_NLOHMANN_JSON_COMPAT OFF)
 if(NOT TARGET nlohmann_json::nlohmann_json)
    CPMAddPackage(
       NAME nlohmann_json
       GITHUB_REPOSITORY nlohmann/json
       VERSION 3.11.3
    )
+   set(SIMCORE_INSTALL_NLOHMANN_JSON_COMPAT ON)
 endif()
 
-CPMAddPackage(
-   NAME minicsv
-   GIT_REPOSITORY https://github.com/shaovoon/minicsv.git
-   GIT_TAG v1.8.7
-   DOWNLOAD_ONLY TRUE
-)
+set(SIMCORE_INSTALL_MINICSV_COMPAT OFF)
 if(NOT TARGET minicsv::minicsv)
+   CPMAddPackage(
+      NAME minicsv
+      GIT_REPOSITORY https://github.com/shaovoon/minicsv.git
+      GIT_TAG v1.8.7
+      DOWNLOAD_ONLY TRUE
+   )
    add_library(simcore_minicsv INTERFACE)
    add_library(minicsv::minicsv ALIAS simcore_minicsv)
    target_include_directories(simcore_minicsv INTERFACE
       $<BUILD_INTERFACE:${minicsv_SOURCE_DIR}>
    )
+   set(SIMCORE_INSTALL_MINICSV_COMPAT ON)
 endif()
 
 if(PROJECT_VERSION_TWEAK)
@@ -162,22 +183,30 @@ set(SIMCORE_SOURCE_FILES
 add_library(simcore STATIC ${SIMCORE_SOURCE_FILES})
 add_library(mitre::oss::simcore ALIAS simcore)
 
-set_target_properties(simcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(simcore PROPERTIES
+   EXPORT_NAME simcore
+   POSITION_INDEPENDENT_CODE ON
+)
 target_compile_features(simcore PUBLIC cxx_std_20)
 target_include_directories(simcore
    PUBLIC
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
       $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-      $<BUILD_INTERFACE:${geolib_idealab_SOURCE_DIR}/include>
+      "$<BUILD_INTERFACE:$<TARGET_PROPERTY:mitre::cppuom,INTERFACE_INCLUDE_DIRECTORIES>>"
+      "$<BUILD_INTERFACE:$<TARGET_PROPERTY:minicsv::minicsv,INTERFACE_INCLUDE_DIRECTORIES>>"
+      "$<BUILD_INTERFACE:$<TARGET_PROPERTY:nlohmann_json::nlohmann_json,INTERFACE_INCLUDE_DIRECTORIES>>"
       $<INSTALL_INTERFACE:include>
 )
+if(DEFINED geolib_idealab_SOURCE_DIR)
+   target_include_directories(simcore
+      PUBLIC
+         $<BUILD_INTERFACE:${geolib_idealab_SOURCE_DIR}/include>
+   )
+endif()
 target_link_libraries(simcore
    PUBLIC
-      mitre::cppuom
-      geolib
       log4cplus::log4cplus
-      minicsv::minicsv
-      nlohmann_json::nlohmann_json
+      $<BUILD_INTERFACE:$<TARGET_FILE:geolib>>
       "$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.1>>:-lstdc++fs>"
 )
 if(SIMCORE_USE_STATIC_LOG4CPLUS)
@@ -188,3 +217,83 @@ if(SIMCORE_BUILD_TESTING)
    enable_testing()
    add_subdirectory(tests)
 endif()
+
+install(
+   TARGETS simcore
+   EXPORT aircraft_simulation_core-targets
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(
+   DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   REGEX "/public/minicsv\\.h$" EXCLUDE
+)
+
+install(
+   DIRECTORY ${PROJECT_BINARY_DIR}/include/
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+if(SIMCORE_INSTALL_CPPUOM_COMPAT)
+   install(
+      DIRECTORY ${cppuom_SOURCE_DIR}/include/
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   )
+endif()
+
+if(SIMCORE_INSTALL_GEOLIB_COMPAT)
+   install(
+      TARGETS geolib
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   )
+   install(
+      DIRECTORY ${geolib_idealab_SOURCE_DIR}/include/geolib
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   )
+endif()
+
+if(SIMCORE_INSTALL_MINICSV_COMPAT)
+   install(
+      DIRECTORY ${minicsv_SOURCE_DIR}/MiniCSV/
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/MiniCSV
+      FILES_MATCHING PATTERN "*.h"
+   )
+endif()
+
+if(SIMCORE_INSTALL_NLOHMANN_JSON_COMPAT)
+   install(
+      DIRECTORY ${nlohmann_json_SOURCE_DIR}/include/
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+   )
+endif()
+
+install(
+   EXPORT aircraft_simulation_core-targets
+   FILE aircraft_simulation_core-targets.cmake
+   NAMESPACE mitre::oss::
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aircraft_simulation_core
+)
+
+configure_package_config_file(
+   ${PROJECT_SOURCE_DIR}/cmake/aircraft_simulation_core-config.cmake.in
+   ${PROJECT_BINARY_DIR}/aircraft_simulation_core-config.cmake
+   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aircraft_simulation_core
+)
+
+write_basic_package_version_file(
+   ${PROJECT_BINARY_DIR}/aircraft_simulation_core-config-version.cmake
+   VERSION ${PROJECT_VERSION}
+   COMPATIBILITY SameMajorVersion
+)
+
+install(
+   FILES
+      ${PROJECT_BINARY_DIR}/aircraft_simulation_core-config.cmake
+      ${PROJECT_BINARY_DIR}/aircraft_simulation_core-config-version.cmake
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/aircraft_simulation_core
+)
