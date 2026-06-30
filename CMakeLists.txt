@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.26)
 
 project(aircraft_simulation_core VERSION 1.0.0.0 LANGUAGES CXX)
 
@@ -206,7 +206,8 @@ endif()
 target_link_libraries(simcore
    PUBLIC
       log4cplus::log4cplus
-      $<BUILD_INTERFACE:$<TARGET_FILE:geolib>>
+      $<BUILD_LOCAL_INTERFACE:geolib>
+      $<INSTALL_INTERFACE:$<TARGET_NAME_IF_EXISTS:geolib>>
       "$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.1>>:-lstdc++fs>"
 )
 if(SIMCORE_USE_STATIC_LOG4CPLUS)

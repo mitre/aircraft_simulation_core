@@ -60,7 +60,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/aircraft_simulation_core-targets.cmake")
 set_property(TARGET mitre::oss::simcore APPEND PROPERTY
    INTERFACE_LINK_LIBRARIES
       mitre::cppuom
-      geolib
       minicsv::minicsv
       nlohmann_json::nlohmann_json
 )
