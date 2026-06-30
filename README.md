@@ -20,26 +20,48 @@ If this code is used in a deployment or embedded within another project, it is r
 
 ## Licensing
 
-[Apache 2.0](https://github.com/mitre/FMACM/blob/master/LICENSE)
+[Apache 2.0](./LICENSE)
 
 ## Documentation
 
 This codebase is _not_ an application; it is a library.
 We use it to enable a larger simulation framework (e.g., the [MOPS Aircraft and Control Model](https://github.com/mitre/FMACM)).
 The public-facing surface of this codebase is large, providing interfaces (as C++ structs) and null implementations where reasonable.
-Some classes are also fully-functional algorithms (e.g. [ThreeDOFDynamics]()) with [tests]().
+Some classes are also fully-functional algorithms (e.g. [ThreeDOFDynamics](./include/public/ThreeDOFDynamics.h)) with [tests](./tests/src/Public/threedof_glider_tests.cpp).
 
-If you need to do deeper, [read the docs](https://mitre.github.io/aircraft_simulation_core/).
+If you need to go deeper, [read the docs](https://mitre.github.io/aircraft_simulation_core/).
 
 ## Mathematical Model
 
 📓 This software is built using [this mathematical model](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf) which derives the kinematics, dynamics, and control for a point-mass aircraft operating in a wind field and moving across a surface.
 The mathematical model is a system of equations that connects the state variables of true airspeed, flight path angle, and heading angle.
-Then, coordinate frame transformations are used to derive 3-dimensional motion on a plane and an ellipsoid, providing propogation of altitide and position.
+Then, coordinate frame transformations are used to derive 3-dimensional motion on a plane and an ellipsoid, providing propagation of altitude and position.
 
-🧮 If you need to do deeper into the maths, [read the paper](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf).
+🧮 If you need to go deeper into the maths, [read the paper](./documentation/MTR260018_PRS_Derivation%20of%20Point%20Mass%20Model%20for%20ATM%20Research.pdf).
 
 👨‍💻 If you need the software implementation, [read the docs](./docs/README.md).
+
+## Build
+
+Configure and build the public test executable with CMake:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target simcore_public_tests --parallel
+```
+
+Run the public test suite with CTest:
+
+```sh
+ctest --test-dir build --output-on-failure --parallel 2
+```
+
+If you only need the library target and want to skip test dependencies:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIMCORE_BUILD_TESTING=OFF
+cmake --build build --target simcore --parallel
+```
 
 ---
 

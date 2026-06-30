@@ -1,0 +1,76 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(log4cplus REQUIRED)
+
+set(_aircraft_simulation_core_include_dir "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
+
+if(NOT TARGET nlohmann_json::nlohmann_json)
+   find_package(nlohmann_json CONFIG QUIET)
+   if(NOT TARGET nlohmann_json::nlohmann_json)
+      if(@SIMCORE_INSTALL_NLOHMANN_JSON_COMPAT@)
+         add_library(nlohmann_json::nlohmann_json INTERFACE IMPORTED)
+         set_target_properties(nlohmann_json::nlohmann_json PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
+         )
+      else()
+         find_package(nlohmann_json CONFIG REQUIRED)
+      endif()
+   endif()
+endif()
+
+if(NOT TARGET mitre::cppuom)
+   find_package(cppuom CONFIG QUIET)
+endif()
+
+if(NOT TARGET mitre::cppuom AND EXISTS "${_aircraft_simulation_core_include_dir}/scalar/Length.h")
+   add_library(mitre::cppuom INTERFACE IMPORTED)
+   set_target_properties(mitre::cppuom PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
+   )
+endif()
+
+if(NOT TARGET mitre::cppuom)
+   message(FATAL_ERROR
+      "aircraft_simulation_core requires target mitre::cppuom or cppuom headers "
+      "installed under ${_aircraft_simulation_core_include_dir}"
+   )
+endif()
+
+if(NOT TARGET geolib)
+   if(@SIMCORE_INSTALL_GEOLIB_COMPAT@)
+      add_library(geolib STATIC IMPORTED)
+      set_target_properties(geolib PROPERTIES
+         IMPORTED_LOCATION "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@CMAKE_STATIC_LIBRARY_PREFIX@geolib@CMAKE_STATIC_LIBRARY_SUFFIX@"
+         INTERFACE_COMPILE_DEFINITIONS "_LINUX_;unix"
+         INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
+      )
+   else()
+      find_package(geolib CONFIG REQUIRED)
+   endif()
+endif()
+
+if(NOT TARGET minicsv::minicsv)
+   if(@SIMCORE_INSTALL_MINICSV_COMPAT@)
+      add_library(minicsv::minicsv INTERFACE IMPORTED)
+      set_target_properties(minicsv::minicsv PROPERTIES
+         INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
+      )
+   else()
+      find_package(minicsv CONFIG REQUIRED)
+   endif()
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/aircraft_simulation_core-targets.cmake")
+
+set_property(TARGET mitre::oss::simcore APPEND PROPERTY
+   INTERFACE_LINK_LIBRARIES
+      mitre::cppuom
+      minicsv::minicsv
+      nlohmann_json::nlohmann_json
+)
+
+unset(_aircraft_simulation_core_include_dir)
+
+check_required_components(aircraft_simulation_core)
