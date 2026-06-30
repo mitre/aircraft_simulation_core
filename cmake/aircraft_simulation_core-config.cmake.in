@@ -21,14 +21,21 @@ if(NOT TARGET nlohmann_json::nlohmann_json)
 endif()
 
 if(NOT TARGET mitre::cppuom)
-   if(@SIMCORE_INSTALL_CPPUOM_COMPAT@)
-      add_library(mitre::cppuom INTERFACE IMPORTED)
-      set_target_properties(mitre::cppuom PROPERTIES
-         INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
-      )
-   else()
-      find_package(cppuom CONFIG REQUIRED)
-   endif()
+   find_package(cppuom CONFIG QUIET)
+endif()
+
+if(NOT TARGET mitre::cppuom AND EXISTS "${_aircraft_simulation_core_include_dir}/scalar/Length.h")
+   add_library(mitre::cppuom INTERFACE IMPORTED)
+   set_target_properties(mitre::cppuom PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${_aircraft_simulation_core_include_dir}"
+   )
+endif()
+
+if(NOT TARGET mitre::cppuom)
+   message(FATAL_ERROR
+      "aircraft_simulation_core requires target mitre::cppuom or cppuom headers "
+      "installed under ${_aircraft_simulation_core_include_dir}"
+   )
 endif()
 
 if(NOT TARGET geolib)
