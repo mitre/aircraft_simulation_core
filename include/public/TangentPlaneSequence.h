@@ -99,7 +99,7 @@ class TangentPlaneSequence {
    void Copy(const TangentPlaneSequence &in);
 
   protected:
-   virtual void Initialize(const std::list<Waypoint> &waypoint_list);
+   void InitializeFromWaypoints(const std::list<Waypoint> &waypoint_list);
 
    std::vector<Waypoint> waypoints_from_initialization_;
    std::vector<std::shared_ptr<LocalTangentPlane> > tangent_planes_from_initialization_;

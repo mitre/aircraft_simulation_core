@@ -29,14 +29,10 @@ std::list<Waypoint> SingleTangentPlaneSequence::m_master_waypoint_sequence = {};
 log4cplus::Logger SingleTangentPlaneSequence::m_logger = log4cplus::Logger::getInstance("SingleTangentPlaneSequence");
 
 SingleTangentPlaneSequence::SingleTangentPlaneSequence(const list<Waypoint> &waypoint_list) {
-   Initialize(waypoint_list);
-}
-
-void SingleTangentPlaneSequence::Initialize(const std::list<Waypoint> &waypoint_list) {
    if (m_master_waypoint_sequence.empty()) {
       m_master_waypoint_sequence = waypoint_list;
    }
-   TangentPlaneSequence::Initialize(m_master_waypoint_sequence);
+   InitializeFromWaypoints(m_master_waypoint_sequence);
 }
 
 void SingleTangentPlaneSequence::ClearStaticMembers() { m_master_waypoint_sequence.clear(); }
