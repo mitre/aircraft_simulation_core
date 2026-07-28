@@ -137,9 +137,14 @@ cppcheck_args=(
 )
 
 # CPM uses build/_deps when no source cache is configured (as in CI).  This
-# complements the file filter because cppcheck can also report diagnostics from
-# third-party headers included by an in-scope translation unit.
-cppcheck_args+=("--suppress=*:${build_dir_abs}/_deps/*")
+# complements the filtered compilation database because cppcheck can report
+# diagnostics from third-party headers included by an in-scope translation
+# unit. Cppcheck 2.13 records these header paths relative to the checkout,
+# while newer versions use absolute paths, so suppress both forms.
+cppcheck_args+=(
+   "--suppress=*:${build_dir}/_deps/*"
+   "--suppress=*:${build_dir_abs}/_deps/*"
+)
 
 cpm_source_cache="${CPM_SOURCE_CACHE:-${HOME}/.cpm}"
 if [[ -n "$cpm_source_cache" ]]; then
