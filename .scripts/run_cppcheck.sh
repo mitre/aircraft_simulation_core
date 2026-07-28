@@ -93,11 +93,18 @@ fi
 
 cmake "${cmake_args[@]}"
 
+# A CMake compilation database contains targets brought in by CPM as well as
+# this project.  Restrict cppcheck to translation units in this checkout, and
+# suppress diagnostics emitted from dependency headers included by those units.
+source_dir="$(pwd -P)"
+build_dir_abs="$(cd "$build_dir" && pwd -P)"
+
 cppcheck_args=(
    cppcheck
    "-j${jobs}"
    --report-progress
    "--project=${build_dir}/compile_commands.json"
+   "--file-filter=${source_dir}/*"
    "--cppcheck-build-dir=${build_dir}"
    "--check-level=${check_level}"
    "--enable=${enabled_checks}"
@@ -120,6 +127,11 @@ cppcheck_args=(
    -i include/loader
    -I include
 )
+
+# CPM uses build/_deps when no source cache is configured (as in CI).  This
+# complements the file filter because cppcheck can also report diagnostics from
+# third-party headers included by an in-scope translation unit.
+cppcheck_args+=("--suppress=*:${build_dir_abs}/_deps/*")
 
 cpm_source_cache="${CPM_SOURCE_CACHE:-${HOME}/.cpm}"
 if [[ -n "$cpm_source_cache" ]]; then
