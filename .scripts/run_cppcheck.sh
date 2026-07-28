@@ -79,6 +79,7 @@ esac
 
 command -v cmake >/dev/null 2>&1 || { echo "cmake not installed." >&2; exit 1; }
 command -v cppcheck >/dev/null 2>&1 || { echo "cppcheck not installed." >&2; exit 1; }
+command -v python3 >/dev/null 2>&1 || { echo "python3 not installed." >&2; exit 1; }
 command -v uv >/dev/null 2>&1 || { echo "uv not installed." >&2; exit 1; }
 
 if [[ "$check_level" == "reduced" && "$(cppcheck --help)" != *"reduced:"* ]]; then
@@ -98,13 +99,20 @@ cmake "${cmake_args[@]}"
 # suppress diagnostics emitted from dependency headers included by those units.
 source_dir="$(pwd -P)"
 build_dir_abs="$(cd "$build_dir" && pwd -P)"
+compile_commands_file="${build_dir}/compile_commands.json"
+cppcheck_compile_commands_file="${build_dir}/cppcheck_compile_commands.json"
+
+python3 .scripts/filter_compile_commands.py \
+   --input "$compile_commands_file" \
+   --output "$cppcheck_compile_commands_file" \
+   --source-dir "$source_dir" \
+   --exclude-dir "$build_dir_abs"
 
 cppcheck_args=(
    cppcheck
    "-j${jobs}"
    --report-progress
-   "--project=${build_dir}/compile_commands.json"
-   "--file-filter=${source_dir}/*"
+   "--project=${cppcheck_compile_commands_file}"
    "--cppcheck-build-dir=${build_dir}"
    "--check-level=${check_level}"
    "--enable=${enabled_checks}"
