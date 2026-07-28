@@ -77,3 +77,4 @@ Testing/
 .cache/
 cppcheck-output/
 cppcheck.xml
+cppcheck-report.html
