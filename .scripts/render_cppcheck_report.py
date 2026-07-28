@@ -87,9 +87,13 @@ def render_finding(finding: ET.Element, repository: str, revision: str) -> str:
 
 def main() -> None:
     args = parse_args()
-    root = ET.parse(args.input).getroot()
-    findings = root.findall("./errors/error")
-    cppcheck = root.find("cppcheck")
+    # cppcheck writes XML to stderr.  When it reports no diagnostics, the
+    # redirected output file exists but is empty, so there is no XML document
+    # for ElementTree to parse.  Treat that as an empty report.
+    xml_content = args.input.read_text(encoding="utf-8")
+    root = ET.fromstring(xml_content) if xml_content.strip() else None
+    findings = root.findall("./errors/error") if root is not None else []
+    cppcheck = root.find("cppcheck") if root is not None else None
     cppcheck_version = cppcheck.get("version", "unknown") if cppcheck is not None else "unknown"
     counts = Counter(finding.get("severity", "unknown") for finding in findings)
 
