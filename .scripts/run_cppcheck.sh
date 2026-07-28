@@ -81,6 +81,11 @@ command -v cmake >/dev/null 2>&1 || { echo "cmake not installed." >&2; exit 1; }
 command -v cppcheck >/dev/null 2>&1 || { echo "cppcheck not installed." >&2; exit 1; }
 command -v uv >/dev/null 2>&1 || { echo "uv not installed." >&2; exit 1; }
 
+if [[ "$check_level" == "reduced" && "$(cppcheck --help)" != *"reduced:"* ]]; then
+   echo "Cppcheck does not support the reduced check level; using normal." >&2
+   check_level="normal"
+fi
+
 cmake_args=(-S . -B "$build_dir" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 if [[ -n "$generator" ]]; then
    cmake_args=(-G "$generator" "${cmake_args[@]}")
