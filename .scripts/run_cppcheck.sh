@@ -94,10 +94,11 @@ fi
 
 cmake "${cmake_args[@]}"
 
-# A CMake compilation database contains targets brought in by CPM as well as
-# this project.  Restrict cppcheck to translation units in this checkout, and
-# suppress diagnostics emitted from dependency headers included by those units.
+# A CMake compilation database also contains CPM dependencies and test targets.
+# Cppcheck audits production sources; the build-and-test job compiles and runs
+# the test suite separately.
 source_dir="$(pwd -P)"
+production_source_dir="${source_dir}/src"
 build_dir_abs="$(cd "$build_dir" && pwd -P)"
 compile_commands_file="${build_dir}/compile_commands.json"
 cppcheck_compile_commands_file="${build_dir}/cppcheck_compile_commands.json"
@@ -105,7 +106,7 @@ cppcheck_compile_commands_file="${build_dir}/cppcheck_compile_commands.json"
 python3 .scripts/filter_compile_commands.py \
    --input "$compile_commands_file" \
    --output "$cppcheck_compile_commands_file" \
-   --source-dir "$source_dir" \
+   --source-dir "$production_source_dir" \
    --exclude-dir "$build_dir_abs"
 
 cppcheck_args=(
