@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-#include "public/AircraftIntent.h"
+#include "public/DefaultAircraftIntent.h"
 #include "public/SingleTangentPlaneSequence.h"
 #include "public/TangentPlaneSequence.h"
 #include "public/Waypoint.h"
@@ -81,7 +81,7 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    Waypoint wp2{"wp2", Units::DegreesAngle(37.6), Units::DegreesAngle(-71.0)};
    Waypoint end_waypoint{"end", Units::DegreesAngle(40.0), Units::DegreesAngle(-70.0)};
    auto waypoints = std::list<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
-   AircraftIntent aircraft_intent;
+   DefaultAircraftIntent aircraft_intent = DefaultAircraftIntent();
    aircraft_intent.LoadWaypointsFromList(waypoints, std::list<Waypoint>(), std::list<Waypoint>());
    auto wplist = aircraft_intent.GetWaypointList();
    auto tangent_plane_sequence = std::make_shared<TangentPlaneSequence>(wplist);

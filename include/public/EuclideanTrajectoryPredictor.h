@@ -45,7 +45,7 @@ class EuclideanTrajectoryPredictor {
 
    virtual ~EuclideanTrajectoryPredictor() = default;
 
-   virtual void CalculateWaypoints(const AircraftIntent &aircraft_intent,
+   virtual void CalculateWaypoints(std::shared_ptr<const AircraftIntent> &aircraft_intent,
                                    const aaesim::open_source::WeatherPrediction &weather_prediction);
 
    const std::vector<HorizontalPath> EstimateHorizontalTrajectory(
@@ -62,7 +62,7 @@ class EuclideanTrajectoryPredictor {
    aaesim::open_source::Guidance Update(const aaesim::open_source::AircraftState &state,
                                         const aaesim::open_source::Guidance &current_guidance);
 
-   const AircraftIntent &GetAircraftIntent() const;
+   const std::shared_ptr<const AircraftIntent> &GetAircraftIntent() const;
 
    const std::vector<HorizontalPath> &GetHorizontalPath() const;
 
@@ -105,7 +105,7 @@ class EuclideanTrajectoryPredictor {
    Units::Angle m_bank_angle{Units::DUMMY_DEGREES_ANGLE};
    Units::Length m_altitude_at_final_waypoint{Units::FeetLength(-50.0)};
    Units::Length m_aircraft_distance_to_go{Units::infinity()};
-   AircraftIntent m_aircraft_intent{};
+   std::shared_ptr<const AircraftIntent> m_aircraft_intent{};
    AlongPathDistanceCalculator m_distance_calculator{};
    PositionCalculator m_position_calculator{};
    std::shared_ptr<Atmosphere> m_atmosphere{};

@@ -113,7 +113,6 @@ set(SIMCORE_SOURCE_FILES
    src/ADSBSVReport.cpp
    src/AircraftCalculations.cpp
    src/AircraftControl.cpp
-   src/AircraftIntent.cpp
    src/AircraftSpeed.cpp
    src/AircraftState.cpp
    src/AlongPathDistanceCalculator.cpp
@@ -129,6 +128,7 @@ set(SIMCORE_SOURCE_FILES
    src/DMatrix.cpp
    src/DVector.cpp
    src/DataReader.cpp
+   src/DefaultAircraftIntent.cpp
    src/DefaultLateralController.cpp
    src/DirectionOfFlightCourseCalculator.cpp
    src/EarthModel.cpp

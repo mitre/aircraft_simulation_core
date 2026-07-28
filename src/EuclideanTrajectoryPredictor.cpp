@@ -104,12 +104,12 @@ EuclideanTrajectoryPredictor::EuclideanTrajectoryPredictor() {
 }
 
 void EuclideanTrajectoryPredictor::CalculateWaypoints(
-      const AircraftIntent &aircraft_intent, const aaesim::open_source::WeatherPrediction &weather_prediction) {
+      std::shared_ptr<const AircraftIntent> &aircraft_intent, const aaesim::open_source::WeatherPrediction &weather_prediction) {
    m_aircraft_intent = aircraft_intent;
 
    // Set altitude at FAF to final altitude in feet.
    m_altitude_at_final_waypoint = Units::FeetLength(Units::MetersLength(
-         aircraft_intent.GetRouteData().m_nominal_altitude[(aircraft_intent.GetNumberOfWaypoints() - 1)]));
+         aircraft_intent->GetRouteData().m_nominal_altitude[(aircraft_intent->GetNumberOfWaypoints() - 1)]));
 
    // set waypoints
    m_waypoint_vector.clear();  // empties the waypoint vector for Aircraft Intent Waypoints
@@ -139,75 +139,75 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
    PrecalcWaypoint new_waypoint;
    // loop to translate all of the intent waypoints into Precalc Waypoints, works from
    // back to front since precalc starts from the endpoint
-   for (int loop = aircraft_intent.GetNumberOfWaypoints() - 1; loop > 0; loop--) {
+   for (int loop = aircraft_intent->GetNumberOfWaypoints() - 1; loop > 0; loop--) {
       delta_x =
-            Units::MetersLength(aircraft_intent.GetRouteData().m_x[loop - 1] - aircraft_intent.GetRouteData().m_x[loop])
+            Units::MetersLength(aircraft_intent->GetRouteData().m_x[loop - 1] - aircraft_intent->GetRouteData().m_x[loop])
                   .value();  // from - to, to get m_path_course correct
-      delta_y = aircraft_intent.GetRouteData().m_y[loop - 1].value() - aircraft_intent.GetRouteData().m_y[loop].value();
+      delta_y = aircraft_intent->GetRouteData().m_y[loop - 1].value() - aircraft_intent->GetRouteData().m_y[loop].value();
 
       // Note: radius is entered to the nearest 10th of a mile = 185.2 meters
-      if (aircraft_intent.GetRouteData().m_rf_radius[loop].value() > 0.00001) {  // This is an RF leg
+      if (aircraft_intent->GetRouteData().m_rf_radius[loop].value() > 0.00001) {  // This is an RF leg
          bool radiusTooLarge = false;
          // find distance from this point to center of turn
-         delta_Bx = aircraft_intent.GetRouteData().m_x[loop - 1].value() -
-                    aircraft_intent.GetRouteData().m_x_rf_center[loop].value();
-         delta_By = aircraft_intent.GetRouteData().m_y[loop - 1].value() -
-                    aircraft_intent.GetRouteData().m_y_rf_center[loop].value();
+         delta_Bx = aircraft_intent->GetRouteData().m_x[loop - 1].value() -
+                    aircraft_intent->GetRouteData().m_x_rf_center[loop].value();
+         delta_By = aircraft_intent->GetRouteData().m_y[loop - 1].value() -
+                    aircraft_intent->GetRouteData().m_y_rf_center[loop].value();
          // TODO compare square so we do not have to take square root
          double radBloop = sqrt(pow(delta_Bx, 2) + pow(delta_By, 2));
          // radius is input to nearest 10th of a mile.
-         if (fabs(radBloop - aircraft_intent.GetRouteData().m_rf_radius[loop].value()) > 100.0) {  // difference of 100
+         if (fabs(radBloop - aircraft_intent->GetRouteData().m_rf_radius[loop].value()) > 100.0) {  // difference of 100
                                                                                                    // meters
             radiusTooLarge = true;
          }
-         delta_Ex = aircraft_intent.GetRouteData().m_x[loop].value() -
-                    aircraft_intent.GetRouteData().m_x_rf_center[loop].value();
-         delta_Ey = aircraft_intent.GetRouteData().m_y[loop].value() -
-                    aircraft_intent.GetRouteData().m_y_rf_center[loop].value();
+         delta_Ex = aircraft_intent->GetRouteData().m_x[loop].value() -
+                    aircraft_intent->GetRouteData().m_x_rf_center[loop].value();
+         delta_Ey = aircraft_intent->GetRouteData().m_y[loop].value() -
+                    aircraft_intent->GetRouteData().m_y_rf_center[loop].value();
          // TODO compare square so we do not have to take square root
          double radEloop = sqrt(pow(delta_Ex, 2) + pow(delta_Ey, 2));
-         if (fabs(radEloop - aircraft_intent.GetRouteData().m_rf_radius[loop].value()) > 100.0) {  // difference of 100
+         if (fabs(radEloop - aircraft_intent->GetRouteData().m_rf_radius[loop].value()) > 100.0) {  // difference of 100
                                                                                                    // meters
             radiusTooLarge = true;
          }
          if (radiusTooLarge) {
             double miss_dist = FindCenterPoint(
-                  Units::MetersLength(aircraft_intent.GetRouteData().m_x[loop - 1]).value(),
-                  aircraft_intent.GetRouteData().m_y[loop - 1].value(),
-                  aircraft_intent.GetRouteData().m_x[loop].value(), aircraft_intent.GetRouteData().m_y[loop].value(),
-                  aircraft_intent.GetRouteData().m_x_rf_center[loop].value(),
-                  aircraft_intent.GetRouteData().m_y_rf_center[loop].value(),
-                  aircraft_intent.GetRouteData().m_rf_radius[loop].value(), turnPtX, turnPtY);
+                  Units::MetersLength(aircraft_intent->GetRouteData().m_x[loop - 1]).value(),
+                  aircraft_intent->GetRouteData().m_y[loop - 1].value(),
+                  aircraft_intent->GetRouteData().m_x[loop].value(), aircraft_intent->GetRouteData().m_y[loop].value(),
+                  aircraft_intent->GetRouteData().m_x_rf_center[loop].value(),
+                  aircraft_intent->GetRouteData().m_y_rf_center[loop].value(),
+                  aircraft_intent->GetRouteData().m_rf_radius[loop].value(), turnPtX, turnPtY);
 
-            LOG4CPLUS_INFO(m_logger, "Calculated turn center point at " << aircraft_intent.GetWaypointName(loop)
+            LOG4CPLUS_INFO(m_logger, "Calculated turn center point at " << aircraft_intent->GetWaypointName(loop)
                                                                         << " is " << miss_dist
                                                                         << " meters different than input.");
 
             new_waypoint.m_rf_leg_center_x = Units::MetersLength(turnPtX);
             new_waypoint.m_rf_leg_center_y = Units::MetersLength(turnPtY);
          } else {
-            new_waypoint.m_rf_leg_center_x = aircraft_intent.GetRouteData().m_x_rf_center[loop];
-            new_waypoint.m_rf_leg_center_y = aircraft_intent.GetRouteData().m_y_rf_center[loop];
+            new_waypoint.m_rf_leg_center_x = aircraft_intent->GetRouteData().m_x_rf_center[loop];
+            new_waypoint.m_rf_leg_center_y = aircraft_intent->GetRouteData().m_y_rf_center[loop];
          }
 
          ccw = CounterClockwise(delta_Bx, delta_By, delta_Ex, delta_Ey);
 
          if (fabs(ccw) < 1.0e-10) {  // Consider to be colinear
             printf("Colinear points loop: %d, x: %f, y:%f, prev_x:%f, prev_y:%f, cp_x:%f, cp_y:%f\n", loop,
-                   aircraft_intent.GetRouteData().m_x[loop].value(), aircraft_intent.GetRouteData().m_y[loop].value(),
-                   aircraft_intent.GetRouteData().m_x[loop - 1].value(),
-                   aircraft_intent.GetRouteData().m_y[loop - 1].value(),
-                   aircraft_intent.GetRouteData().m_x_rf_center[loop].value(),
-                   aircraft_intent.GetRouteData().m_y_rf_center[loop].value());
+                   aircraft_intent->GetRouteData().m_x[loop].value(), aircraft_intent->GetRouteData().m_y[loop].value(),
+                   aircraft_intent->GetRouteData().m_x[loop - 1].value(),
+                   aircraft_intent->GetRouteData().m_y[loop - 1].value(),
+                   aircraft_intent->GetRouteData().m_x_rf_center[loop].value(),
+                   aircraft_intent->GetRouteData().m_y_rf_center[loop].value());
             LOG4CPLUS_ERROR(m_logger, "RF Leg Center of Turn is colinear with Waypoints");
          }
-         new_waypoint.m_name = aircraft_intent.GetRouteData().m_name[loop];
-         new_waypoint.m_x_pos_meters = aircraft_intent.GetRouteData().m_x[loop];
-         new_waypoint.m_y_pos_meters = aircraft_intent.GetRouteData().m_y[loop];
-         new_waypoint.m_radius_rf_leg = aircraft_intent.GetRouteData().m_rf_radius[loop];
+         new_waypoint.m_name = aircraft_intent->GetRouteData().m_name[loop];
+         new_waypoint.m_x_pos_meters = aircraft_intent->GetRouteData().m_x[loop];
+         new_waypoint.m_y_pos_meters = aircraft_intent->GetRouteData().m_y[loop];
+         new_waypoint.m_radius_rf_leg = aircraft_intent->GetRouteData().m_rf_radius[loop];
 
          double directDist = sqrt(pow(delta_x, 2) + pow(delta_y, 2));
-         double radius = aircraft_intent.GetRouteData().m_rf_radius[loop].value();
+         double radius = aircraft_intent->GetRouteData().m_rf_radius[loop].value();
          leg_length = 2 * asin(directDist / (2 * radius)) * radius;
 
          eTperp = Units::RadiansAngle(atan2(delta_Ey, delta_Ex));
@@ -224,12 +224,12 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
          // calculate Psi m_path_course
          course = Units::RadiansAngle(atan2(delta_y, delta_x));
 
-         new_waypoint.m_name = aircraft_intent.GetRouteData().m_name[loop];
-         new_waypoint.m_x_pos_meters = aircraft_intent.GetRouteData().m_x[loop];
-         new_waypoint.m_y_pos_meters = aircraft_intent.GetRouteData().m_y[loop];
-         new_waypoint.m_rf_leg_center_x = aircraft_intent.GetRouteData().m_x_rf_center[loop];
-         new_waypoint.m_rf_leg_center_y = aircraft_intent.GetRouteData().m_y_rf_center[loop];
-         new_waypoint.m_radius_rf_leg = aircraft_intent.GetRouteData().m_rf_radius[loop];
+         new_waypoint.m_name = aircraft_intent->GetRouteData().m_name[loop];
+         new_waypoint.m_x_pos_meters = aircraft_intent->GetRouteData().m_x[loop];
+         new_waypoint.m_y_pos_meters = aircraft_intent->GetRouteData().m_y[loop];
+         new_waypoint.m_rf_leg_center_x = aircraft_intent->GetRouteData().m_x_rf_center[loop];
+         new_waypoint.m_rf_leg_center_y = aircraft_intent->GetRouteData().m_y_rf_center[loop];
+         new_waypoint.m_radius_rf_leg = aircraft_intent->GetRouteData().m_rf_radius[loop];
       }
 
       prev_dist += leg_length;
@@ -237,27 +237,27 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
       new_waypoint.m_course_angle = course;
       new_waypoint.m_precalc_constraints.constraint_along_path_distance = Units::MetersLength(prev_dist);
       new_waypoint.m_precalc_constraints.constraint_altHi =
-            aircraft_intent.GetRouteData().m_high_altitude_constraint[loop - 1];
+            aircraft_intent->GetRouteData().m_high_altitude_constraint[loop - 1];
       new_waypoint.m_precalc_constraints.constraint_altLow =
-            aircraft_intent.GetRouteData().m_low_altitude_constraint[loop - 1];
+            aircraft_intent->GetRouteData().m_low_altitude_constraint[loop - 1];
       new_waypoint.m_precalc_constraints.constraint_speedHi =
-            aircraft_intent.GetRouteData().m_high_speed_constraint[loop - 1];
+            aircraft_intent->GetRouteData().m_high_speed_constraint[loop - 1];
       new_waypoint.m_precalc_constraints.constraint_speedLow =
-            aircraft_intent.GetRouteData().m_low_speed_constraint[loop - 1];
+            aircraft_intent->GetRouteData().m_low_speed_constraint[loop - 1];
 
       m_waypoint_vector.push_back(new_waypoint);
    }
 
    new_waypoint.m_leg_length = Units::zero();
-   new_waypoint.m_name = aircraft_intent.GetRouteData().m_name[0];
-   new_waypoint.m_x_pos_meters = aircraft_intent.GetRouteData().m_x[0];
-   new_waypoint.m_y_pos_meters = aircraft_intent.GetRouteData().m_y[0];
+   new_waypoint.m_name = aircraft_intent->GetRouteData().m_name[0];
+   new_waypoint.m_x_pos_meters = aircraft_intent->GetRouteData().m_x[0];
+   new_waypoint.m_y_pos_meters = aircraft_intent->GetRouteData().m_y[0];
    new_waypoint.m_precalc_constraints.constraint_along_path_distance = Units::MetersLength(prev_dist);
-   new_waypoint.m_precalc_constraints.constraint_altHi = aircraft_intent.GetRouteData().m_high_altitude_constraint[0];
-   new_waypoint.m_precalc_constraints.constraint_altLow = aircraft_intent.GetRouteData().m_low_altitude_constraint[0];
-   new_waypoint.m_precalc_constraints.constraint_speedHi = aircraft_intent.GetRouteData().m_high_speed_constraint[0];
-   new_waypoint.m_precalc_constraints.constraint_speedLow = aircraft_intent.GetRouteData().m_low_speed_constraint[0];
-   if (aircraft_intent.GetRouteData().m_rf_radius[0].value() < 0.000001) {  // straight leg
+   new_waypoint.m_precalc_constraints.constraint_altHi = aircraft_intent->GetRouteData().m_high_altitude_constraint[0];
+   new_waypoint.m_precalc_constraints.constraint_altLow = aircraft_intent->GetRouteData().m_low_altitude_constraint[0];
+   new_waypoint.m_precalc_constraints.constraint_speedHi = aircraft_intent->GetRouteData().m_high_speed_constraint[0];
+   new_waypoint.m_precalc_constraints.constraint_speedLow = aircraft_intent->GetRouteData().m_low_speed_constraint[0];
+   if (aircraft_intent->GetRouteData().m_rf_radius[0].value() < 0.000001) {  // straight leg
       new_waypoint.m_radius_rf_leg = Units::MetersLength(0);
       new_waypoint.m_course_angle = m_waypoint_vector.back().m_course_angle;
       new_waypoint.m_rf_leg_center_x = Units::MetersLength(0);
@@ -269,7 +269,7 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
                              m_waypoint_vector.back().m_x_pos_meters.value(),
                              m_waypoint_vector.back().m_y_pos_meters.value(), new_waypoint.m_rf_leg_center_x.value(),
                              new_waypoint.m_rf_leg_center_y.value());
-      new_waypoint.m_radius_rf_leg = aircraft_intent.GetRouteData().m_rf_radius[0];
+      new_waypoint.m_radius_rf_leg = aircraft_intent->GetRouteData().m_rf_radius[0];
 
       if (ccw < 0.0) {  // right turn
          new_waypoint.m_course_angle = bTperp + Units::DegreesAngle(90);
@@ -279,7 +279,7 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
    }
    m_waypoint_vector.push_back(new_waypoint);
 
-   Units::KnotsSpeed start_speed = aircraft_intent.GetRouteData().m_nominal_ias[0];
+   Units::KnotsSpeed start_speed = aircraft_intent->GetRouteData().m_nominal_ias[0];
    AdjustConstraints(start_speed);
 }
 
@@ -1102,7 +1102,7 @@ void EuclideanTrajectoryPredictor::AdjustConstraints(Units::Speed start_speed) {
    }
 }
 
-const AircraftIntent &EuclideanTrajectoryPredictor::GetAircraftIntent() const { return m_aircraft_intent; }
+const std::shared_ptr<const AircraftIntent> &EuclideanTrajectoryPredictor::GetAircraftIntent() const { return m_aircraft_intent; }
 
 const vector<HorizontalPath> &EuclideanTrajectoryPredictor::GetHorizontalPath() const { return m_horizontal_path; }
 

@@ -57,6 +57,8 @@ compile_commands.json
 *.log
 *.bak
 *.swp
+sbowman.md
+.DS_Store
 
 # vcpkg
 vcpkg_installed/

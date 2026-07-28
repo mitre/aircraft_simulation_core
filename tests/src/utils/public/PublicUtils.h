@@ -37,8 +37,6 @@ enum Quadrant { FIRST, SECOND, THIRD, FOURTH };
 class PublicUtils {
   public:
    static std::vector<aaesim::open_source::HorizontalPath> CreateStraightHorizontalPath(Quadrant quadrant);
-   static AircraftIntent LoadAircraftIntent(std::string parmsfile);
-   static AircraftIntent PrepareAircraftIntent(std::string parmsfile);
 };
 }  // namespace utils
 }  // namespace test
