@@ -65,7 +65,7 @@ class DMatrix {
 
    DMatrix &operator=(const DMatrix &in);
 
-   DMatrix &operator*(const DMatrix &that) const;
+   DMatrix operator*(const DMatrix &that) const;
 
    int GetMinRow() const;
 

@@ -671,11 +671,10 @@ TEST(DMatrix, multiply) {
    DMatrix b((double **)&b1, 0, 1, 0, 1);
    EXPECT_THROW(a * b, DMatrix::IncompatibleDimensionsException);
 
-   DMatrix &ba = b * a;
+   const DMatrix ba = b * a;
    EXPECT_EQ(ba[0][0], 39);
    EXPECT_EQ(ba.GetMaxRow(), 1);
    EXPECT_EQ(ba.GetMaxColumn(), 2);
-   delete &ba;
 }
 
 TEST(AircraftState, extrapolate) {

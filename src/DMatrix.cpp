@@ -207,7 +207,7 @@ DMatrix &DMatrix::operator=(const DMatrix &in) {
    return *this;
 }
 
-DMatrix &DMatrix::operator*(const DMatrix &that) const {
+DMatrix DMatrix::operator*(const DMatrix &that) const {
    int rowStart1 = GetMinRow();
    int rowEnd1 = GetMaxRow();
    int colStart1 = GetMinColumn();
@@ -220,17 +220,17 @@ DMatrix &DMatrix::operator*(const DMatrix &that) const {
       // cannot be multiplied because inner dimensions don't match
       throw IncompatibleDimensionsException(MULTIPLICATION_DIMENSIONS_MESSAGE);
    }
-   DMatrix *result = new DMatrix(rowStart1, rowEnd1, colStart2, colEnd2);
+   DMatrix result(rowStart1, rowEnd1, colStart2, colEnd2);
    for (int i = rowStart1; i <= rowEnd1; i++) {
       for (int j = colStart2; j <= colEnd2; j++) {
          double x = 0;
          for (int k = colStart1; k <= colEnd1; k++) {
             x += (*this)[i][k] * that[k][j];
          }
-         result->Set(i, j, x);
+            result.Set(i, j, x);
       }
    }
-   return *result;
+   return result;
 }
 
 void DMatrix::AscendSort() { std::sort(&m_rows[0], &m_rows[m_max_row - m_min_row + 1]); }
