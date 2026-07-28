@@ -1,0 +1,12 @@
+[project]
+name = "aircraft-simulation-core"
+version = "0.1.0"
+description = "Python tooling used to maintain the aircraft-simulation-core repo"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pygments>=2.20.0",
+]
+
+[tool.uv]
+package = false
