@@ -89,13 +89,11 @@ namespace aaesim::open_source
 
       virtual ~AircraftIntent() = default;
 
-      virtual void Initialize() = 0; // FIXME Stuart should not be public, should not exist
-
       virtual void LoadWaypointsFromList(const std::list<Waypoint> &ascent_waypoints,
                                          const std::list<Waypoint> &cruise_waypoints,
                                          const std::list<Waypoint> &descent_waypoints) = 0; // FIXME Stuart should not be public...remove list usage
 
-      virtual void UpdateXYZFromLatLonWgs84() = 0; // FIXME Stuart should not be public, refactor name
+      virtual void UpdateXYZFromLatLonWgs84() = 0; // FIXME Stuart should not be public, refactor name...only needed by FIM?
 
       virtual void UpdateWaypoint(const Waypoint &waypoint) = 0; // FIXME Stuart is this used? Replace any uses with builder pattern?
 

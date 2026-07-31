@@ -33,17 +33,56 @@
 
 using namespace aaesim::open_source;
 
-DefaultAircraftIntent::DefaultAircraftIntent() { Initialize(); }
-
-DefaultAircraftIntent::DefaultAircraftIntent(const DefaultAircraftIntent &in) {
-   Initialize();
-   Copy(in);
+DefaultAircraftIntent::Builder::Builder(const AircraftIntent &aircraft_intent) {
+   if (aircraft_intent.ContainsAscentWaypoints()) {
+      ascent_waypoints_ = aircraft_intent.GetAscentWaypoints();
+   }
+   if (aircraft_intent.ContainsCruiseWaypoints()) {
+      cruise_waypoints_ = aircraft_intent.GetCruiseWaypoints();
+   }
+   if (aircraft_intent.ContainsDescentWaypoints()) {
+      descent_waypoints_ = aircraft_intent.GetDescentWaypoints();
+   }
+   planned_cruise_mach_ = aircraft_intent.GetPlannedCruiseMach();
+   planned_cruise_altitude_ = aircraft_intent.GetPlannedCruiseAltitude();
 }
 
-void DefaultAircraftIntent::Initialize() {
-   m_all_waypoints.clear();
-   DeleteRouteDataContent();
-   m_planned_cruise_altitude = Units::ZERO_LENGTH;
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetAscentWaypoints(const std::vector<Waypoint> &ascent_waypoints) {
+   ascent_waypoints_ = ascent_waypoints;
+   return *this;
+}
+
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetCruiseWaypoints(const std::vector<Waypoint> &cruise_waypoints) {
+   cruise_waypoints_ = cruise_waypoints;
+   return *this;
+}
+
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetDescentWaypoints(const std::vector<Waypoint> &descent_waypoints) {
+   descent_waypoints_ = descent_waypoints;
+   return *this;
+}
+
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetPlannedCruiseMach(BoundedValue<double, 0, 1> planned_cruise_mach) {
+   planned_cruise_mach_ = planned_cruise_mach;
+   return *this;
+}
+
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetPlannedCruiseAltitude(Units::Length planned_cruise_altitude) {
+   planned_cruise_altitude_ = planned_cruise_altitude;
+   return *this;
+}
+
+std::shared_ptr<AircraftIntent> DefaultAircraftIntent::Builder::Build() const {
+   std::shared_ptr<DefaultAircraftIntent> aircraft_intent = std::make_shared<DefaultAircraftIntent>();
+   // FIXME Stuart need to call LoadWaypointsFromList() to populate route_data_ and m_all_waypoints, but that method is public and should not be. Need to refactor to use builder pattern instead of list.
+   aircraft_intent->ClearAndResetRouteDataContent(ascent_waypoints_, cruise_waypoints_, descent_waypoints_);
+   aircraft_intent->SetPlannedCruiseMach(planned_cruise_mach_);
+   aircraft_intent->SetPlannedCruiseAltitude(planned_cruise_altitude_);
+   return aircraft_intent;
+}
+
+DefaultAircraftIntent::DefaultAircraftIntent(const DefaultAircraftIntent &in) {
+   Copy(in);
 }
 
 DefaultAircraftIntent &DefaultAircraftIntent::operator=(const DefaultAircraftIntent &in) {
@@ -81,16 +120,16 @@ void DefaultAircraftIntent::ClearAndResetRouteDataContent(const std::vector<Wayp
    m_ascent_waypoints = ascent_waypoints;
    m_cruise_waypoints = cruise_waypoints;
    m_descent_waypoints = descent_waypoints;
-   m_all_waypoints.clear();
+   m_ordered_waypoints.clear();
 
    DeleteRouteDataContent();
    AddWaypointsToRouteDataVectors(m_ascent_waypoints, ASCENT);
    AddWaypointsToRouteDataVectors(m_cruise_waypoints, CRUISE);
 
-   auto vector_current_index = m_all_waypoints.size();
+   auto vector_current_index = m_ordered_waypoints.size();
    auto waypoint_itr = m_descent_waypoints.begin();
    while (waypoint_itr != m_descent_waypoints.end()) {
-      m_all_waypoints.push_back(*waypoint_itr);
+      m_ordered_waypoints.push_back(*waypoint_itr);
       route_data_.m_name.push_back(waypoint_itr->GetName());
       route_data_.m_waypoint_phase_of_flight.push_back(DESCENT);
       route_data_.m_nominal_altitude.emplace_back(waypoint_itr->GetAltitude());
@@ -108,7 +147,7 @@ void DefaultAircraftIntent::ClearAndResetRouteDataContent(const std::vector<Wayp
 
       const Units::Speed nominal_ias = waypoint_itr->GetNominalIas();
 
-      if (vector_current_index == m_all_waypoints.size()) {
+      if (vector_current_index == m_ordered_waypoints.size()) {
          if (planned_cruise_mach_ != 0) {
             // cruise mach specified; use it
             route_data_.m_nominal_ias[vector_current_index] = nominal_ias;
@@ -183,7 +222,7 @@ void DefaultAircraftIntent::LoadWaypointsFromList(const std::list<Waypoint> &asc
                                  DefaultAircraftIntent::ConvertListToVector(descent_waypoints_shortened_legs));
 
    const auto all_waypoints_as_list =
-         DefaultAircraftIntent::RemoveZeroLengthLegs(DefaultAircraftIntent::ConvertVectorToList(m_all_waypoints));
+         DefaultAircraftIntent::RemoveZeroLengthLegs(DefaultAircraftIntent::ConvertVectorToList(m_ordered_waypoints));
    m_tangent_plane_sequence =
          std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints_as_list));
    UpdateXYZFromLatLonWgs84();
@@ -225,7 +264,7 @@ void DefaultAircraftIntent::UpdateXYZFromLatLonWgs84() {
 int DefaultAircraftIntent::GetWaypointIndexByName(const std::string &waypoint_name) const {
    int ix = -1;
    bool found_waypoint = false;
-   for (const Waypoint &wp : m_all_waypoints) {
+   for (const Waypoint &wp : m_ordered_waypoints) {
       ++ix;
       if (wp.GetName().compare(waypoint_name) == 0) {
          found_waypoint = true;
@@ -245,7 +284,7 @@ void DefaultAircraftIntent::Copy(const DefaultAircraftIntent &in) {
    m_is_loaded = in.m_is_loaded;
    route_data_ = in.route_data_;
    m_tangent_plane_sequence = in.m_tangent_plane_sequence;
-   m_all_waypoints = in.m_all_waypoints;
+   m_ordered_waypoints = in.m_ordered_waypoints;
    m_descent_waypoints = in.m_descent_waypoints;
    m_cruise_waypoints = in.m_cruise_waypoints;
    m_ascent_waypoints = in.m_ascent_waypoints;
@@ -307,7 +346,7 @@ void DefaultAircraftIntent::InsertPairAtIndex(const std::string &wpname, const U
    wp.SetName(wpname);
 
    // copy constraints -- high from previous waypoint and low from next
-   auto wp2 = std::next(m_all_waypoints.begin(), index - 1);
+   auto wp2 = std::next(m_ordered_waypoints.begin(), index - 1);
    wp.SetAltitudeConstraintHigh(wp2->GetAltitudeConstraintHigh());
    wp.SetSpeedConstraintHigh(wp2->GetSpeedConstraintHigh());
    ++wp2;
@@ -340,7 +379,7 @@ void DefaultAircraftIntent::InsertWaypointAtIndex(const Waypoint &wp, int index)
 
 void DefaultAircraftIntent::UpdateWaypoint(const Waypoint &waypoint) {
    int update_count(0);
-   std::vector<Waypoint> new_vector(m_all_waypoints);
+   std::vector<Waypoint> new_vector(m_ordered_waypoints);
    for (auto it = new_vector.begin(); it != new_vector.end(); ++it) {
       if (it->GetName() == waypoint.GetName()) {
          (*it) = waypoint;
@@ -358,26 +397,26 @@ void DefaultAircraftIntent::UpdateWaypoint(const Waypoint &waypoint) {
 }
 
 void DefaultAircraftIntent::ClearWaypoints() {
-   m_all_waypoints.clear();
+   m_ordered_waypoints.clear();
 
    const std::vector<Waypoint> empty_vector;
-   ClearAndResetRouteDataContent(empty_vector, empty_vector, m_all_waypoints);
+   ClearAndResetRouteDataContent(empty_vector, empty_vector, m_ordered_waypoints);
    UpdateXYZFromLatLonWgs84();
 }
 
 const Waypoint &DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
-   if (i >= m_all_waypoints.size()) {
-      LOG4CPLUS_FATAL(m_logger, "Index " << i << " is out of range for size " << m_all_waypoints.size());
-      throw InvalidIndexException(i, 0, m_all_waypoints.size() - 1);
+   if (i >= m_ordered_waypoints.size()) {
+      LOG4CPLUS_FATAL(m_logger, "Index " << i << " is out of range for size " << m_ordered_waypoints.size());
+      throw InvalidIndexException(i, 0, m_ordered_waypoints.size() - 1);
    }
-   return m_all_waypoints[i];
+   return m_ordered_waypoints[i];
 }
 
 void DefaultAircraftIntent::SetNumberOfWaypoints(unsigned int n) {
-   if (n < m_all_waypoints.size()) {
-      std::vector<Waypoint>::iterator it1 = std::next(m_all_waypoints.begin(), n);  // get an iterator pointing to index
-      std::vector<Waypoint>::iterator it2 = m_all_waypoints.end();
-      m_all_waypoints.erase(it1, it2);
+   if (n < m_ordered_waypoints.size()) {
+      std::vector<Waypoint>::iterator it1 = std::next(m_ordered_waypoints.begin(), n);  // get an iterator pointing to index
+      std::vector<Waypoint>::iterator it2 = m_ordered_waypoints.end();
+      m_ordered_waypoints.erase(it1, it2);
    }
 }
 

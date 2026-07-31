@@ -25,7 +25,7 @@
 
 #include <algorithm>
 #include <fstream>
-#include <list>
+#include <list> // FIXME Stuart this should be removed
 #include <map>
 #include <memory>
 #include <string>
@@ -41,20 +41,39 @@
 
 namespace aaesim::open_source
 {
-   class DefaultAircraftIntent : public AircraftIntent
+   class DefaultAircraftIntent final : public AircraftIntent
    {
    public:
-      DefaultAircraftIntent();
+      class Builder final
+      {
+      public:
+         Builder() = default;
+         Builder(const AircraftIntent &aircraft_intent);
+         Builder &SetAscentWaypoints(const std::vector<Waypoint> &ascent_waypoints);
+         Builder &SetCruiseWaypoints(const std::vector<Waypoint> &cruise_waypoints);
+         Builder &SetDescentWaypoints(const std::vector<Waypoint> &descent_waypoints);
+         Builder &SetPlannedCruiseMach(BoundedValue<double, 0, 1> planned_cruise_mach);
+         Builder &SetPlannedCruiseAltitude(Units::Length planned_cruise_altitude);
+         std::shared_ptr<AircraftIntent> Build() const;
+
+         private:
+         std::vector<Waypoint> ascent_waypoints_{};
+         std::vector<Waypoint> cruise_waypoints_{};
+         std::vector<Waypoint> descent_waypoints_{};
+         BoundedValue<double, 0, 1> planned_cruise_mach_{0};
+         Units::Length planned_cruise_altitude_{Units::ZERO_LENGTH};
+      };
+
+      DefaultAircraftIntent() = default;
       virtual ~DefaultAircraftIntent() = default;
       DefaultAircraftIntent(const DefaultAircraftIntent &in);            // FIXME Stuart get rid of this
       DefaultAircraftIntent &operator=(const DefaultAircraftIntent &in); // FIXME Stuart get rid
       bool operator==(const DefaultAircraftIntent &in) const;            // FIXME Stuart use default
       void Copy(const DefaultAircraftIntent &in);                        // FIXME Stuart get rid of after Builder exists...user builder to copy AircraftIntent
 
-      void Initialize() override;
       void LoadWaypointsFromList(const std::list<Waypoint> &ascent_waypoints,
                                  const std::list<Waypoint> &cruise_waypoints,
-                                 const std::list<Waypoint> &descent_waypoints) override;
+                                 const std::list<Waypoint> &descent_waypoints) override; // FIXME Stuart should not be public...remove list usage
       void UpdateXYZFromLatLonWgs84() override;
       void UpdateWaypoint(const Waypoint &waypoint) override;
       std::list<Waypoint> GetWaypointList() const override;
@@ -71,9 +90,9 @@ namespace aaesim::open_source
       int GetWaypointIndexByName(const std::string &waypoint_name) const override;
       std::pair<int, int> FindCommonWaypoint(const AircraftIntent &intent) const override;
       void InsertPairAtIndex(const std::string &wpname, const Units::Length &x, const Units::Length &y,
-                             int index) override;
+                             int index) override; // FIXME Stuart remove this method...only for FIM?
       void InsertWaypointAtIndex(const Waypoint &waypoint, int index) override;
-      void ClearWaypoints() override;
+      void ClearWaypoints() override; // FIXME Stuart replace any uses with builder pattern, remove this method
       unsigned int GetNumberOfWaypoints() const override;
       bool IsLoaded() const override;
       bool ContainsAscentWaypoints() const override;
@@ -87,9 +106,9 @@ namespace aaesim::open_source
       bool ContainsWaypointName(const std::string &waypoint_name) const override; // FIXME Stuart remove this method...not really needed
 
       static DefaultAircraftIntent CopyAndTrimAfterNamedWaypoint(const DefaultAircraftIntent &aircraft_intent,
-                                                          const std::string &waypoint_name);
+                                                                 const std::string &waypoint_name); // FIXME Stuart find new home for this method...not really needed in AircraftIntent, but useful for FIM
 
-   protected:
+   protected: // FIXME Stuart no more protected methods...use builder pattern to create AircraftIntent
       static inline std::map<std::string, Arinc424LegType> m_arinc424_dictionary{
           {"IF", AircraftIntent::Arinc424LegType::IF},
           {"UNSET", AircraftIntent::Arinc424LegType::UNSET},
@@ -100,14 +119,15 @@ namespace aaesim::open_source
           {"VA", AircraftIntent::Arinc424LegType::VA},
           {"CA", AircraftIntent::Arinc424LegType::CA},
       };
-      std::list<Waypoint> AddConnectingLeg(const std::list<Waypoint> &first_waypoint_vector,
-                                           const std::list<Waypoint> &second_waypoint_vector) const;
 
       static std::list<Waypoint> RemoveZeroLengthLegs(const std::list<Waypoint> &waypoints);
 
       static std::vector<Waypoint> ConvertListToVector(const std::list<Waypoint> &waypoint_list);
 
       static std::list<Waypoint> ConvertVectorToList(const std::vector<Waypoint> &waypoint_vector);
+
+      std::list<Waypoint> AddConnectingLeg(const std::list<Waypoint> &first_waypoint_vector,
+                                           const std::list<Waypoint> &second_waypoint_vector) const;
 
       void ClearAndResetRouteDataContent(const std::vector<Waypoint> &ascent_waypoints,
                                          const std::vector<Waypoint> &cruise_waypoints,
@@ -116,9 +136,9 @@ namespace aaesim::open_source
       void DoRouteDataLogging() const;
 
       struct RouteData route_data_{};
-      std::shared_ptr<TangentPlaneSequence> m_tangent_plane_sequence{};
+      std::shared_ptr<TangentPlaneSequence> m_tangent_plane_sequence{}; // FIXME Stuart remove...only for FIM?
       double planned_cruise_mach_{0};
-      std::vector<Waypoint> m_all_waypoints{};
+      std::vector<Waypoint> m_ordered_waypoints{};
       bool m_is_loaded{false};
       std::vector<Waypoint> m_ascent_waypoints{}, m_cruise_waypoints{}, m_descent_waypoints{};
       Units::MetersLength m_planned_cruise_altitude{Units::ZERO_LENGTH};
@@ -140,7 +160,7 @@ namespace aaesim::open_source
 
    inline std::list<Waypoint> DefaultAircraftIntent::GetWaypointList() const
    {
-      return std::list<Waypoint>(m_all_waypoints.begin(), m_all_waypoints.end());
+      return std::list<Waypoint>(m_ordered_waypoints.begin(), m_ordered_waypoints.end());
    }
 
    inline std::vector<Waypoint> DefaultAircraftIntent::ConvertListToVector(const std::list<Waypoint> &waypoint_list)
@@ -159,7 +179,7 @@ namespace aaesim::open_source
       auto waypoint_itr = waypoints.begin();
       while (waypoint_itr != waypoints.end())
       {
-         m_all_waypoints.push_back(*waypoint_itr);
+         m_ordered_waypoints.push_back(*waypoint_itr);
          route_data_.m_name.push_back(waypoint_itr->GetName());
          route_data_.m_waypoint_phase_of_flight.push_back(add_as_phase);
          route_data_.m_nominal_altitude.emplace_back(waypoint_itr->GetAltitude());
@@ -249,7 +269,7 @@ namespace aaesim::open_source
       {
          return waypoint_to_test.GetName().compare(waypoint_name) == 0;
       };
-      return std::any_of(m_all_waypoints.rbegin(), m_all_waypoints.rend(), name_comparator);
+      return std::any_of(m_ordered_waypoints.rbegin(), m_ordered_waypoints.rend(), name_comparator);
    }
 
    inline const std::vector<Waypoint> &DefaultAircraftIntent::GetAscentWaypoints() const { return m_ascent_waypoints; }
