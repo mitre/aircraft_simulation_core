@@ -26,7 +26,7 @@
 
 #include <memory>
 
-#include "public/AircraftIntent.h"
+#include "public/TangentPlaneSequence.h"
 #include "public/WeatherPrediction.h"
 
 class Wind {

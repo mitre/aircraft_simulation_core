@@ -30,7 +30,6 @@
 #include <utility>
 #include <vector>
 
-#include "public/AircraftIntent.h"
 #include "public/AircraftState.h"
 #include "public/HorizontalPath.h"
 #include "public/LineOnEllipsoid.h"

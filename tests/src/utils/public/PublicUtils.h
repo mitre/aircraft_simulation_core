@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "public/AircraftIntent.h"
 #include "public/HorizontalPath.h"
 
 namespace aaesim {

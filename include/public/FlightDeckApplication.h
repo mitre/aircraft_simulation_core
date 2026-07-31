@@ -46,7 +46,7 @@ struct OwnshipFmsPredictionParameters {
    Units::Length transition_altitude{};
    Units::Length expected_cruise_altitude{};
    WeatherPrediction weather_prediction{};
-   AircraftIntent fms_intent{};
+   std::shared_ptr<const AircraftIntent> fms_intent{};
 };
 
 struct FlightDeckApplicationInitializer {

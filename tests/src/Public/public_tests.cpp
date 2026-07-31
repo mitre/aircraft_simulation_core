@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "public/AircraftCalculations.h"
-#include "public/AircraftIntent.h"
 #include "public/AlongPathDistanceCalculator.h"
 #include "public/CoreUtils.h"
 #include "public/CustomMath.h"
