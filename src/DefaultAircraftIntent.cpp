@@ -72,12 +72,12 @@ DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetPlannedCruise
    return *this;
 }
 
-std::shared_ptr<AircraftIntent> DefaultAircraftIntent::Builder::Build() const {
+std::shared_ptr<DefaultAircraftIntent> DefaultAircraftIntent::Builder::Build() const {
    std::shared_ptr<DefaultAircraftIntent> aircraft_intent = std::make_shared<DefaultAircraftIntent>();
-   // FIXME Stuart need to call LoadWaypointsFromList() to populate route_data_ and m_all_waypoints, but that method is public and should not be. Need to refactor to use builder pattern instead of list.
-   aircraft_intent->ClearAndResetRouteDataContent(ascent_waypoints_, cruise_waypoints_, descent_waypoints_);
    aircraft_intent->SetPlannedCruiseMach(planned_cruise_mach_);
    aircraft_intent->SetPlannedCruiseAltitude(planned_cruise_altitude_);
+   aircraft_intent->LoadWaypointsFromList(ConvertVectorToList(ascent_waypoints_), ConvertVectorToList(cruise_waypoints_),
+                                          ConvertVectorToList(descent_waypoints_));
    return aircraft_intent;
 }
 
@@ -226,6 +226,7 @@ void DefaultAircraftIntent::LoadWaypointsFromList(const std::list<Waypoint> &asc
    m_tangent_plane_sequence =
          std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints_as_list));
    UpdateXYZFromLatLonWgs84();
+   m_is_loaded = true;
    DoRouteDataLogging();
 }
 
@@ -491,9 +492,9 @@ std::list<Waypoint> DefaultAircraftIntent::RemoveZeroLengthLegs(const std::list<
    return resolved_waypoints;
 }
 
-DefaultAircraftIntent DefaultAircraftIntent::CopyAndTrimAfterNamedWaypoint(const DefaultAircraftIntent &aircraft_intent,
+DefaultAircraftIntent DefaultAircraftIntent::CopyAndTrimAfterNamedWaypoint(const AircraftIntent &aircraft_intent,
                                                              const std::string &waypoint_name) {
-   DefaultAircraftIntent aircraft_intent_copy(aircraft_intent);
+   DefaultAircraftIntent aircraft_intent_copy(*Builder(aircraft_intent).Build());
    const std::string final_waypoint_name =
          aircraft_intent.GetWaypoint(aircraft_intent.GetNumberOfWaypoints() - 1).GetName();
    if (aircraft_intent.ContainsWaypointName(waypoint_name) && final_waypoint_name != waypoint_name) {

@@ -104,7 +104,8 @@ EuclideanTrajectoryPredictor::EuclideanTrajectoryPredictor() {
 }
 
 void EuclideanTrajectoryPredictor::CalculateWaypoints(
-      std::shared_ptr<const AircraftIntent> &aircraft_intent, const aaesim::open_source::WeatherPrediction &weather_prediction) {
+      const std::shared_ptr<const AircraftIntent> &aircraft_intent,
+      const aaesim::open_source::WeatherPrediction &weather_prediction) {
    m_aircraft_intent = aircraft_intent;
 
    // Set altitude at FAF to final altitude in feet.

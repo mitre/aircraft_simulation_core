@@ -25,7 +25,7 @@
 
 #include <algorithm>
 #include <fstream>
-#include <list> // FIXME Stuart this should be removed
+#include <list> // FIXME Stuart this should be removed...no lists allowed!
 #include <map>
 #include <memory>
 #include <string>
@@ -39,9 +39,10 @@
 #include "utility/BoundedValue.h"
 #include "utility/UtilityConstants.h"
 
+// FIXME Stuart make sure this class const-correct. It should be as immutable as possible.
 namespace aaesim::open_source
 {
-   class DefaultAircraftIntent final : public AircraftIntent
+   class DefaultAircraftIntent : public AircraftIntent
    {
    public:
       class Builder final
@@ -54,7 +55,7 @@ namespace aaesim::open_source
          Builder &SetDescentWaypoints(const std::vector<Waypoint> &descent_waypoints);
          Builder &SetPlannedCruiseMach(BoundedValue<double, 0, 1> planned_cruise_mach);
          Builder &SetPlannedCruiseAltitude(Units::Length planned_cruise_altitude);
-         std::shared_ptr<AircraftIntent> Build() const;
+         std::shared_ptr<DefaultAircraftIntent> Build() const;
 
          private:
          std::vector<Waypoint> ascent_waypoints_{};
@@ -105,7 +106,7 @@ namespace aaesim::open_source
       void SetPlannedCruiseMach(BoundedValue<double, 0, 1> mach_number) override;
       bool ContainsWaypointName(const std::string &waypoint_name) const override; // FIXME Stuart remove this method...not really needed
 
-      static DefaultAircraftIntent CopyAndTrimAfterNamedWaypoint(const DefaultAircraftIntent &aircraft_intent,
+      static DefaultAircraftIntent CopyAndTrimAfterNamedWaypoint(const AircraftIntent &aircraft_intent,
                                                                  const std::string &waypoint_name); // FIXME Stuart find new home for this method...not really needed in AircraftIntent, but useful for FIM
 
    protected: // FIXME Stuart no more protected methods...use builder pattern to create AircraftIntent
@@ -279,3 +280,5 @@ namespace aaesim::open_source
    inline const std::vector<Waypoint> &DefaultAircraftIntent::GetCruiseWaypoints() const { return m_cruise_waypoints; }
 
 } // namespace aaesim::open_source
+
+using DefaultAircraftIntent = aaesim::open_source::DefaultAircraftIntent;

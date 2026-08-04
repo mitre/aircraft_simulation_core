@@ -45,7 +45,7 @@ class EuclideanTrajectoryPredictor {
 
    virtual ~EuclideanTrajectoryPredictor() = default;
 
-   virtual void CalculateWaypoints(std::shared_ptr<const AircraftIntent> &aircraft_intent,
+   virtual void CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
                                    const aaesim::open_source::WeatherPrediction &weather_prediction);
 
    const std::vector<HorizontalPath> EstimateHorizontalTrajectory(

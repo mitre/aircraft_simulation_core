@@ -153,3 +153,5 @@ namespace aaesim::open_source
    };
 
 } // namespace aaesim::open_source
+
+using AircraftIntent = aaesim::open_source::AircraftIntent;

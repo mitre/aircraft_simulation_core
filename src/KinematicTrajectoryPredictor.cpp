@@ -44,7 +44,7 @@ KinematicTrajectoryPredictor::KinematicTrajectoryPredictor(Units::Angle maximum_
 
 KinematicTrajectoryPredictor::KinematicTrajectoryPredictor(const KinematicTrajectoryPredictor &obj) { operator=(obj); }
 
-void KinematicTrajectoryPredictor::CalculateWaypoints(std::shared_ptr<const AircraftIntent> &aircraft_intent,
+void KinematicTrajectoryPredictor::CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
                                                       const WeatherPrediction &weather_prediction) {
    Units::Length altitude_at_faf = Units::MetersLength(
          aircraft_intent->GetRouteData().m_nominal_altitude[aircraft_intent->GetNumberOfWaypoints() - 1]);

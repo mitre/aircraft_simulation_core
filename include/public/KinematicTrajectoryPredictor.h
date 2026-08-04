@@ -44,7 +44,7 @@ class KinematicTrajectoryPredictor : public aaesim::open_source::EuclideanTrajec
 
    virtual ~KinematicTrajectoryPredictor() = default;
 
-   void CalculateWaypoints(std::shared_ptr<const AircraftIntent> &aircraft_intent,
+   void CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
                            const WeatherPrediction &weather_prediction) override final;
 
    KinematicTrajectoryPredictor &operator=(const KinematicTrajectoryPredictor &obj);
