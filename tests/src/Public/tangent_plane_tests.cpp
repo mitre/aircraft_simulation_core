@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "public/DefaultAircraftIntent.h"
+#include "public/NullAircraftIntent.h"
 #include "public/SingleTangentPlaneSequence.h"
 #include "public/TangentPlaneSequence.h"
 #include "public/Waypoint.h"
@@ -140,6 +141,23 @@ TEST(DefaultAircraftIntent, BuilderCopiesDefaultIntentWithoutRenormalizingWaypoi
    const auto copied_intent = *DefaultAircraftIntent::Builder(source_intent).Build();
 
    EXPECT_EQ(source_intent, copied_intent);
+}
+
+TEST(NullAircraftIntent, HasNoRouteData) {
+   const NullAircraftIntent aircraft_intent{};
+
+   EXPECT_FALSE(aircraft_intent.GetWaypoint(0).has_value());
+   EXPECT_TRUE(aircraft_intent.GetWaypoints().empty());
+   EXPECT_FALSE(aircraft_intent.GetWaypointName(0).has_value());
+   EXPECT_TRUE(aircraft_intent.GetRouteData().m_name.empty());
+   EXPECT_FALSE(aircraft_intent.GetWaypointIndexByName("unused").has_value());
+   EXPECT_EQ(std::make_pair(-1, -1), aircraft_intent.FindCommonWaypoint(aircraft_intent));
+   EXPECT_EQ(0U, aircraft_intent.GetNumberOfWaypoints());
+   EXPECT_TRUE(aircraft_intent.GetAscentWaypoints().empty());
+   EXPECT_TRUE(aircraft_intent.GetCruiseWaypoints().empty());
+   EXPECT_TRUE(aircraft_intent.GetDescentWaypoints().empty());
+   EXPECT_EQ(0.0, aircraft_intent.GetPlannedCruiseMach());
+   EXPECT_FALSE(aircraft_intent.ContainsWaypointName("unused"));
 }
 
 }  // namespace test
