@@ -48,12 +48,12 @@ class AircraftControllerFactory final {
       auto lateral_controller = std::make_shared<DefaultLateralController>(config.maximum_allowable_roll_angle);
       AircraftControl::Builder builder{};
       if (config.descent_controller_config.type == DescentSpeedControlStrategy::NONE and
-          aircraft_intent.ContainsDescentWaypoints()) {
+          !aircraft_intent.GetDescentWaypoints().empty()) {
          throw std::runtime_error(
                "Invalid vertical controller configuration for descent. Must specify the descent strategy");
       }
 
-      if (aircraft_intent.ContainsDescentWaypoints() || aircraft_intent.ContainsCruiseWaypoints()) {
+      if (!aircraft_intent.GetDescentWaypoints().empty() || !aircraft_intent.GetCruiseWaypoints().empty()) {
          builder.WithCruiseDescentLateralController(lateral_controller);
          if (config.descent_controller_config.type == THRUST) {
             auto descent_controller = std::make_shared<aaesim::open_source::SpeedOnThrustControl>();
@@ -66,7 +66,7 @@ class AircraftControllerFactory final {
          }
       }
 
-      if (aircraft_intent.ContainsAscentWaypoints()) {
+      if (!aircraft_intent.GetAscentWaypoints().empty()) {
          auto ascent_controller = std::make_shared<aaesim::open_source::ClimbPhaseVerticalController>();
          builder.WithClimbVerticalController(ascent_controller);
          builder.WithClimbLateralController(lateral_controller);
