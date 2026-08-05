@@ -115,6 +115,7 @@ set(SIMCORE_SOURCE_FILES
    src/AircraftControl.cpp
    src/AircraftSpeed.cpp
    src/AircraftState.cpp
+   src/AircraftIntentUtils.cpp
    src/AlongPathDistanceCalculator.cpp
    src/ArcOnEllipsoid.cpp
    src/Atmosphere.cpp

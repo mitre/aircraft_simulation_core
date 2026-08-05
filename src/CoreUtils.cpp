@@ -132,6 +132,14 @@ std::list<Waypoint> CoreUtils::ShortenLongLegs(const std::list<Waypoint> &ordere
    return std::list<Waypoint>(replacement_waypoints);
 }
 
+std::vector<Waypoint> CoreUtils::ShortenLongLegs(const std::vector<Waypoint> &ordered_waypoints,
+                                                 Units::Length maximum_allowable_length) {
+   if (ordered_waypoints.empty()) return {};
+   const auto shortened = ShortenLongLegs(std::list<Waypoint>(ordered_waypoints.begin(), ordered_waypoints.end()),
+                                          maximum_allowable_length);
+   return {shortened.begin(), shortened.end()};
+}
+
 std::list<Waypoint> CoreUtils::GetIntermediateWaypointsForLongLeg(const aaesim::LineOnEllipsoid &line_on_ellipsoid,
                                                                   Units::Length maximum_allowable_single_leg_distance) {
    using namespace geolib_idealab;

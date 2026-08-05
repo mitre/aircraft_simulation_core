@@ -106,6 +106,10 @@ class CoreUtils {
          const std::list<Waypoint> &ordered_waypoints,
          Units::Length maximum_allowable_length = MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH);
 
+   static std::vector<Waypoint> ShortenLongLegs(
+         const std::vector<Waypoint> &ordered_waypoints,
+         Units::Length maximum_allowable_length = MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH);
+
    /**
     * Visible for testing.
     *

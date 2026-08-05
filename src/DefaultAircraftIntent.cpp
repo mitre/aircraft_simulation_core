@@ -34,13 +34,13 @@
 using namespace aaesim::open_source;
 
 DefaultAircraftIntent::Builder::Builder(const AircraftIntent &aircraft_intent) {
-   if (aircraft_intent.ContainsAscentWaypoints()) {
+   if (!aircraft_intent.GetAscentWaypoints().empty()) {
       ascent_waypoints_ = aircraft_intent.GetAscentWaypoints();
    }
-   if (aircraft_intent.ContainsCruiseWaypoints()) {
+   if (!aircraft_intent.GetCruiseWaypoints().empty()) {
       cruise_waypoints_ = aircraft_intent.GetCruiseWaypoints();
    }
-   if (aircraft_intent.ContainsDescentWaypoints()) {
+   if (!aircraft_intent.GetDescentWaypoints().empty()) {
       descent_waypoints_ = aircraft_intent.GetDescentWaypoints();
    }
    planned_cruise_mach_ = aircraft_intent.GetPlannedCruiseMach();
@@ -76,19 +76,10 @@ std::shared_ptr<DefaultAircraftIntent> DefaultAircraftIntent::Builder::Build() c
    std::shared_ptr<DefaultAircraftIntent> aircraft_intent = std::make_shared<DefaultAircraftIntent>();
    aircraft_intent->SetPlannedCruiseMach(planned_cruise_mach_);
    aircraft_intent->SetPlannedCruiseAltitude(planned_cruise_altitude_);
-   aircraft_intent->LoadWaypointsFromList(ConvertVectorToList(ascent_waypoints_), ConvertVectorToList(cruise_waypoints_),
-                                          ConvertVectorToList(descent_waypoints_));
+   aircraft_intent->LoadWaypoints(ascent_waypoints_, cruise_waypoints_, descent_waypoints_);
    return aircraft_intent;
 }
 
-DefaultAircraftIntent::DefaultAircraftIntent(const DefaultAircraftIntent &in) {
-   Copy(in);
-}
-
-DefaultAircraftIntent &DefaultAircraftIntent::operator=(const DefaultAircraftIntent &in) {
-   Copy(in);
-   return *this;
-}
 
 void DefaultAircraftIntent::DeleteRouteDataContent() {
    route_data_.m_name.clear();
@@ -174,13 +165,13 @@ void DefaultAircraftIntent::ClearAndResetRouteDataContent(const std::vector<Wayp
    }
 }
 
-void DefaultAircraftIntent::LoadWaypointsFromList(const std::list<Waypoint> &ascent_waypoints,
-                                           const std::list<Waypoint> &cruise_waypoints,
-                                           const std::list<Waypoint> &descent_waypoints) {
+void DefaultAircraftIntent::LoadWaypoints(const std::vector<Waypoint> &ascent_waypoints,
+                                          const std::vector<Waypoint> &cruise_waypoints,
+                                          const std::vector<Waypoint> &descent_waypoints) {
    const bool has_ascent = !ascent_waypoints.empty();
    const bool has_cruise = !cruise_waypoints.empty();
    const bool has_descent = !descent_waypoints.empty();
-   std::list<Waypoint> cruise_waypoints_with_connection_added, descent_waypoints_with_connection_added;
+   std::vector<Waypoint> cruise_waypoints_with_connection_added, descent_waypoints_with_connection_added;
    if (has_ascent) {
       if (has_cruise) {
          cruise_waypoints_with_connection_added = AddConnectingLeg(ascent_waypoints, cruise_waypoints);
@@ -199,7 +190,7 @@ void DefaultAircraftIntent::LoadWaypointsFromList(const std::list<Waypoint> &asc
       descent_waypoints_with_connection_added = descent_waypoints;
    }
 
-   std::list<Waypoint> ascent_waypoints_shortened_legs, cruise_waypoints_shortened_legs,
+   std::vector<Waypoint> ascent_waypoints_shortened_legs, cruise_waypoints_shortened_legs,
          descent_waypoints_shortened_legs;
    if (!has_ascent) {
       ascent_waypoints_shortened_legs = ascent_waypoints;
@@ -217,14 +208,12 @@ void DefaultAircraftIntent::LoadWaypointsFromList(const std::list<Waypoint> &asc
       descent_waypoints_shortened_legs = CoreUtils::ShortenLongLegs(descent_waypoints_with_connection_added);
    }
 
-   ClearAndResetRouteDataContent(DefaultAircraftIntent::ConvertListToVector(ascent_waypoints_shortened_legs),
-                                 DefaultAircraftIntent::ConvertListToVector(cruise_waypoints_shortened_legs),
-                                 DefaultAircraftIntent::ConvertListToVector(descent_waypoints_shortened_legs));
+   ClearAndResetRouteDataContent(ascent_waypoints_shortened_legs, cruise_waypoints_shortened_legs,
+                                 descent_waypoints_shortened_legs);
 
-   const auto all_waypoints_as_list =
-         DefaultAircraftIntent::RemoveZeroLengthLegs(DefaultAircraftIntent::ConvertVectorToList(m_ordered_waypoints));
+   const auto all_waypoints = RemoveZeroLengthLegs(m_ordered_waypoints);
    m_tangent_plane_sequence =
-         std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints_as_list));
+         std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints));
    UpdateXYZFromLatLonWgs84();
    m_is_loaded = true;
    DoRouteDataLogging();
@@ -278,18 +267,6 @@ int DefaultAircraftIntent::GetWaypointIndexByName(const std::string &waypoint_na
    return ix;
 }
 
-void DefaultAircraftIntent::Copy(const DefaultAircraftIntent &in) {
-   DeleteRouteDataContent();
-   m_planned_cruise_altitude = in.m_planned_cruise_altitude;
-   planned_cruise_mach_ = in.planned_cruise_mach_;
-   m_is_loaded = in.m_is_loaded;
-   route_data_ = in.route_data_;
-   m_tangent_plane_sequence = in.m_tangent_plane_sequence;
-   m_ordered_waypoints = in.m_ordered_waypoints;
-   m_descent_waypoints = in.m_descent_waypoints;
-   m_cruise_waypoints = in.m_cruise_waypoints;
-   m_ascent_waypoints = in.m_ascent_waypoints;
-}
 
 void DefaultAircraftIntent::GetLatLonFromXYZ(const Units::Length &xMeters, const Units::Length &yMeters,
                                             const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const {
@@ -317,7 +294,7 @@ std::pair<int, int> DefaultAircraftIntent::FindCommonWaypoint(const AircraftInte
    int thatIndex = -1;
 
    while ((ix >= 0) && (tx >= 0)) {
-      if (GetWaypointName(ix) == intent.GetWaypointName(tx)) {
+      if (GetWaypoint(ix).GetName() == intent.GetWaypoint(tx).GetName()) {
          thisIndex = ix;
          thatIndex = tx;
          ix--;
@@ -413,6 +390,8 @@ const Waypoint &DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
    return m_ordered_waypoints[i];
 }
 
+const std::vector<Waypoint> &DefaultAircraftIntent::GetWaypoints() const { return m_ordered_waypoints; }
+
 void DefaultAircraftIntent::SetNumberOfWaypoints(unsigned int n) {
    if (n < m_ordered_waypoints.size()) {
       std::vector<Waypoint>::iterator it1 = std::next(m_ordered_waypoints.begin(), n);  // get an iterator pointing to index
@@ -467,8 +446,8 @@ Units::MetersLength DefaultAircraftIntent::GetWaypointY(unsigned int i) const {
    return route_data_.m_y[i];
 }
 
-std::list<Waypoint> DefaultAircraftIntent::RemoveZeroLengthLegs(const std::list<Waypoint> &waypoints) {
-   std::list<Waypoint> resolved_waypoints;
+std::vector<Waypoint> DefaultAircraftIntent::RemoveZeroLengthLegs(const std::vector<Waypoint> &waypoints) {
+   std::vector<Waypoint> resolved_waypoints;
    if (waypoints.empty()) {
       return resolved_waypoints;
    }
@@ -490,48 +469,4 @@ std::list<Waypoint> DefaultAircraftIntent::RemoveZeroLengthLegs(const std::list<
    // always include the last waypoint
    resolved_waypoints.push_back(waypoints.back());
    return resolved_waypoints;
-}
-
-DefaultAircraftIntent DefaultAircraftIntent::CopyAndTrimAfterNamedWaypoint(const AircraftIntent &aircraft_intent,
-                                                             const std::string &waypoint_name) {
-   DefaultAircraftIntent aircraft_intent_copy(*Builder(aircraft_intent).Build());
-   const std::string final_waypoint_name =
-         aircraft_intent.GetWaypoint(aircraft_intent.GetNumberOfWaypoints() - 1).GetName();
-   if (aircraft_intent.ContainsWaypointName(waypoint_name) && final_waypoint_name != waypoint_name) {
-      auto name_comparator = [&waypoint_name](const Waypoint &waypoint_to_test) {
-         return waypoint_to_test.GetName() == waypoint_name;
-      };
-      auto trim_vector = [&name_comparator](const std::vector<Waypoint> &waypoints) {
-         std::vector<Waypoint> trimmed_vector;
-         for (const Waypoint &wp : waypoints) {
-            trimmed_vector.push_back(wp);
-            if (name_comparator(wp)) {
-               break;
-            }
-         }
-         return trimmed_vector;
-      };
-      std::vector<Waypoint> ascent_waypoints = aircraft_intent.GetAscentWaypoints();
-      std::vector<Waypoint> cruise_waypoints = aircraft_intent.GetCruiseWaypoints();
-      std::vector<Waypoint> descent_waypoints = aircraft_intent.GetDescentWaypoints();
-      if (std::any_of(ascent_waypoints.rbegin(), ascent_waypoints.rend(), name_comparator)) {
-         cruise_waypoints.clear();
-         descent_waypoints.clear();
-         ascent_waypoints = trim_vector(ascent_waypoints);
-      } else if (std::any_of(cruise_waypoints.rbegin(), cruise_waypoints.rend(), name_comparator)) {
-         cruise_waypoints = trim_vector(cruise_waypoints);
-         descent_waypoints.clear();
-      } else {
-         descent_waypoints = trim_vector(descent_waypoints);
-      }
-      auto to_list = [](std::vector<Waypoint> waypoints) {
-         std::list<Waypoint> dest;
-         std::copy(waypoints.begin(), waypoints.end(), std::back_inserter(dest));
-         return dest;
-      };
-      aircraft_intent_copy.ClearWaypoints();
-      aircraft_intent_copy.LoadWaypointsFromList(to_list(ascent_waypoints), to_list(cruise_waypoints),
-                                                 to_list(descent_waypoints));
-   }
-   return aircraft_intent_copy;
 }

@@ -35,4 +35,7 @@ SingleTangentPlaneSequence::SingleTangentPlaneSequence(const list<Waypoint> &way
    InitializeFromWaypoints(m_master_waypoint_sequence);
 }
 
+SingleTangentPlaneSequence::SingleTangentPlaneSequence(const vector<Waypoint> &waypoints)
+   : SingleTangentPlaneSequence(list<Waypoint>(waypoints.begin(), waypoints.end())) {}
+
 void SingleTangentPlaneSequence::ClearStaticMembers() { m_master_waypoint_sequence.clear(); }

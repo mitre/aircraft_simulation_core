@@ -20,6 +20,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 
 #include "public/TangentPlaneSequence.h"
 
@@ -27,6 +28,7 @@ class SingleTangentPlaneSequence final : public TangentPlaneSequence {
   public:
    static void ClearStaticMembers();
    SingleTangentPlaneSequence(const std::list<Waypoint> &waypoint_list);
+   SingleTangentPlaneSequence(const std::vector<Waypoint> &waypoints);
 
   private:
    static std::list<Waypoint> m_master_waypoint_sequence;

@@ -80,11 +80,10 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    Waypoint wp1{"wp1", Units::DegreesAngle(37.5), Units::DegreesAngle(-76.0)};
    Waypoint wp2{"wp2", Units::DegreesAngle(37.6), Units::DegreesAngle(-71.0)};
    Waypoint end_waypoint{"end", Units::DegreesAngle(40.0), Units::DegreesAngle(-70.0)};
-   auto waypoints = std::list<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
+   auto waypoints = std::vector<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
    DefaultAircraftIntent aircraft_intent = DefaultAircraftIntent();
-   aircraft_intent.LoadWaypointsFromList(waypoints, std::list<Waypoint>(), std::list<Waypoint>());
-   auto wplist = aircraft_intent.GetWaypointList();
-   auto tangent_plane_sequence = std::make_shared<TangentPlaneSequence>(wplist);
+   aircraft_intent.LoadWaypoints(waypoints, {}, {});
+   auto tangent_plane_sequence = std::make_shared<SingleTangentPlaneSequence>(aircraft_intent.GetWaypoints());
    auto route_data = aircraft_intent.GetRouteData();
 
    struct ZippedData {

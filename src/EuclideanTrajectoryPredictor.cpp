@@ -180,7 +180,7 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
                   aircraft_intent->GetRouteData().m_y_rf_center[loop].value(),
                   aircraft_intent->GetRouteData().m_rf_radius[loop].value(), turnPtX, turnPtY);
 
-            LOG4CPLUS_INFO(m_logger, "Calculated turn center point at " << aircraft_intent->GetWaypointName(loop)
+            LOG4CPLUS_INFO(m_logger, "Calculated turn center point at " << aircraft_intent->GetWaypoint(loop).GetName()
                                                                         << " is " << miss_dist
                                                                         << " meters different than input.");
 

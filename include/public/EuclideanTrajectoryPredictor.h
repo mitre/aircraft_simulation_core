@@ -27,6 +27,7 @@
 
 #include "nlohmann/json.hpp"
 #include "public/AircraftIntent.h"
+#include "public/TangentPlaneSequence.h"
 #include "public/AlongPathDistanceCalculator.h"
 #include "public/EuclideanTightTurnResolver.h"
 #include "public/HorizontalPath.h"
