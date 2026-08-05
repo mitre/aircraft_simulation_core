@@ -124,6 +124,24 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    std::for_each(zipped_route.begin(), zipped_route.end(), enu_comparator_high_tolerance);
 }
 
+TEST(DefaultAircraftIntent, BuilderCopiesDefaultIntentWithoutRenormalizingWaypoints) {
+   const std::vector<Waypoint> ascent_waypoints{
+         Waypoint{"ascent", Units::DegreesAngle(35.0), Units::DegreesAngle(-77.0)}};
+   const std::vector<Waypoint> cruise_waypoints{
+         Waypoint{"cruise", Units::DegreesAngle(36.0), Units::DegreesAngle(-76.0)}};
+   const std::vector<Waypoint> descent_waypoints{
+         Waypoint{"descent", Units::DegreesAngle(37.0), Units::DegreesAngle(-75.0)}};
+
+   const auto source_intent = *DefaultAircraftIntent::Builder()
+                                      .SetAscentWaypoints(ascent_waypoints)
+                                      .SetCruiseWaypoints(cruise_waypoints)
+                                      .SetDescentWaypoints(descent_waypoints)
+                                      .Build();
+   const auto copied_intent = *DefaultAircraftIntent::Builder(source_intent).Build();
+
+   EXPECT_EQ(source_intent, copied_intent);
+}
+
 }  // namespace test
 }  // namespace open_source
 }  // namespace aaesim

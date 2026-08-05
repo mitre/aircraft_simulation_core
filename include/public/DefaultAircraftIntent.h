@@ -185,7 +185,8 @@ namespace aaesim::open_source
          // nothing to do
          return second_waypoint_vector;
       if (!second_waypoint_vector.empty() &&
-          (first_waypoint_vector.back().GetName() == second_waypoint_vector.front().GetName()))
+          (first_waypoint_vector.back().GetName() == second_waypoint_vector.front().GetName() ||
+           first_waypoint_vector.back().GetName() + "_copy_as_IF" == second_waypoint_vector.front().GetName()))
       {
          // nothing to do
          return second_waypoint_vector;
