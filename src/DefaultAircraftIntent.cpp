@@ -215,7 +215,6 @@ void DefaultAircraftIntent::LoadWaypoints(const std::vector<Waypoint> &ascent_wa
    m_tangent_plane_sequence =
          std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints));
    UpdateXYZFromLatLonWgs84();
-   m_is_loaded = true;
    DoRouteDataLogging();
 }
 
@@ -305,54 +304,6 @@ std::pair<int, int> DefaultAircraftIntent::FindCommonWaypoint(const AircraftInte
    return std::make_pair(thisIndex, thatIndex);
 }
 
-void DefaultAircraftIntent::InsertPairAtIndex(const std::string &wpname, const Units::Length &x, const Units::Length &y,
-                                       const int index) {
-   /*
-    * The incoming point must have been validated by the caller.
-    *
-    * The point will be converted to a waypoint and inserted into the waypoint list that this object
-    * was initialized with. Then the object will be re-initialized.
-    */
-   Units::Angle lat, lon;
-   GetLatLonFromXYZ(x, y, Units::ZERO_LENGTH, lat, lon);
-
-   Waypoint wp;
-   wp.SetRfTurnArcRadius(Units::ZERO_LENGTH);
-   wp.SetWaypointLatLon(lat, lon);
-   wp.SetName(wpname);
-
-   // copy constraints -- high from previous waypoint and low from next
-   auto wp2 = std::next(m_ordered_waypoints.begin(), index - 1);
-   wp.SetAltitudeConstraintHigh(wp2->GetAltitudeConstraintHigh());
-   wp.SetSpeedConstraintHigh(wp2->GetSpeedConstraintHigh());
-   ++wp2;
-   wp.SetAltitudeConstraintLow(wp2->GetAltitudeConstraintLow());
-   wp.SetSpeedConstraintLow(wp2->GetSpeedConstraintLow());
-
-   InsertWaypointAtIndex(wp, index);
-}
-
-void DefaultAircraftIntent::InsertWaypointAtIndex(const Waypoint &wp, int index) {
-   if (index < m_ascent_waypoints.size()) {
-      std::vector<Waypoint> new_vector(m_ascent_waypoints);
-      auto itr = std::next(new_vector.begin(), index);
-      new_vector.insert(itr, wp);
-      ClearAndResetRouteDataContent(new_vector, m_cruise_waypoints, m_descent_waypoints);
-   } else if (index < m_ascent_waypoints.size() + m_cruise_waypoints.size()) {
-      std::vector<Waypoint> new_vector(m_cruise_waypoints);
-      auto itr = std::next(new_vector.begin(), index - m_ascent_waypoints.size());
-      new_vector.insert(itr, wp);
-      ClearAndResetRouteDataContent(m_ascent_waypoints, new_vector, m_descent_waypoints);
-   } else {
-      std::vector<Waypoint> new_vector(m_descent_waypoints);
-      auto itr = std::next(new_vector.begin(), index - m_ascent_waypoints.size() - m_cruise_waypoints.size());
-      new_vector.insert(itr, wp);
-      ClearAndResetRouteDataContent(m_ascent_waypoints, m_cruise_waypoints, new_vector);
-   }
-
-   UpdateXYZFromLatLonWgs84();
-}
-
 std::optional<Waypoint> DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
    if (i >= m_ordered_waypoints.size()) {
       return std::nullopt;
@@ -364,7 +315,7 @@ const std::vector<Waypoint> &DefaultAircraftIntent::GetWaypoints() const { retur
 
 bool DefaultAircraftIntent::operator==(const DefaultAircraftIntent &obj) const {
    if (m_planned_cruise_altitude == obj.m_planned_cruise_altitude &&
-       planned_cruise_mach_ == obj.planned_cruise_mach_ && m_is_loaded == obj.m_is_loaded &&
+       planned_cruise_mach_ == obj.planned_cruise_mach_ &&
        route_data_.m_name == obj.route_data_.m_name && route_data_.m_x == obj.route_data_.m_x &&
        route_data_.m_y == obj.route_data_.m_y && route_data_.m_z == obj.route_data_.m_z &&
        route_data_.m_latitude == obj.route_data_.m_latitude && route_data_.m_longitude == obj.route_data_.m_longitude &&

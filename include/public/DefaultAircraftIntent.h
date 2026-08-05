@@ -80,11 +80,7 @@ namespace aaesim::open_source
       const RouteData &GetRouteData() const override;
       std::optional<unsigned int> GetWaypointIndexByName(const std::string &waypoint_name) const override;
       std::pair<int, int> FindCommonWaypoint(const AircraftIntent &intent) const override;
-      void InsertPairAtIndex(const std::string &wpname, const Units::Length &x, const Units::Length &y,
-                             int index); // TODO remove
-      void InsertWaypointAtIndex(const Waypoint &waypoint, int index); // TODO remove
       unsigned int GetNumberOfWaypoints() const override;
-      bool IsLoaded() const; // TODO should not exist
       bool ContainsAscentWaypoints() const;
       const std::vector<Waypoint> &GetAscentWaypoints() const override;
       bool ContainsCruiseWaypoints() const;
@@ -128,7 +124,6 @@ namespace aaesim::open_source
       std::shared_ptr<TangentPlaneSequence> m_tangent_plane_sequence{};
       double planned_cruise_mach_{0};
       std::vector<Waypoint> m_ordered_waypoints{};
-      bool m_is_loaded{false};
       std::vector<Waypoint> m_ascent_waypoints{}, m_cruise_waypoints{}, m_descent_waypoints{};
       Units::MetersLength m_planned_cruise_altitude{Units::ZERO_LENGTH};
 
@@ -143,8 +138,6 @@ namespace aaesim::open_source
    inline unsigned int DefaultAircraftIntent::GetNumberOfWaypoints() const { return route_data_.m_name.size(); }
 
    inline Units::MetersLength DefaultAircraftIntent::GetPlannedCruiseAltitude() const { return m_planned_cruise_altitude; }
-
-   inline bool DefaultAircraftIntent::IsLoaded() const { return m_is_loaded; }
 
    inline void DefaultAircraftIntent::AddWaypointsToRouteDataVectors(const std::vector<Waypoint> &waypoints,
                                                                      enum WaypointPhaseOfFlight add_as_phase)
