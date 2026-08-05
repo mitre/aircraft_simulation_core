@@ -353,25 +353,6 @@ void DefaultAircraftIntent::InsertWaypointAtIndex(const Waypoint &wp, int index)
    UpdateXYZFromLatLonWgs84();
 }
 
-void DefaultAircraftIntent::UpdateWaypoint(const Waypoint &waypoint) {
-   int update_count(0);
-   std::vector<Waypoint> new_vector(m_ordered_waypoints);
-   for (auto it = new_vector.begin(); it != new_vector.end(); ++it) {
-      if (it->GetName() == waypoint.GetName()) {
-         (*it) = waypoint;
-         update_count++;
-      }
-   }
-   if (update_count != 1) {
-      LOG4CPLUS_FATAL(m_logger, update_count << " waypoints updated.");
-      throw std::runtime_error("Wrong number of waypoints matched.");
-   }
-
-   const std::vector<Waypoint> empty_vector;
-   ClearAndResetRouteDataContent(empty_vector, empty_vector, new_vector);
-   UpdateXYZFromLatLonWgs84();
-}
-
 void DefaultAircraftIntent::ClearWaypoints() {
    m_ordered_waypoints.clear();
 

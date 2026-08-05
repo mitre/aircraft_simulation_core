@@ -71,7 +71,6 @@ namespace aaesim::open_source
       DefaultAircraftIntent &operator=(const DefaultAircraftIntent &) = default;
       bool operator==(const DefaultAircraftIntent &in) const;
 
-      void UpdateWaypoint(const Waypoint &waypoint); // TODO why does this exist?
       void GetLatLonFromXYZ(const Units::Length &xMeters, const Units::Length &yMeters,
                             const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const; // TODO why does this exist?
       void SetNumberOfWaypoints(unsigned int n); // TODO should not exist, client code should use builder
