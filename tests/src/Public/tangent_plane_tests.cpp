@@ -81,8 +81,7 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    Waypoint wp2{"wp2", Units::DegreesAngle(37.6), Units::DegreesAngle(-71.0)};
    Waypoint end_waypoint{"end", Units::DegreesAngle(40.0), Units::DegreesAngle(-70.0)};
    auto waypoints = std::vector<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
-   DefaultAircraftIntent aircraft_intent = DefaultAircraftIntent();
-   aircraft_intent.LoadWaypoints(waypoints, {}, {});
+   const auto aircraft_intent = *DefaultAircraftIntent::Builder().SetAscentWaypoints(waypoints).Build();
    auto tangent_plane_sequence = std::make_shared<SingleTangentPlaneSequence>(aircraft_intent.GetWaypoints());
    auto route_data = aircraft_intent.GetRouteData();
 

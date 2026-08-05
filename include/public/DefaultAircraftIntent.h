@@ -71,30 +71,26 @@ namespace aaesim::open_source
       DefaultAircraftIntent &operator=(const DefaultAircraftIntent &) = default;
       bool operator==(const DefaultAircraftIntent &in) const;
 
-      void LoadWaypoints(const std::vector<Waypoint> &ascent_waypoints,
-                         const std::vector<Waypoint> &cruise_waypoints,
-                         const std::vector<Waypoint> &descent_waypoints);
-      void UpdateXYZFromLatLonWgs84();
-      void UpdateWaypoint(const Waypoint &waypoint);
+      void UpdateWaypoint(const Waypoint &waypoint); // TODO why does this exist?
       void GetLatLonFromXYZ(const Units::Length &xMeters, const Units::Length &yMeters,
-                            const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const;
-      void SetNumberOfWaypoints(unsigned int n);
+                            const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const; // TODO why does this exist?
+      void SetNumberOfWaypoints(unsigned int n); // TODO should not exist, client code should use builder
       std::optional<Waypoint> GetWaypoint(unsigned int i) const override;
       const std::vector<Waypoint> &GetWaypoints() const override;
       std::optional<std::string> GetWaypointName(unsigned int i) const override;
       Units::MetersLength GetWaypointX(unsigned int i) const;
       Units::MetersLength GetWaypointY(unsigned int i) const;
       Units::MetersLength GetPlannedCruiseAltitude() const override;
-      void SetPlannedCruiseAltitude(Units::Length altitude);
+      void SetPlannedCruiseAltitude(Units::Length altitude); // TODO should not exist, client code should use builder
       const RouteData &GetRouteData() const override;
       std::optional<unsigned int> GetWaypointIndexByName(const std::string &waypoint_name) const override;
       std::pair<int, int> FindCommonWaypoint(const AircraftIntent &intent) const override;
       void InsertPairAtIndex(const std::string &wpname, const Units::Length &x, const Units::Length &y,
                              int index);
       void InsertWaypointAtIndex(const Waypoint &waypoint, int index);
-      void ClearWaypoints();
+      void ClearWaypoints(); // TODO should not exist
       unsigned int GetNumberOfWaypoints() const override;
-      bool IsLoaded() const;
+      bool IsLoaded() const; // TODO should not exist
       bool ContainsAscentWaypoints() const;
       const std::vector<Waypoint> &GetAscentWaypoints() const override;
       bool ContainsCruiseWaypoints() const;
@@ -102,7 +98,7 @@ namespace aaesim::open_source
       bool ContainsDescentWaypoints() const;
       const std::vector<Waypoint> &GetDescentWaypoints() const override;
       double GetPlannedCruiseMach() const override;
-      void SetPlannedCruiseMach(BoundedValue<double, 0, 1> mach_number);
+      void SetPlannedCruiseMach(BoundedValue<double, 0, 1> mach_number); // TODO should not be public, client code should use builder
       bool ContainsWaypointName(const std::string &waypoint_name) const override;
 
    private:
@@ -125,6 +121,11 @@ namespace aaesim::open_source
       void ClearAndResetRouteDataContent(const std::vector<Waypoint> &ascent_waypoints,
                                          const std::vector<Waypoint> &cruise_waypoints,
                                          const std::vector<Waypoint> &descent_waypoints);
+
+      void LoadWaypoints(const std::vector<Waypoint> &ascent_waypoints,
+                         const std::vector<Waypoint> &cruise_waypoints,
+                         const std::vector<Waypoint> &descent_waypoints);
+      void UpdateXYZFromLatLonWgs84();
 
       void DoRouteDataLogging() const;
 
