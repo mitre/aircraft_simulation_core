@@ -74,8 +74,8 @@ DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetPlannedCruise
 
 std::shared_ptr<DefaultAircraftIntent> DefaultAircraftIntent::Builder::Build() const {
    std::shared_ptr<DefaultAircraftIntent> aircraft_intent = std::make_shared<DefaultAircraftIntent>();
-   aircraft_intent->SetPlannedCruiseMach(planned_cruise_mach_);
-   aircraft_intent->SetPlannedCruiseAltitude(planned_cruise_altitude_);
+   aircraft_intent->planned_cruise_mach_ = planned_cruise_mach_;
+   aircraft_intent->m_planned_cruise_altitude = planned_cruise_altitude_;
    aircraft_intent->LoadWaypoints(ascent_waypoints_, cruise_waypoints_, descent_waypoints_);
    return aircraft_intent;
 }
@@ -353,14 +353,6 @@ void DefaultAircraftIntent::InsertWaypointAtIndex(const Waypoint &wp, int index)
    UpdateXYZFromLatLonWgs84();
 }
 
-void DefaultAircraftIntent::ClearWaypoints() {
-   m_ordered_waypoints.clear();
-
-   const std::vector<Waypoint> empty_vector;
-   ClearAndResetRouteDataContent(empty_vector, empty_vector, m_ordered_waypoints);
-   UpdateXYZFromLatLonWgs84();
-}
-
 std::optional<Waypoint> DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
    if (i >= m_ordered_waypoints.size()) {
       return std::nullopt;
@@ -369,14 +361,6 @@ std::optional<Waypoint> DefaultAircraftIntent::GetWaypoint(unsigned int i) const
 }
 
 const std::vector<Waypoint> &DefaultAircraftIntent::GetWaypoints() const { return m_ordered_waypoints; }
-
-void DefaultAircraftIntent::SetNumberOfWaypoints(unsigned int n) {
-   if (n < m_ordered_waypoints.size()) {
-      std::vector<Waypoint>::iterator it1 = std::next(m_ordered_waypoints.begin(), n);  // get an iterator pointing to index
-      std::vector<Waypoint>::iterator it2 = m_ordered_waypoints.end();
-      m_ordered_waypoints.erase(it1, it2);
-   }
-}
 
 bool DefaultAircraftIntent::operator==(const DefaultAircraftIntent &obj) const {
    if (m_planned_cruise_altitude == obj.m_planned_cruise_altitude &&
@@ -398,12 +382,6 @@ bool DefaultAircraftIntent::operator==(const DefaultAircraftIntent &obj) const {
       return true;
    }
    return false;
-}
-
-void DefaultAircraftIntent::SetPlannedCruiseAltitude(Units::Length altitude) { this->m_planned_cruise_altitude = altitude; }
-
-void DefaultAircraftIntent::SetPlannedCruiseMach(BoundedValue<double, 0, 1> mach_number) {
-   planned_cruise_mach_ = (double)mach_number;
 }
 
 std::optional<std::string> DefaultAircraftIntent::GetWaypointName(unsigned int i) const {
