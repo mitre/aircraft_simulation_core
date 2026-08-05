@@ -7,8 +7,8 @@ namespace aaesim::open_source {
 DefaultAircraftIntent AircraftIntentUtils::CopyAndTrimAfterNamedWaypoint(const AircraftIntent &intent,
                                                                           const std::string &waypoint_name) {
    auto copy = *DefaultAircraftIntent::Builder(intent).Build();
-   if (!intent.ContainsWaypointName(waypoint_name) ||
-       intent.GetWaypoint(intent.GetNumberOfWaypoints() - 1).GetName() == waypoint_name) {
+   const auto &waypoints = intent.GetWaypoints();
+   if (!intent.ContainsWaypointName(waypoint_name) || waypoints.empty() || waypoints.back().GetName() == waypoint_name) {
       return copy;
    }
    const auto matches = [&waypoint_name](const Waypoint &waypoint) { return waypoint.GetName() == waypoint_name; };

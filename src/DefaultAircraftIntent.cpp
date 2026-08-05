@@ -251,20 +251,13 @@ void DefaultAircraftIntent::UpdateXYZFromLatLonWgs84() {
    }
 }
 
-int DefaultAircraftIntent::GetWaypointIndexByName(const std::string &waypoint_name) const {
-   int ix = -1;
-   bool found_waypoint = false;
-   for (const Waypoint &wp : m_ordered_waypoints) {
-      ++ix;
-      if (wp.GetName().compare(waypoint_name) == 0) {
-         found_waypoint = true;
-         break;
+std::optional<unsigned int> DefaultAircraftIntent::GetWaypointIndexByName(const std::string &waypoint_name) const {
+   for (unsigned int index = 0; index < m_ordered_waypoints.size(); ++index) {
+      if (m_ordered_waypoints[index].GetName() == waypoint_name) {
+         return index;
       }
    }
-
-   if (!found_waypoint) ix = -1;
-
-   return ix;
+   return std::nullopt;
 }
 
 
@@ -294,7 +287,12 @@ std::pair<int, int> DefaultAircraftIntent::FindCommonWaypoint(const AircraftInte
    int thatIndex = -1;
 
    while ((ix >= 0) && (tx >= 0)) {
-      if (GetWaypoint(ix).GetName() == intent.GetWaypoint(tx).GetName()) {
+      const auto waypoint = GetWaypoint(ix);
+      const auto other_waypoint = intent.GetWaypoint(tx);
+      if (!waypoint || !other_waypoint) {
+         break;
+      }
+      if (waypoint->GetName() == other_waypoint->GetName()) {
          thisIndex = ix;
          thatIndex = tx;
          ix--;
@@ -382,10 +380,9 @@ void DefaultAircraftIntent::ClearWaypoints() {
    UpdateXYZFromLatLonWgs84();
 }
 
-const Waypoint &DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
+std::optional<Waypoint> DefaultAircraftIntent::GetWaypoint(unsigned int i) const {
    if (i >= m_ordered_waypoints.size()) {
-      LOG4CPLUS_FATAL(m_logger, "Index " << i << " is out of range for size " << m_ordered_waypoints.size());
-      throw InvalidIndexException(i, 0, m_ordered_waypoints.size() - 1);
+      return std::nullopt;
    }
    return m_ordered_waypoints[i];
 }
@@ -428,7 +425,10 @@ void DefaultAircraftIntent::SetPlannedCruiseMach(BoundedValue<double, 0, 1> mach
    planned_cruise_mach_ = (double)mach_number;
 }
 
-const std::string &DefaultAircraftIntent::GetWaypointName(unsigned int i) const { return GetWaypoint(i).GetName(); }
+std::optional<std::string> DefaultAircraftIntent::GetWaypointName(unsigned int i) const {
+   if (i >= m_ordered_waypoints.size()) return std::nullopt;
+   return m_ordered_waypoints[i].GetName();
+}
 
 Units::MetersLength DefaultAircraftIntent::GetWaypointX(unsigned int i) const {
    if (i >= route_data_.m_x.size()) {

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -74,13 +75,13 @@ namespace aaesim::open_source
 
       virtual ~AircraftIntent() = default;
 
-      virtual const Waypoint &GetWaypoint(unsigned int i) const = 0;
+      virtual std::optional<Waypoint> GetWaypoint(unsigned int i) const = 0;
       virtual const std::vector<Waypoint> &GetWaypoints() const = 0;
-      virtual const std::string &GetWaypointName(unsigned int i) const = 0;
+      virtual std::optional<std::string> GetWaypointName(unsigned int i) const = 0;
 
       virtual Units::MetersLength GetPlannedCruiseAltitude() const = 0;
       virtual const RouteData &GetRouteData() const = 0;
-      virtual int GetWaypointIndexByName(const std::string &waypoint_name) const = 0;
+      virtual std::optional<unsigned int> GetWaypointIndexByName(const std::string &waypoint_name) const = 0;
       virtual std::pair<int, int> FindCommonWaypoint(const AircraftIntent &intent) const = 0;
       virtual unsigned int GetNumberOfWaypoints() const = 0;
       virtual const std::vector<Waypoint> &GetAscentWaypoints() const = 0;

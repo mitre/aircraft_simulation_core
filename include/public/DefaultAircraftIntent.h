@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 #include <scalar/Speed.h>
@@ -77,15 +79,15 @@ namespace aaesim::open_source
       void GetLatLonFromXYZ(const Units::Length &xMeters, const Units::Length &yMeters,
                             const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const;
       void SetNumberOfWaypoints(unsigned int n);
-      const Waypoint &GetWaypoint(unsigned int i) const override;
+      std::optional<Waypoint> GetWaypoint(unsigned int i) const override;
       const std::vector<Waypoint> &GetWaypoints() const override;
-      const std::string &GetWaypointName(unsigned int i) const override;
+      std::optional<std::string> GetWaypointName(unsigned int i) const override;
       Units::MetersLength GetWaypointX(unsigned int i) const;
       Units::MetersLength GetWaypointY(unsigned int i) const;
       Units::MetersLength GetPlannedCruiseAltitude() const override;
       void SetPlannedCruiseAltitude(Units::Length altitude);
       const RouteData &GetRouteData() const override;
-      int GetWaypointIndexByName(const std::string &waypoint_name) const override;
+      std::optional<unsigned int> GetWaypointIndexByName(const std::string &waypoint_name) const override;
       std::pair<int, int> FindCommonWaypoint(const AircraftIntent &intent) const override;
       void InsertPairAtIndex(const std::string &wpname, const Units::Length &x, const Units::Length &y,
                              int index);

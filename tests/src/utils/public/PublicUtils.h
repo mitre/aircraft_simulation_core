@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "public/HorizontalPath.h"
+#include "public/DefaultAircraftIntent.h"
 
 namespace aaesim {
 namespace test {
@@ -36,6 +37,8 @@ enum Quadrant { FIRST, SECOND, THIRD, FOURTH };
 class PublicUtils {
   public:
    static std::vector<aaesim::open_source::HorizontalPath> CreateStraightHorizontalPath(Quadrant quadrant);
+   static DefaultAircraftIntent LoadAircraftIntent(std::string parmsfile);
+   static DefaultAircraftIntent PrepareAircraftIntent(std::string parmsfile);
 };
 }  // namespace utils
 }  // namespace test
