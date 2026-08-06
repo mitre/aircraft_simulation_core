@@ -26,7 +26,7 @@
 #include "public/EquationsOfMotionStateDeriv.h"
 #include "public/SimulationTime.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct LatLonDerivative {
    Units::AngularSpeed latitude_time_derivative;
    Units::AngularSpeed longitude_time_derivative;
@@ -37,4 +37,4 @@ struct EllipsoidalPositionEstimator {
                                 const EquationsOfMotionStateDeriv &eqm_state_derivative,
                                 EarthModel::GeodeticPosition &position, LatLonDerivative &position_rate) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

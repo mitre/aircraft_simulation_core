@@ -28,10 +28,9 @@
 #include "public/Atmosphere.h"
 #include "public/WindStack.h"
 
-class Wind;
+namespace mitre::oss::simcore {
 
-namespace aaesim {
-namespace open_source {
+class Wind;
 class WeatherEstimate {
    friend class Wind_populate_predicted_wind_matrices_Test;
 
@@ -45,14 +44,14 @@ class WeatherEstimate {
       shared_members() = default;
       explicit shared_members(std::shared_ptr<Atmosphere> atmosphere)
          : east_west(), north_south(), m_atmosphere(atmosphere) {}
-      aaesim::open_source::WindStack east_west{};
-      aaesim::open_source::WindStack north_south{};
+      mitre::oss::simcore::WindStack east_west{};
+      mitre::oss::simcore::WindStack north_south{};
       std::shared_ptr<Atmosphere> m_atmosphere{};
    };
 
   public:
-   aaesim::open_source::WindStack &east_west() const { return m_shared_members->east_west; }
-   aaesim::open_source::WindStack &north_south() const { return m_shared_members->north_south; }
+   mitre::oss::simcore::WindStack &east_west() const { return m_shared_members->east_west; }
+   mitre::oss::simcore::WindStack &north_south() const { return m_shared_members->north_south; }
 
    std::shared_ptr<Wind> getWind() const;
 
@@ -115,5 +114,4 @@ inline std::pair<std::pair<Units::Angle, Units::Angle>, Units::Length> WeatherEs
    return m_location_of_current_conditions;
 }
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

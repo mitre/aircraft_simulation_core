@@ -22,6 +22,6 @@
 #include <map>
 #include <string>
 
-RandomGenerator aaesim::open_source::ScenarioUtils::RANDOM_NUMBER_GENERATOR;
-const int aaesim::open_source::ScenarioUtils::AIRCRAFT_ID_NOT_IN_MAP = -1;
-std::map<std::string, int> aaesim::open_source::ScenarioUtils::m_aircraft_string_int_map;
+mitre::oss::simcore::RandomGenerator mitre::oss::simcore::ScenarioUtils::RANDOM_NUMBER_GENERATOR;
+const int mitre::oss::simcore::ScenarioUtils::AIRCRAFT_ID_NOT_IN_MAP = -1;
+std::map<std::string, int> mitre::oss::simcore::ScenarioUtils::m_aircraft_string_int_map;

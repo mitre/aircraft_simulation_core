@@ -33,6 +33,8 @@
 #include "public/OutputHandler.h"
 #include "public/VerticalPath.h"
 
+namespace mitre::oss::simcore {
+
 struct PredictionFileBase {
   public:
    PredictionFileBase() = default;
@@ -63,8 +65,8 @@ struct PredictionFileBase {
       Units::MetersPerSecondSpeed VwePred{Units::MetersPerSecondSpeed(-1.0)};
       Units::MetersPerSecondSpeed VwnPred{Units::MetersPerSecondSpeed(-1.0)};
       VerticalPath::PredictionAlgorithmType algorithm{VerticalPath::PredictionAlgorithmType::UNDETERMINED};
-      aaesim::open_source::bada_utils::FlapConfiguration flap_setting{
-            aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+      mitre::oss::simcore::bada_utils::FlapConfiguration flap_setting{
+            mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
       Units::MetersPerSecondSpeed vertical_rate{Units::MetersPerSecondSpeed(-1.0)};
       Units::DegreesAngle flight_path_angle{Units::DegreesAngle(-1)};
    };
@@ -103,3 +105,4 @@ struct PredictionFileBase {
       return prediction_data;
    }
 };
+}  // namespace mitre::oss::simcore

@@ -23,6 +23,8 @@
 
 #include "public/DVector.h"
 
+namespace mitre::oss::simcore {
+
 class DMatrix {
   public:
    class IncompatibleDimensionsException : public std::exception {
@@ -81,3 +83,4 @@ class DMatrix {
    int m_min_row;
    int m_max_row;
 };
+}  // namespace mitre::oss::simcore

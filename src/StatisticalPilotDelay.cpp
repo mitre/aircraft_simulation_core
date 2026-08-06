@@ -26,7 +26,7 @@
 #include "public/CustomMath.h"
 #include "public/ScenarioUtils.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger StatisticalPilotDelay::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("StatisticalPilotDelay"));
@@ -142,10 +142,10 @@ Units::Time StatisticalPilotDelay::ComputeTimeToSpeedChange(Units::Length curren
    Units::SecondsTime tval;
 
    if ((current_altitude - altitude_at_end_of_route) > Units::FeetLength(9000.0)) {
-      tval = aaesim::open_source::ScenarioUtils::RANDOM_NUMBER_GENERATOR.TruncatedGaussianSample(
+      tval = mitre::oss::simcore::ScenarioUtils::RANDOM_NUMBER_GENERATOR.TruncatedGaussianSample(
             m_pilot_delay_mean, m_pilot_delay_standard_deviation, STANDARD_DEVIATION_LIMIT);
    } else {
-      tval = aaesim::open_source::ScenarioUtils::RANDOM_NUMBER_GENERATOR.TruncatedGaussianSample(
+      tval = mitre::oss::simcore::ScenarioUtils::RANDOM_NUMBER_GENERATOR.TruncatedGaussianSample(
             m_pilot_delay_mean / 2, m_pilot_delay_standard_deviation / 2, STANDARD_DEVIATION_LIMIT);
    }
 

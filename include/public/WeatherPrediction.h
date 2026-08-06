@@ -23,27 +23,26 @@
 
 #include "public/WeatherEstimate.h"
 
-namespace aaesim {
-namespace test {
+namespace mitre::oss::simcore::test {
 class Wind_populate_predicted_wind_matrices_Test;
 class TrajectoryPredictor_updateWeatherPrediction_Test;
 class TrajectoryPredictor_startAltitudeInDescentAltList_Test;
 class TrajectoryPredictor_startAndEndAltitudeInDescentAltList_Test;
-}  // namespace test
+}  // namespace mitre::oss::simcore::test
 
-namespace open_source {
+namespace mitre::oss::simcore {
 
 class WeatherPrediction final : public WeatherEstimate {
-   friend class aaesim::test::Wind_populate_predicted_wind_matrices_Test;
+   friend class mitre::oss::simcore::test::Wind_populate_predicted_wind_matrices_Test;
 
-   friend class aaesim::test::TrajectoryPredictor_updateWeatherPrediction_Test;
+   friend class mitre::oss::simcore::test::TrajectoryPredictor_updateWeatherPrediction_Test;
 
-   friend class aaesim::test::TrajectoryPredictor_startAltitudeInDescentAltList_Test;
+   friend class mitre::oss::simcore::test::TrajectoryPredictor_startAltitudeInDescentAltList_Test;
 
-   friend class aaesim::test::TrajectoryPredictor_startAndEndAltitudeInDescentAltList_Test;
+   friend class mitre::oss::simcore::test::TrajectoryPredictor_startAndEndAltitudeInDescentAltList_Test;
 
   public:
-   static aaesim::open_source::WeatherPrediction CreateZeroWindPrediction(std::shared_ptr<Atmosphere> atmosphere);
+   static mitre::oss::simcore::WeatherPrediction CreateZeroWindPrediction(std::shared_ptr<Atmosphere> atmosphere);
 
    WeatherPrediction() = default;
    WeatherPrediction(std::shared_ptr<Wind> wind, std::shared_ptr<Atmosphere> atmosphere);
@@ -68,5 +67,4 @@ inline int WeatherPrediction::GetUpdateCount() const { return update_count_; }
 inline std::shared_ptr<Wind> WeatherPrediction::GetForecastWind() const { return getWind(); }
 
 inline std::shared_ptr<Atmosphere> WeatherPrediction::GetForecastAtmosphere() const { return getAtmosphere(); }
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

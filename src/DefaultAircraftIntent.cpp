@@ -31,7 +31,7 @@
 #include "public/InvalidIndexException.h"
 #include "public/SingleTangentPlaneSequence.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 DefaultAircraftIntent::Builder::Builder(const AircraftIntent &aircraft_intent) {
    if (!aircraft_intent.GetAscentWaypoints().empty()) {

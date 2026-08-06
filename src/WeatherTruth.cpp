@@ -23,7 +23,7 @@
 
 #include "public/Atmosphere.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 WeatherTruth::WeatherTruth() : WeatherEstimate() {}
 

@@ -27,8 +27,7 @@
 #include "public/WeatherPrediction.h"
 #include "utility/BoundedValue.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct SpeedCommandLimiter {
    virtual ~SpeedCommandLimiter() = default;
 
@@ -36,7 +35,7 @@ struct SpeedCommandLimiter {
          const Units::Speed previous_ias_speed_command, const Units::Speed current_ias_speed_command,
          const Units::Speed reference_velocity_mps, const Units::Length speed_quantization_distance,
          const Units::Length distance_to_end_of_route, const Units::Length current_altitude,
-         const aaesim::open_source::bada_utils::FlapConfiguration flap_configuration) = 0;
+         const mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration) = 0;
 
    virtual BoundedValue<double, 0, 2> LimitMachCommand(
          const BoundedValue<double, 0, 2> &previous_reference_speed_command_mach,
@@ -44,5 +43,4 @@ struct SpeedCommandLimiter {
          const Units::Mass &current_mass, const Units::Length &current_altitude,
          const WeatherPrediction &weather_prediction) = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

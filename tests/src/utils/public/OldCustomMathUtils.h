@@ -38,9 +38,7 @@
  * here on 19 Nov 15.  The sampling methods saved here are used in some
  * of the tests.
  **/
-namespace aaesim {
-namespace test {
-namespace utils {
+namespace mitre::oss::simcore::test::utils {
 class OldCustomMath {
   public:
    static log4cplus::Logger logger;
@@ -80,6 +78,4 @@ class OldCustomMath {
 
    DMatrix &createRotationMatrix(double l, double m, double n, const Units::Angle theta);
 };
-}  // namespace utils
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test::utils

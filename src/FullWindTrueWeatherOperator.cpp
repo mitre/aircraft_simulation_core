@@ -19,7 +19,7 @@
 
 #include "public/FullWindTrueWeatherOperator.h"
 
-void aaesim::open_source::FullWindTrueWeatherOperator::CalculateEnvironmentalWind(
+void mitre::oss::simcore::FullWindTrueWeatherOperator::CalculateEnvironmentalWind(
       const EarthModel::GeodeticPosition &position, const Units::Length &altitude_msl) {
    m_true_weather->LoadConditionsAt(position.latitude, position.longitude, altitude_msl);
 
@@ -30,11 +30,11 @@ void aaesim::open_source::FullWindTrueWeatherOperator::CalculateEnvironmentalWin
                                                                  m_vertical_derivative_north);
 }
 
-Units::Speed aaesim::open_source::FullWindTrueWeatherOperator::GetWindSpeedEast() const { return m_wind_speed_east; }
-Units::Speed aaesim::open_source::FullWindTrueWeatherOperator::GetWindSpeedNorth() const { return m_wind_speed_north; }
-Units::Frequency aaesim::open_source::FullWindTrueWeatherOperator::GetWindSpeedVerticalDerivativeEast() const {
+Units::Speed mitre::oss::simcore::FullWindTrueWeatherOperator::GetWindSpeedEast() const { return m_wind_speed_east; }
+Units::Speed mitre::oss::simcore::FullWindTrueWeatherOperator::GetWindSpeedNorth() const { return m_wind_speed_north; }
+Units::Frequency mitre::oss::simcore::FullWindTrueWeatherOperator::GetWindSpeedVerticalDerivativeEast() const {
    return m_vertical_derivative_east;
 }
-Units::Frequency aaesim::open_source::FullWindTrueWeatherOperator::GetWindSpeedVerticalDerivativeNorth() const {
+Units::Frequency mitre::oss::simcore::FullWindTrueWeatherOperator::GetWindSpeedVerticalDerivativeNorth() const {
    return m_vertical_derivative_north;
 }

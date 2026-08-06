@@ -33,6 +33,8 @@
 
 #include "public/CustomMath.h"
 
+namespace mitre::oss::simcore {
+
 using namespace std;
 
 log4cplus::Logger LocalTangentPlane::logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("LocalTangentPlane"));
@@ -139,3 +141,4 @@ const EarthModel::LocalPositionEnu &LocalTangentPlane::getPointOfTangencyEnu() c
 const EarthModel::AbsolutePositionEcef &LocalTangentPlane::getPointOfTangencyEcef() const {
    return pointOfTangencyEcef;
 }
+}  // namespace mitre::oss::simcore

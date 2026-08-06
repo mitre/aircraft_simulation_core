@@ -19,7 +19,7 @@
 
 #include "public/NullSpeedLimiter.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 NullSpeedLimiter::NullSpeedLimiter() = default;
 
@@ -27,7 +27,7 @@ Units::Speed NullSpeedLimiter::LimitSpeedCommand(
       const Units::Speed previous_ias_speed_command, const Units::Speed current_ias_speed_command,
       const Units::Speed reference_velocity_mps, const Units::Length speed_quantization_distance,
       const Units::Length distance_to_end_of_route, const Units::Length current_altitude,
-      const aaesim::open_source::bada_utils::FlapConfiguration flap_configuration) {
+      const mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration) {
    return current_ias_speed_command;
 }
 

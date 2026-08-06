@@ -19,16 +19,16 @@
 
 #include "public/HorizontalPath.h"
 
-double aaesim::open_source::HorizontalPath::GetXPositionMeters() const { return m_x_position_meters; }
+double mitre::oss::simcore::HorizontalPath::GetXPositionMeters() const { return m_x_position_meters; }
 
-double aaesim::open_source::HorizontalPath::GetYPositionMeters() const { return m_y_position_meters; }
+double mitre::oss::simcore::HorizontalPath::GetYPositionMeters() const { return m_y_position_meters; }
 
-void aaesim::open_source::HorizontalPath::SetXYPositionMeters(double x_position_meters, double y_position_meters) {
+void mitre::oss::simcore::HorizontalPath::SetXYPositionMeters(double x_position_meters, double y_position_meters) {
    m_x_position_meters = x_position_meters;
    m_y_position_meters = y_position_meters;
 }
 
-bool aaesim::open_source::HorizontalPath::operator==(const HorizontalPath &that) const {
+bool mitre::oss::simcore::HorizontalPath::operator==(const HorizontalPath &that) const {
    return (this->m_x_position_meters == that.m_x_position_meters) &&
           (this->m_y_position_meters == that.m_y_position_meters) && (this->m_segment_type == that.m_segment_type);
 }

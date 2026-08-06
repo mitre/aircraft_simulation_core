@@ -38,8 +38,7 @@
 
 #include "utility/CsvParser.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 class DataReader {
   public:
@@ -69,5 +68,4 @@ class DataReader {
    std::map<std::string, int> m_column_index;
 };
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

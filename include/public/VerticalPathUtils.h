@@ -27,8 +27,7 @@
 
 #include "public/CoreUtils.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct VerticalPathUtils {
    struct VerticalPathDataSet final {
       Units::Length along_path_distance{};
@@ -44,8 +43,8 @@ struct VerticalPathUtils {
       Units::Mass mass{};
       Units::MetersPerSecondSpeed wind_velocity_east{};
       Units::MetersPerSecondSpeed wind_velocity_north{};
-      aaesim::open_source::bada_utils::FlapConfiguration flap_setting{
-            aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+      mitre::oss::simcore::bada_utils::FlapConfiguration flap_setting{
+            mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
       int resolved_index{INT32_MIN};
       VerticalPath::PredictionAlgorithmType algorithm_type{VerticalPath::PredictionAlgorithmType::UNDETERMINED};
    };
@@ -68,14 +67,13 @@ struct VerticalPathUtils {
 
    static VerticalPathDataSet GetPathDataAtIndex(const VerticalPath &vertical_path, int index);
 
-   static std::vector<aaesim::open_source::VerticalPathUtils::VerticalPathDataSet> ConvertToPathDataSet(
+   static std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet> ConvertToPathDataSet(
          const VerticalPath &vertical_path);
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore
 
-inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
-      aaesim::open_source::VerticalPathUtils::GetVerticalPathData(const VerticalPath &vertical_path,
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetVerticalPathData(const VerticalPath &vertical_path,
                                                                   Units::Length estimated_distance_to_path_end) {
    const Units::MetersLength distance_to_go{estimated_distance_to_path_end};
    const auto reference_lookup_index =
@@ -83,18 +81,18 @@ inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
    return GetPathDataAtIndex(vertical_path, reference_lookup_index);
 }
 
-inline std::vector<aaesim::open_source::VerticalPathUtils::VerticalPathDataSet>
-      aaesim::open_source::VerticalPathUtils::ConvertToPathDataSet(const VerticalPath &vertical_path) {
-   std::vector<aaesim::open_source::VerticalPathUtils::VerticalPathDataSet> path_data_set{};
+inline std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet>
+      mitre::oss::simcore::VerticalPathUtils::ConvertToPathDataSet(const VerticalPath &vertical_path) {
+   std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet> path_data_set{};
    for (auto idx = 0; idx < vertical_path.along_path_distance_m.size(); ++idx) {
-      path_data_set.push_back(aaesim::open_source::VerticalPathUtils::GetPathDataAtIndex(vertical_path, idx));
+      path_data_set.push_back(mitre::oss::simcore::VerticalPathUtils::GetPathDataAtIndex(vertical_path, idx));
    }
    return path_data_set;
 }
 
-inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
-      aaesim::open_source::VerticalPathUtils::GetPathDataAtIndex(const VerticalPath &vertical_path, int index) {
-   aaesim::open_source::VerticalPathUtils::VerticalPathDataSet single_data_row{};
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetPathDataAtIndex(const VerticalPath &vertical_path, int index) {
+   mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet single_data_row{};
    single_data_row.resolved_index = index;
    single_data_row.along_path_distance = Units::MetersLength(vertical_path.along_path_distance_m[index]);
    single_data_row.altitude_msl = Units::MetersLength(vertical_path.altitude_m[index]);
@@ -114,8 +112,8 @@ inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
    return single_data_row;
 }
 
-inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
-      aaesim::open_source::VerticalPathUtils::GetInterpolatedPathData(const VerticalPath &vertical_path,
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetInterpolatedPathData(const VerticalPath &vertical_path,
                                                                       Units::Length estimated_distance_to_path_end) {
    const Units::MetersLength distance_to_go{estimated_distance_to_path_end};
    const auto reference_lookup_index =
@@ -125,7 +123,7 @@ inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
       return GetPathDataAtIndex(vertical_path, reference_lookup_index);
    }
 
-   aaesim::open_source::VerticalPathUtils::VerticalPathDataSet single_data_row{};
+   mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet single_data_row{};
    single_data_row.resolved_index = reference_lookup_index;
    single_data_row.altitude_msl = Units::MetersLength(
          CoreUtils::LinearlyInterpolate(reference_lookup_index, distance_to_go.value(),
@@ -163,7 +161,7 @@ inline aaesim::open_source::VerticalPathUtils::VerticalPathDataSet
    return single_data_row;
 }
 
-inline Units::Speed aaesim::open_source::VerticalPathUtils::CalculateSpeedGuidance(
+inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidance(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
    auto reference_lookup_index = CoreUtils::FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
@@ -180,7 +178,7 @@ inline Units::Speed aaesim::open_source::VerticalPathUtils::CalculateSpeedGuidan
    return cas_guidance;
 }
 
-inline double aaesim::open_source::VerticalPathUtils::CalculateMachGuidance(
+inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
    auto reference_lookup_index = CoreUtils::FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
@@ -197,7 +195,7 @@ inline double aaesim::open_source::VerticalPathUtils::CalculateMachGuidance(
    return mach_guidance;
 }
 
-inline Units::Time aaesim::open_source::VerticalPathUtils::CalculateTimeToFly(
+inline Units::Time mitre::oss::simcore::VerticalPathUtils::CalculateTimeToFly(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
    auto reference_lookup_index = CoreUtils::FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
@@ -214,7 +212,7 @@ inline Units::Time aaesim::open_source::VerticalPathUtils::CalculateTimeToFly(
    return time_to_fly;
 }
 
-inline Units::Mass aaesim::open_source::VerticalPathUtils::GetExpectedMass(
+inline Units::Mass mitre::oss::simcore::VerticalPathUtils::GetExpectedMass(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
    auto reference_lookup_index = CoreUtils::FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);

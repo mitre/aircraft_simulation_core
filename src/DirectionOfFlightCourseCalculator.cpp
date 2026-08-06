@@ -24,7 +24,7 @@
 
 #include "public/CoreUtils.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger DirectionOfFlightCourseCalculator::m_logger =
       log4cplus::Logger::getInstance("DirectionOfFlightCourseCalculator");

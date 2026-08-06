@@ -26,8 +26,7 @@
 
 #include "utility/CustomUnits.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 namespace bada_utils {
 
 enum ENGINE_TYPE { JET, TURBOPROP, PISTON };
@@ -257,5 +256,4 @@ struct Procedure {
 };
 
 }  // namespace bada_utils
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

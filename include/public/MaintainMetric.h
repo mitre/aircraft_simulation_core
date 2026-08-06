@@ -21,6 +21,8 @@
 
 #include "math/Statistics.h"
 
+namespace mitre::oss::simcore {
+
 #ifndef CYCLE_THRESHOLD
 #define CYCLE_THRESHOLD 10
 #endif
@@ -85,3 +87,4 @@ private:
    /** Output should be enabled for IM aircraft */
    bool m_output_enabled;
 };
+}  // namespace mitre::oss::simcore

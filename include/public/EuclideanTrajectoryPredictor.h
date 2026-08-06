@@ -37,8 +37,7 @@
 #include "public/VerticalPredictor.h"
 #include "public/WeatherPrediction.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 class EuclideanTrajectoryPredictor {
   public:
@@ -47,21 +46,21 @@ class EuclideanTrajectoryPredictor {
    virtual ~EuclideanTrajectoryPredictor() = default;
 
    virtual void CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
-                                   const aaesim::open_source::WeatherPrediction &weather_prediction);
+                                   const mitre::oss::simcore::WeatherPrediction &weather_prediction);
 
    const std::vector<HorizontalPath> EstimateHorizontalTrajectory(
-         const aaesim::open_source::WeatherPrediction &weather_prediction);
+         const mitre::oss::simcore::WeatherPrediction &weather_prediction);
 
-   virtual void BuildTrajectoryPrediction(aaesim::open_source::WeatherPrediction &weather,
+   virtual void BuildTrajectoryPrediction(mitre::oss::simcore::WeatherPrediction &weather,
                                           const std::shared_ptr<TangentPlaneSequence> &position_converter,
                                           Units::Length start_altitude);
 
-   virtual void BuildTrajectoryPrediction(aaesim::open_source::WeatherPrediction &weather,
+   virtual void BuildTrajectoryPrediction(mitre::oss::simcore::WeatherPrediction &weather,
                                           const std::shared_ptr<TangentPlaneSequence> &position_converter,
                                           Units::Length start_altitude, Units::Length aircraft_distance_to_go);
 
-   aaesim::open_source::Guidance Update(const aaesim::open_source::AircraftState &state,
-                                        const aaesim::open_source::Guidance &current_guidance);
+   mitre::oss::simcore::Guidance Update(const mitre::oss::simcore::AircraftState &state,
+                                        const mitre::oss::simcore::Guidance &current_guidance);
 
    const std::shared_ptr<const AircraftIntent> &GetAircraftIntent() const;
 
@@ -92,7 +91,7 @@ class EuclideanTrajectoryPredictor {
    static double HalfTurn(HorizontalTurnPath turn);
 
   protected:
-   void UpdateWeatherPrediction(aaesim::open_source::WeatherPrediction &weather,
+   void UpdateWeatherPrediction(mitre::oss::simcore::WeatherPrediction &weather,
                                 const std::shared_ptr<TangentPlaneSequence> &position_converter) const;
 
    /**
@@ -110,7 +109,7 @@ class EuclideanTrajectoryPredictor {
    AlongPathDistanceCalculator m_distance_calculator{};
    PositionCalculator m_position_calculator{};
    std::shared_ptr<Atmosphere> m_atmosphere{};
-   std::shared_ptr<aaesim::open_source::EuclideanTightTurnResolver> m_tight_turn_resolver{};
+   std::shared_ptr<mitre::oss::simcore::EuclideanTightTurnResolver> m_tight_turn_resolver{};
 
   private:
    static log4cplus::Logger m_logger;
@@ -169,32 +168,33 @@ class EuclideanTrajectoryPredictor {
 
    void CalculateHorizontalTrajectory(const HorizontalTrajOption option);
 
-   std::vector<aaesim::open_source::TurnAnticipation> CalculateTurnAnticipation(const HorizontalTrajOption option);
+   std::vector<mitre::oss::simcore::TurnAnticipation> CalculateTurnAnticipation(const HorizontalTrajOption option);
 };
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore
 
-inline const std::shared_ptr<Atmosphere> aaesim::open_source::EuclideanTrajectoryPredictor::GetAtmosphere() const {
+inline const std::shared_ptr<mitre::oss::simcore::Atmosphere>
+mitre::oss::simcore::EuclideanTrajectoryPredictor::GetAtmosphere() const {
    return m_atmosphere;
 }
 
-inline const std::vector<PrecalcWaypoint> &aaesim::open_source::EuclideanTrajectoryPredictor::GetPrecalcWaypoints()
+inline const std::vector<mitre::oss::simcore::PrecalcWaypoint> &
+mitre::oss::simcore::EuclideanTrajectoryPredictor::GetPrecalcWaypoints()
       const {
    return m_waypoint_vector;
 }
 
-inline const std::shared_ptr<VerticalPredictor> &
-      aaesim::open_source::EuclideanTrajectoryPredictor::GetVerticalPredictor() const {
+inline const std::shared_ptr<mitre::oss::simcore::VerticalPredictor> &
+      mitre::oss::simcore::EuclideanTrajectoryPredictor::GetVerticalPredictor() const {
    return m_vertical_predictor;
 }
 
-inline void aaesim::open_source::EuclideanTrajectoryPredictor::SetBankAngle(Units::Angle bank_angle) {
+inline void mitre::oss::simcore::EuclideanTrajectoryPredictor::SetBankAngle(Units::Angle bank_angle) {
    m_bank_angle = bank_angle;
 }
 
-inline Units::Angle aaesim::open_source::EuclideanTrajectoryPredictor::GetBankAngle() const { return m_bank_angle; }
+inline Units::Angle mitre::oss::simcore::EuclideanTrajectoryPredictor::GetBankAngle() const { return m_bank_angle; }
 
-inline Units::Length aaesim::open_source::EuclideanTrajectoryPredictor::GetAltitudeAtFinalWaypoint() const {
+inline Units::Length mitre::oss::simcore::EuclideanTrajectoryPredictor::GetAltitudeAtFinalWaypoint() const {
    return Units::FeetLength(m_altitude_at_final_waypoint);
 }

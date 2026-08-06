@@ -32,8 +32,7 @@
 
 using namespace std;
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 const size_t TvReader::EXPECTED_TV_COLUMN_COUNT(17);
 
@@ -118,5 +117,4 @@ void TvReader::SetColumnIndexesFromHeader(const int header_lines) {
    SkipLines(header_lines - 1);
 }
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

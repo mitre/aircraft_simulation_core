@@ -24,6 +24,8 @@
 
 #include <string>
 
+namespace mitre::oss::simcore {
+
 const Units::KelvinTemperature TEMPERATURE_TOLERANCE(0.1);
 
 /** Lowest altitude supported in US Standard Atmosphere */
@@ -184,3 +186,4 @@ Units::Length USStandardAtmosphere1976::GetMachIASTransition(const Units::Speed 
 
    return h;
 }
+}  // namespace mitre::oss::simcore

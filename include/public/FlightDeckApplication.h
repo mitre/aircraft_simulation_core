@@ -30,13 +30,12 @@
 #include "public/TangentPlaneSequence.h"
 #include "public/WeatherPrediction.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct OwnshipPerformanceParameters {
-   aaesim::open_source::bada_utils::FlapSpeeds flap_speeds{};
-   aaesim::open_source::bada_utils::FlightEnvelope flight_envelope{};
-   aaesim::open_source::bada_utils::Mass mass_data{};
-   aaesim::open_source::bada_utils::Aerodynamics aerodynamics{};
+   mitre::oss::simcore::bada_utils::FlapSpeeds flap_speeds{};
+   mitre::oss::simcore::bada_utils::FlightEnvelope flight_envelope{};
+   mitre::oss::simcore::bada_utils::Mass mass_data{};
+   mitre::oss::simcore::bada_utils::Aerodynamics aerodynamics{};
 };
 
 struct OwnshipFmsPredictionParameters {
@@ -53,18 +52,17 @@ struct FlightDeckApplicationInitializer {
    virtual ~FlightDeckApplicationInitializer() = default;
    OwnshipFmsPredictionParameters fms_prediction_parameters{};
    OwnshipPerformanceParameters performance_parameters{};
-   std::shared_ptr<const aaesim::open_source::ASSAP> surveillance_processor{};
+   std::shared_ptr<const mitre::oss::simcore::ASSAP> surveillance_processor{};
    std::shared_ptr<TangentPlaneSequence> position_converter{};
 };
 
 struct FlightDeckApplication {
    virtual ~FlightDeckApplication() = default;
    virtual void Initialize(FlightDeckApplicationInitializer &initializer_visitor) = 0;
-   virtual aaesim::open_source::Guidance Update(const aaesim::open_source::SimulationTime &simtime,
-                                                const aaesim::open_source::Guidance &current_guidance,
-                                                const aaesim::open_source::DynamicsState &dynamics_state,
-                                                const aaesim::open_source::AircraftState &own_state) = 0;
+   virtual mitre::oss::simcore::Guidance Update(const mitre::oss::simcore::SimulationTime &simtime,
+                                                const mitre::oss::simcore::Guidance &current_guidance,
+                                                const mitre::oss::simcore::DynamicsState &dynamics_state,
+                                                const mitre::oss::simcore::AircraftState &own_state) = 0;
    virtual bool IsActive() const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

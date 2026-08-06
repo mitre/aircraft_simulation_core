@@ -24,7 +24,7 @@
 #include <fstream>
 #include <string>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 enum ActiveFlagType {
    UNSET = 0,
@@ -85,4 +85,4 @@ struct PrecalcConstraint final {
    bool violation_flag{false};
    bool is_last_constraint{false};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

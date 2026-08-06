@@ -19,6 +19,8 @@
 
 #include "public/StereographicProjection.h"
 
+using namespace mitre::oss::simcore;
+
 #include "utility/UtilityConstants.h"
 
 Units::RadiansAngle StereographicProjection::latTPT(0); /* North latitude of tangency point (radians) */
@@ -67,7 +69,7 @@ void StereographicProjection::init(Units::Angle lat, Units::Angle lon, Units::Le
       cos_clatTPT = -cos_clatTPT;
    }
 
-   gamma = aaesim::open_source::constants::PI / 2.0 - asin(sin_clatTPT);
+   gamma = mitre::oss::simcore::constants::PI / 2.0 - asin(sin_clatTPT);
    sin_gamma = sin(gamma);
    cos_gamma = cos(gamma);
 }
@@ -154,7 +156,7 @@ void StereographicProjection::xy_to_ll(const Units::Length x, const Units::Lengt
    delta = Units::RadiansAngle(acos(cos_delta));
    sin_delta = sin(delta);
 
-   dlatc = aaesim::open_source::constants::PI / 2. - delta.value(); /* The conformal latitude of the X,Y point*/
+   dlatc = mitre::oss::simcore::constants::PI / 2. - delta.value(); /* The conformal latitude of the X,Y point*/
 
    /* Find Epsilon, The longitude component measured from the
       point of tangency.*/

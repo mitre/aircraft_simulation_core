@@ -21,6 +21,8 @@
 
 #include "utility/UtilityConstants.h"
 
+namespace mitre::oss::simcore {
+
 using namespace std;
 
 VerticalPath::VerticalPath() = default;
@@ -122,3 +124,4 @@ bool VerticalPath::operator==(const VerticalPath &obj) const {
 
    return match;
 }
+}  // namespace mitre::oss::simcore

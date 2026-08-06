@@ -33,8 +33,9 @@
 #define IQ 127773
 #define IR 2836
 
-using namespace aaesim::test::utils;
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore::test::utils;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
 
 log4cplus::Logger OldCustomMath::logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("OldCustomMath"));
 

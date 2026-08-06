@@ -29,10 +29,10 @@
 
 using std::shared_ptr;
 using std::string;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 void Wind::InterpolateTrueWind(const Units::Angle lat_in, const Units::Angle lon_in, const Units::Length altitude,
-                               aaesim::open_source::WindStack &east_west, aaesim::open_source::WindStack &north_south) {
+                               mitre::oss::simcore::WindStack &east_west, mitre::oss::simcore::WindStack &north_south) {
    InterpolateWindMatrix(lat_in, lon_in, altitude, east_west, north_south);
 }
 

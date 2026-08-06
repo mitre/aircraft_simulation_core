@@ -29,7 +29,7 @@
 #include <iomanip>
 #include <memory>
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 void EllipsoidalEarthModel::ConvertGeodeticToAbsolute(const EarthModel::GeodeticPosition &geo,
                                                       EarthModel::AbsolutePositionEcef &ecef) const {

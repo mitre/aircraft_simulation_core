@@ -32,7 +32,7 @@
 /*
  *
  */
-namespace aaesim {
+namespace mitre::oss::simcore {
 
 class LatitudeLongitudePoint {
   public:
@@ -84,4 +84,4 @@ class LatitudeLongitudePoint {
    static log4cplus::Logger m_logger;
    geolib_idealab::LLPoint m_llpoint{};
 };
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

@@ -28,8 +28,7 @@
 #include "BadaUtils.h"
 #include "utility/CustomUnits.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 struct DynamicsState {
    // This structure is not used at all within the EOM function. It only serves to
@@ -48,10 +47,9 @@ struct DynamicsState {
    Units::MetersPerSecondSpeed xd{};
    Units::MetersPerSecondSpeed yd{};
    double speed_brake{0};  // % of deployment
-   aaesim::open_source::bada_utils::FlapConfiguration flap_configuration{
-         aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+   mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration{
+         mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
    Units::Mass current_mass{};
    Units::AbsCelsiusTemperature true_temperature{};
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

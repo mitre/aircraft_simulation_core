@@ -24,7 +24,7 @@
 
 #include "public/Atmosphere.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 WeatherPrediction::WeatherPrediction(std::shared_ptr<Wind> wind, std::shared_ptr<Atmosphere> atmosphere)
    : WeatherEstimate(std::move(wind), std::move(atmosphere)), update_count_(0) {
@@ -34,7 +34,7 @@ WeatherPrediction::WeatherPrediction(std::shared_ptr<Wind> wind, std::shared_ptr
 }
 
 WeatherPrediction WeatherPrediction::CreateZeroWindPrediction(std::shared_ptr<Atmosphere> atmosphere) {
-   aaesim::open_source::WindStack zeroWinds(1, 5);
+   mitre::oss::simcore::WindStack zeroWinds(1, 5);
    zeroWinds.Insert(1, Units::FeetLength(0.), Units::KnotsSpeed(0.));
    zeroWinds.Insert(2, Units::FeetLength(10000.), Units::KnotsSpeed(0.));
    zeroWinds.Insert(3, Units::FeetLength(20000.), Units::KnotsSpeed(0.));

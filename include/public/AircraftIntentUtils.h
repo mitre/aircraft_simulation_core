@@ -5,7 +5,7 @@
 #include "public/AircraftIntent.h"
 #include "public/DefaultAircraftIntent.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 class AircraftIntentUtils final {
  public:
@@ -13,4 +13,4 @@ class AircraftIntentUtils final {
                                                               const std::string &waypoint_name);
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

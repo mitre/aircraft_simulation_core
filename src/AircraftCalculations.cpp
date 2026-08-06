@@ -28,7 +28,7 @@
 #include "public/PositionCalculator.h"
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger AircraftCalculations::logger = log4cplus::Logger::getInstance("AircraftCalculations");
 

@@ -32,13 +32,12 @@
 #include <memory>
 #include <string>
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 const Units::SecondsTime DataReader::UNDEFINED_TIME(-9999);
 
 log4cplus::Logger DataReader::m_logger =
-      log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("aaesim::open_source::DataReader"));
+      log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("mitre::oss::simcore::DataReader"));
 
 DataReader::DataReader(const std::string &file_name, int header_lines, size_t expected_columns)
    : m_expected_column_count(expected_columns) {
@@ -124,5 +123,4 @@ int DataReader::GetColumnNumber(const std::string &column_name) {
    return index;
 }
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

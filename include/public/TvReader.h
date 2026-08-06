@@ -36,10 +36,9 @@
 #include "public/DataReader.h"
 #include "utility/CustomUnits.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
-class TvReader : public aaesim::open_source::DataReader {
+class TvReader : public mitre::oss::simcore::DataReader {
   public:
    static const size_t EXPECTED_TV_COLUMN_COUNT;
    TvReader(const std::string &file_name, int header_lines);
@@ -77,5 +76,4 @@ class TvReader : public aaesim::open_source::DataReader {
    int m_vert_rate_column{0};
 };
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

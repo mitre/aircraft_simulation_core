@@ -25,7 +25,7 @@
 
 #include "public/GeolibUtils.h"
 
-using namespace aaesim;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger LatitudeLongitudePoint::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("LatitudeLongitudePoint"));

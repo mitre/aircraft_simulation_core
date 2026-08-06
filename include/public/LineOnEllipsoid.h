@@ -26,7 +26,7 @@
 #include "public/LatitudeLongitudePoint.h"
 #include "public/ShapeOnEllipsoid.h"
 
-namespace aaesim {
+namespace mitre::oss::simcore {
 class LineOnEllipsoid final : public ShapeOnEllipsoid {
   public:
    LineOnEllipsoid() = default;
@@ -59,8 +59,8 @@ class LineOnEllipsoid final : public ShapeOnEllipsoid {
 
    Units::Length GetDistanceToEndPoint(const LatitudeLongitudePoint &latitude_longitude_point) const override;
 
-   static LineOnEllipsoid CreateFromPoints(const aaesim::LatitudeLongitudePoint &start_point,
-                                           const aaesim::LatitudeLongitudePoint &end_point);
+   static LineOnEllipsoid CreateFromPoints(const mitre::oss::simcore::LatitudeLongitudePoint &start_point,
+                                           const mitre::oss::simcore::LatitudeLongitudePoint &end_point);
 
    LatitudeLongitudePoint GetNearestPointOnShape(const LatitudeLongitudePoint &point_not_on_shape) const override;
 
@@ -83,4 +83,4 @@ class LineOnEllipsoid final : public ShapeOnEllipsoid {
 
 inline ShapeOnEllipsoid::kShapeType LineOnEllipsoid::GetShapeType() const { return LINE; }
 
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

@@ -33,8 +33,8 @@
 #include "public/Wind.h"
 
 using namespace std;
-using namespace aaesim::open_source::constants;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore::constants;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger EuclideanTrajectoryPredictor::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("EuclideanTrajectoryPredictor"));
@@ -100,12 +100,12 @@ EuclideanTrajectoryPredictor::EuclideanTrajectoryPredictor() {
    m_horizontal_path.clear();
    m_distance_calculator = AlongPathDistanceCalculator();
    m_position_calculator = PositionCalculator();
-   m_tight_turn_resolver = std::make_shared<aaesim::open_source::LawOfSinesResolver>();
+   m_tight_turn_resolver = std::make_shared<mitre::oss::simcore::LawOfSinesResolver>();
 }
 
 void EuclideanTrajectoryPredictor::CalculateWaypoints(
       const std::shared_ptr<const AircraftIntent> &aircraft_intent,
-      const aaesim::open_source::WeatherPrediction &weather_prediction) {
+      const mitre::oss::simcore::WeatherPrediction &weather_prediction) {
    m_aircraft_intent = aircraft_intent;
 
    // Set altitude at FAF to final altitude in feet.
@@ -286,10 +286,10 @@ void EuclideanTrajectoryPredictor::CalculateWaypoints(
    AdjustConstraints(start_speed);
 }
 
-vector<aaesim::open_source::TurnAnticipation> EuclideanTrajectoryPredictor::CalculateTurnAnticipation(
+vector<mitre::oss::simcore::TurnAnticipation> EuclideanTrajectoryPredictor::CalculateTurnAnticipation(
       const HorizontalTrajOption option) {
-   vector<aaesim::open_source::TurnAnticipation> turnAnticipation{};
-   aaesim::open_source::TurnAnticipation straightTurnAnticipation{};
+   vector<mitre::oss::simcore::TurnAnticipation> turnAnticipation{};
+   mitre::oss::simcore::TurnAnticipation straightTurnAnticipation{};
    // first point has zero turn anticipation
    turnAnticipation.push_back(straightTurnAnticipation);
    // loop through all but last waypoint (starting point for route)
@@ -421,7 +421,7 @@ vector<aaesim::open_source::TurnAnticipation> EuclideanTrajectoryPredictor::Calc
          }
       }  // END of SECOND_PASS
 
-      aaesim::open_source::TurnAnticipation thisTurnAnticipation{};
+      mitre::oss::simcore::TurnAnticipation thisTurnAnticipation{};
       // Calculate Turn Radius
       double bankangle = 0.5 * fabs(course_change);
       thisTurnAnticipation.groundspeed = gspeed_at_turn_mps;
@@ -506,7 +506,7 @@ void EuclideanTrajectoryPredictor::CalculateHorizontalTrajectory(const Horizonta
    }
 
    // Calculate turn anticipation for each turn point
-   vector<aaesim::open_source::TurnAnticipation> turnAnticipation = CalculateTurnAnticipation(option);
+   vector<mitre::oss::simcore::TurnAnticipation> turnAnticipation = CalculateTurnAnticipation(option);
 
    // loop to create horizontal trajectory points
 
@@ -861,13 +861,13 @@ void EuclideanTrajectoryPredictor::CalculateHorizontalTrajectory(const Horizonta
 }
 
 void EuclideanTrajectoryPredictor::BuildTrajectoryPrediction(
-      aaesim::open_source::WeatherPrediction &weather, const std::shared_ptr<TangentPlaneSequence> &position_converter,
+      mitre::oss::simcore::WeatherPrediction &weather, const std::shared_ptr<TangentPlaneSequence> &position_converter,
       Units::Length start_altitude) {
    BuildTrajectoryPrediction(weather, position_converter, start_altitude, Units::infinity());
 }
 
 void EuclideanTrajectoryPredictor::BuildTrajectoryPrediction(
-      aaesim::open_source::WeatherPrediction &weather, const std::shared_ptr<TangentPlaneSequence> &position_converter,
+      mitre::oss::simcore::WeatherPrediction &weather, const std::shared_ptr<TangentPlaneSequence> &position_converter,
       Units::Length start_altitude, Units::Length aircraft_distance_to_go) {
    m_aircraft_distance_to_go = aircraft_distance_to_go;
    SetAtmosphere(weather.getAtmosphere());
@@ -924,9 +924,9 @@ void EuclideanTrajectoryPredictor::BuildTrajectoryPrediction(
 }
 
 // the method to calculate Guidance based on the 4D Trajectory
-aaesim::open_source::Guidance EuclideanTrajectoryPredictor::Update(
-      const aaesim::open_source::AircraftState &state, const aaesim::open_source::Guidance &current_guidance) {
-   aaesim::open_source::Guidance result;
+mitre::oss::simcore::Guidance EuclideanTrajectoryPredictor::Update(
+      const mitre::oss::simcore::AircraftState &state, const mitre::oss::simcore::Guidance &current_guidance) {
+   mitre::oss::simcore::Guidance result;
    static const Units::DegreesPerSecondAngularSpeed roll_rate(3.0);  // roll rate for guidance (AAES-668)
 
    // Calculate Psi command and cross-track error if the aircraft is turning
@@ -1110,7 +1110,7 @@ const std::shared_ptr<const AircraftIntent> &EuclideanTrajectoryPredictor::GetAi
 const vector<HorizontalPath> &EuclideanTrajectoryPredictor::GetHorizontalPath() const { return m_horizontal_path; }
 
 void EuclideanTrajectoryPredictor::UpdateWeatherPrediction(
-      aaesim::open_source::WeatherPrediction &weather,
+      mitre::oss::simcore::WeatherPrediction &weather,
       const std::shared_ptr<TangentPlaneSequence> &position_converter) const {}
 
 void EuclideanTrajectoryPredictor::SetAtmosphere(std::shared_ptr<Atmosphere> atmosphere) {
@@ -1119,7 +1119,7 @@ void EuclideanTrajectoryPredictor::SetAtmosphere(std::shared_ptr<Atmosphere> atm
 }
 
 const std::vector<HorizontalPath> EuclideanTrajectoryPredictor::EstimateHorizontalTrajectory(
-      const aaesim::open_source::WeatherPrediction &weather_prediction) {
+      const mitre::oss::simcore::WeatherPrediction &weather_prediction) {
    SetAtmosphere(weather_prediction.getAtmosphere());
    CalculateHorizontalTrajectory(FIRST_PASS);
    return GetHorizontalPath();

@@ -26,7 +26,7 @@
 
 #include "public/Waypoint.h"
 
-namespace aaesim::open_source
+namespace mitre::oss::simcore
 {
 
    struct AircraftIntent
@@ -92,6 +92,6 @@ namespace aaesim::open_source
 
    };
 
-} // namespace aaesim::open_source
+} // namespace mitre::oss::simcore
 
-using AircraftIntent = aaesim::open_source::AircraftIntent;
+using AircraftIntent = mitre::oss::simcore::AircraftIntent;

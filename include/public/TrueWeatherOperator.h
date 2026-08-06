@@ -29,7 +29,7 @@
 #include "public/EarthModel.h"
 #include "public/WeatherTruth.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct TrueWeatherOperator {
    virtual void CalculateEnvironmentalWind(const EarthModel::GeodeticPosition &position,
                                            const Units::Length &altitude_msl) = 0;
@@ -41,6 +41,6 @@ struct TrueWeatherOperator {
    virtual Units::Density GetDensity() const = 0;
    virtual Units::Pressure GetPressure() const = 0;
    virtual std::shared_ptr<const Atmosphere> GetAtmosphere() const = 0;
-   virtual std::shared_ptr<const aaesim::open_source::WeatherTruth> GetTrueWeather() const = 0;
+   virtual std::shared_ptr<const mitre::oss::simcore::WeatherTruth> GetTrueWeather() const = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

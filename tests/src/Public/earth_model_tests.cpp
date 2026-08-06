@@ -26,6 +26,8 @@
 #include "public/LocalTangentPlane.h"
 #include "public/TangentPlaneSequence.h"
 
+using namespace mitre::oss::simcore;
+
 const auto ENU_POSITION_TEST_TOLERANCE = Units::KilometersLength{1e-8};
 const auto ECEF_POSITION_TEST_TOLERANCE = Units::KilometersLength{1e-8};
 const auto DEGREE_POSITION_TEST_TOLERANCE = Units::DegreesAngle{1e-8};

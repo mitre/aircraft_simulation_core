@@ -29,8 +29,7 @@
 #include "public/TangentPlaneSequence.h"
 #include "public/Waypoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 namespace test {
 static double TIGHT_TOLERANCE_DEGREES{1e-12};
 TEST(TangentPlaneSequence, StraightLineConsistency) {
@@ -161,5 +160,4 @@ TEST(NullAircraftIntent, HasNoRouteData) {
 }
 
 }  // namespace test
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

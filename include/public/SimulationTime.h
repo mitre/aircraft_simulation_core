@@ -23,7 +23,7 @@
 
 #include <string>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class SimulationTime final {
   public:
    static inline const Units::SecondsTime SIMULATION_TIME_STEP = Units::SecondsTime(1.0);
@@ -83,4 +83,4 @@ class SimulationTime final {
    Units::SecondsTime m_current_time{Units::zero()};
    inline static Units::SecondsTime m_simulation_time_step{SIMULATION_TIME_STEP};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

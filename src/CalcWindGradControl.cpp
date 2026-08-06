@@ -21,7 +21,7 @@
 
 #include "public/Environment.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 CalcWindGradControl::CalcWindGradControl()
    : m_wind_x(),

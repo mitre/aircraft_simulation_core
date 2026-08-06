@@ -26,6 +26,8 @@
 
 #include "public/BadaUtils.h"
 
+namespace mitre::oss::simcore {
+
 class EquationsOfMotionState {
   public:
    Units::Length enu_x{}, enu_y{}, altitude_msl{};
@@ -35,6 +37,7 @@ class EquationsOfMotionState {
    Units::Force thrust{};
    Units::Angle phi{};
    double speed_brake_percentage{0};
-   aaesim::open_source::bada_utils::FlapConfiguration flap_configuration{
-         aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+   mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration{
+         mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
 };
+}  // namespace mitre::oss::simcore

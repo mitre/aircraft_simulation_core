@@ -29,7 +29,7 @@
 #include "public/LatitudeLongitudePoint.h"
 #include "public/LineOnEllipsoid.h"
 
-namespace aaesim {
+namespace mitre::oss::simcore {
 //---------------------------------------------
 /* Developers:
  * These (epsilon and tolerance) values can be played with (tuned), but the values directly impact the precision of
@@ -304,4 +304,4 @@ class GeolibUtils {
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("GeolibUtils"))};
 };
 
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 DefaultAircraftIntent AircraftIntentUtils::CopyAndTrimAfterNamedWaypoint(const AircraftIntent &intent,
                                                                           const std::string &waypoint_name) {
@@ -39,4 +39,4 @@ DefaultAircraftIntent AircraftIntentUtils::CopyAndTrimAfterNamedWaypoint(const A
                   .SetPlannedCruiseAltitude(intent.GetPlannedCruiseAltitude()).Build();
 }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

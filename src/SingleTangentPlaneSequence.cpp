@@ -23,6 +23,8 @@
 
 #include "public/CoreUtils.h"
 
+namespace mitre::oss::simcore {
+
 using namespace std;
 
 std::list<Waypoint> SingleTangentPlaneSequence::m_master_waypoint_sequence = {};
@@ -39,3 +41,4 @@ SingleTangentPlaneSequence::SingleTangentPlaneSequence(const vector<Waypoint> &w
    : SingleTangentPlaneSequence(list<Waypoint>(waypoints.begin(), waypoints.end())) {}
 
 void SingleTangentPlaneSequence::ClearStaticMembers() { m_master_waypoint_sequence.clear(); }
+}  // namespace mitre::oss::simcore

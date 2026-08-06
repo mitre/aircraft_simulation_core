@@ -21,10 +21,10 @@
 
 #include "public/AbstractTrueWeatherOperator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ZeroWindTrueWeatherOperator final : public AbstractTrueWeatherOperator {
   public:
-   ZeroWindTrueWeatherOperator(std::shared_ptr<aaesim::open_source::WeatherTruth> true_weather);
+   ZeroWindTrueWeatherOperator(std::shared_ptr<mitre::oss::simcore::WeatherTruth> true_weather);
    ~ZeroWindTrueWeatherOperator() = default;
    void CalculateEnvironmentalWind(const EarthModel::GeodeticPosition &position,
                                    const Units::Length &altitude_msl) override;
@@ -36,4 +36,4 @@ class ZeroWindTrueWeatherOperator final : public AbstractTrueWeatherOperator {
   private:
    inline static WindStack ZERO_STACK{WindStack::CreateZeroSpeedStack()};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

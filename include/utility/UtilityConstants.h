@@ -19,8 +19,7 @@
 
 #pragma once
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 namespace constants {
 inline constexpr double PI = 3.14159265358979323846;
 inline constexpr double DEGREES_PER_RADIAN = 180 / PI;
@@ -35,5 +34,4 @@ inline constexpr double KNOTS_TO_FEET_PER_SECOND = 1.687809857;
 inline constexpr double GRAVITY_METERS_PER_SECOND = 9.80665;
 inline constexpr double GRAVITY_FEET_PER_SECOND = GRAVITY_METERS_PER_SECOND / FEET_TO_METERS;
 }  // namespace constants
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

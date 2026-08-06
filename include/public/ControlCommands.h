@@ -24,11 +24,13 @@
 #include <scalar/Speed.h>
 #include "BadaUtils.h"
 
+namespace mitre::oss::simcore {
+
 class ControlCommands {
   public:
    ControlCommands(const Units::Angle &phi, const Units::Force &thrust, const Units::Angle &gamma,
                    const Units::Speed &trueAirspeed, const double speedBrake,
-                   const aaesim::open_source::bada_utils::FlapConfiguration flapMode)
+                   const mitre::oss::simcore::bada_utils::FlapConfiguration flapMode)
       : phi(phi),
         thrust(thrust),
         gamma(gamma),
@@ -46,7 +48,7 @@ class ControlCommands {
 
    double getSpeedBrake() const { return speedBrake; }
 
-   aaesim::open_source::bada_utils::FlapConfiguration getFlapMode() const { return flapMode; }
+   mitre::oss::simcore::bada_utils::FlapConfiguration getFlapMode() const { return flapMode; }
 
   private:
    Units::Angle phi;
@@ -54,5 +56,6 @@ class ControlCommands {
    Units::Angle gamma;
    Units::Speed trueAirspeed;
    double speedBrake;
-   aaesim::open_source::bada_utils::FlapConfiguration flapMode;
+   mitre::oss::simcore::bada_utils::FlapConfiguration flapMode;
 };
+}  // namespace mitre::oss::simcore

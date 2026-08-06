@@ -32,10 +32,10 @@
 
 namespace fs = std::filesystem;
 
-log4cplus::Logger aaesim::open_source::ConfigurationFileReader::m_logger =
+log4cplus::Logger mitre::oss::simcore::ConfigurationFileReader::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("ConfigurationFileReader"));
 
-const std::vector<std::filesystem::path> aaesim::open_source::ConfigurationFileReader::LoadConfigurationFile(
+const std::vector<std::filesystem::path> mitre::oss::simcore::ConfigurationFileReader::LoadConfigurationFile(
       const std::string &suggested_filename) {
    std::string configuration_filename("");
    if (suggested_filename.find('/') != std::string::npos) {

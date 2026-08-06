@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ConfigurationFileReader {
   public:
    ~ConfigurationFileReader() = default;
@@ -35,4 +35,4 @@ class ConfigurationFileReader {
    ConfigurationFileReader() = default;
    static log4cplus::Logger m_logger;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

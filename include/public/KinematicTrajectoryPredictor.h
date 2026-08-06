@@ -31,9 +31,8 @@
 #include "public/KinematicDescent4DPredictor.h"
 #include "public/PrecalcWaypoint.h"
 
-namespace aaesim {
-namespace open_source {
-class KinematicTrajectoryPredictor : public aaesim::open_source::EuclideanTrajectoryPredictor {
+namespace mitre::oss::simcore {
+class KinematicTrajectoryPredictor : public mitre::oss::simcore::EuclideanTrajectoryPredictor {
   public:
    KinematicTrajectoryPredictor();
 
@@ -70,53 +69,52 @@ class KinematicTrajectoryPredictor : public aaesim::open_source::EuclideanTrajec
 
    const double GetVerticalPathAltitudeByIndex(const int index) const;
 
-   std::shared_ptr<aaesim::open_source::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
+   std::shared_ptr<mitre::oss::simcore::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
 
   private:
    static log4cplus::Logger m_logger;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore
 
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathDistances() const {
+inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathDistances() const {
    return m_vertical_predictor->GetVerticalPath().along_path_distance_m;
 }
 
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathDistanceByIndex(int index) const {
+inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathDistanceByIndex(int index) const {
    return m_vertical_predictor->GetVerticalPath().along_path_distance_m[index];
 }
 
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathTimes() const {
+inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathTimes() const {
    return m_vertical_predictor->GetVerticalPath().time_to_go_sec;
 }
 
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathTimeByIndex(int index) const {
+inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathTimeByIndex(int index) const {
    return m_vertical_predictor->GetVerticalPath().time_to_go_sec[index];
 }
 
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathGroundspeeds()
+inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathGroundspeeds()
       const {
    return m_vertical_predictor->GetVerticalPath().gs_mps;
 }
 
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathVelocities() const {
+inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathVelocities() const {
    return m_vertical_predictor->GetVerticalPath().cas_mps;
 }
 
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathVelocityByIndex(int index) const {
+inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathVelocityByIndex(int index) const {
    return m_vertical_predictor->GetVerticalPath().cas_mps[index];
 }
 
-inline const Units::Speed aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathCasByIndex(
+inline const Units::Speed mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathCasByIndex(
       int index) const {
    return Units::MetersPerSecondSpeed(m_vertical_predictor->GetVerticalPath().cas_mps[index]);
 }
 
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathAltitudes() const {
+inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathAltitudes() const {
    return m_vertical_predictor->GetVerticalPath().altitude_m;
 }
 
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathAltitudeByIndex(
+inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathAltitudeByIndex(
       const int index) const {
    return m_vertical_predictor->GetVerticalPath().altitude_m[index];
 }

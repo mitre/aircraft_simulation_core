@@ -23,7 +23,7 @@
 #include <scalar/Speed.h>
 #include <scalar/Time.h>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct PilotDelay {
    virtual Units::Speed UpdateIAS(Units::Speed previous_speed_command_ias, Units::Speed proposed_speed_command_ias,
                                   Units::Length current_altitude, Units::Length altitude_at_end_of_route) = 0;
@@ -31,4 +31,4 @@ struct PilotDelay {
    virtual Units::Speed UpdateMach(double previous_speed_command_as_mach, double proposed_speed_command_as_mach,
                                    Units::Length current_altitude, Units::Length altitude_at_end_of_route) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

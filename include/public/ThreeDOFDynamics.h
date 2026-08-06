@@ -41,23 +41,23 @@
 #include "public/SimulationTime.h"
 #include "public/TrueWeatherOperator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ThreeDOFDynamics final {
   public:
    ThreeDOFDynamics() = default;
    ~ThreeDOFDynamics() = default;
 
-   AircraftState Update(const int unique_acid, const aaesim::open_source::SimulationTime &simtime,
+   AircraftState Update(const int unique_acid, const mitre::oss::simcore::SimulationTime &simtime,
                         const Guidance &guidance, const std::shared_ptr<AircraftControl> &aircraft_control);
 
-   void Initialize(const aaesim::open_source::SimulationTime &simulation_time,
-                   std::shared_ptr<const aaesim::open_source::FixedMassAircraftPerformance> aircraft_performance,
+   void Initialize(const mitre::oss::simcore::SimulationTime &simulation_time,
+                   std::shared_ptr<const mitre::oss::simcore::FixedMassAircraftPerformance> aircraft_performance,
                    const EarthModel::GeodeticPosition &initial_position,
                    const EarthModel::LocalPositionEnu &initial_position_enu, Units::Length initial_altitude_msl,
                    Units::Speed initial_true_airspeed, Units::Angle initial_ground_course_enu,
                    double initial_mass_fraction,
-                   std::shared_ptr<aaesim::open_source::EllipsoidalPositionEstimator> position_estimator,
-                   std::shared_ptr<aaesim::open_source::TrueWeatherOperator> true_weather_operator);
+                   std::shared_ptr<mitre::oss::simcore::EllipsoidalPositionEstimator> position_estimator,
+                   std::shared_ptr<mitre::oss::simcore::TrueWeatherOperator> true_weather_operator);
 
    const std::pair<Units::Speed, Units::Speed> GetWindComponents() const;
 
@@ -67,7 +67,7 @@ class ThreeDOFDynamics final {
 
    const EquationsOfMotionStateDeriv GetEquationsOfMotionStateDerivative() const;
 
-   const std::map<const aaesim::open_source::SimulationTime, const DynamicsState> &GetDynamicsStateHistory() const;
+   const std::map<const mitre::oss::simcore::SimulationTime, const DynamicsState> &GetDynamicsStateHistory() const;
 
   private:
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("ThreeDOFDynamics"))};
@@ -90,9 +90,9 @@ class ThreeDOFDynamics final {
    DynamicsState ComputeDynamicsState(const EquationsOfMotionState &equations_of_motion_state,
                                       const EquationsOfMotionStateDeriv &equations_of_motion_state_derivative) const;
 
-   std::shared_ptr<const aaesim::open_source::FixedMassAircraftPerformance> m_bada_calculator{};
-   std::shared_ptr<aaesim::open_source::EllipsoidalPositionEstimator> m_position_estimator;
-   std::map<const aaesim::open_source::SimulationTime, const DynamicsState> m_dynamics_history{};
+   std::shared_ptr<const mitre::oss::simcore::FixedMassAircraftPerformance> m_bada_calculator{};
+   std::shared_ptr<mitre::oss::simcore::EllipsoidalPositionEstimator> m_position_estimator;
+   std::map<const mitre::oss::simcore::SimulationTime, const DynamicsState> m_dynamics_history{};
    EquationsOfMotionState m_equations_of_motion_state{};
    EquationsOfMotionStateDeriv m_equations_of_motion_state_derivative{};
    EarthModel::GeodeticPosition m_last_resolved_position{};
@@ -100,7 +100,7 @@ class ThreeDOFDynamics final {
    Units::Speed m_wind_velocity_north{Units::zero()};
    double m_max_thrust_percent{1.0};
    double m_min_thrust_percent{1.0};
-   std::shared_ptr<aaesim::open_source::TrueWeatherOperator> m_true_weather_operator;
+   std::shared_ptr<mitre::oss::simcore::TrueWeatherOperator> m_true_weather_operator;
 };
 
 inline const std::pair<Units::Speed, Units::Speed> ThreeDOFDynamics::GetWindComponents() const {
@@ -120,9 +120,9 @@ inline const EquationsOfMotionStateDeriv ThreeDOFDynamics::GetEquationsOfMotionS
    return m_equations_of_motion_state_derivative;
 }
 
-inline const std::map<const aaesim::open_source::SimulationTime, const DynamicsState> &
+inline const std::map<const mitre::oss::simcore::SimulationTime, const DynamicsState> &
       ThreeDOFDynamics::GetDynamicsStateHistory() const {
    return m_dynamics_history;
 }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

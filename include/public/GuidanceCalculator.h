@@ -23,13 +23,12 @@
 #include "public/Guidance.h"
 #include "public/ShapeOnEllipsoid.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct GuidanceCalculator {
-   virtual open_source::Guidance Update(const open_source::AircraftState &current_state) = 0;
-   static aaesim::open_source::Guidance CombineGuidance(const aaesim::open_source::Guidance &horizontal_guidance,
-                                                        const aaesim::open_source::Guidance &vertical_guidance) {
-      aaesim::open_source::Guidance full_guidance;
+   virtual Guidance Update(const AircraftState &current_state) = 0;
+   static mitre::oss::simcore::Guidance CombineGuidance(const mitre::oss::simcore::Guidance &horizontal_guidance,
+                                                        const mitre::oss::simcore::Guidance &vertical_guidance) {
+      mitre::oss::simcore::Guidance full_guidance;
 
       full_guidance.m_cross_track_error = horizontal_guidance.m_cross_track_error;
       full_guidance.m_reference_bank_angle = horizontal_guidance.m_reference_bank_angle;
@@ -49,7 +48,7 @@ struct GuidanceCalculator {
    }
 
    static Units::Length AddSignToCrossTrack(Units::Length cross_track_measurement,
-                                            aaesim::ShapeOnEllipsoid::kDirectionRelativeToShape side_of_shape) {
+                                            mitre::oss::simcore::ShapeOnEllipsoid::kDirectionRelativeToShape side_of_shape) {
       assert(side_of_shape != ShapeOnEllipsoid::UNSET);
       if (side_of_shape == ShapeOnEllipsoid::LEFT_OF_SHAPE) {
          return -Units::abs(cross_track_measurement);
@@ -57,5 +56,4 @@ struct GuidanceCalculator {
       return Units::abs(cross_track_measurement);
    };
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

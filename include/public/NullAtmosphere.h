@@ -27,6 +27,8 @@
 
 #include <public/Atmosphere.h>
 
+namespace mitre::oss::simcore {
+
 class NullAtmosphere final : public Atmosphere {
   public:
    NullAtmosphere() {}
@@ -90,3 +92,4 @@ class NullAtmosphere final : public Atmosphere {
       throw std::logic_error("NullAtmosphere algorithms are not implemented.");
    }
 };
+}  // namespace mitre::oss::simcore

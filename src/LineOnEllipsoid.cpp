@@ -26,7 +26,7 @@
 
 #include "public/GeolibUtils.h"
 
-using namespace aaesim;
+using namespace mitre::oss::simcore;
 using namespace geolib_idealab;
 
 log4cplus::Logger LineOnEllipsoid::m_logger = log4cplus::Logger::getInstance("LineOnEllipsoid");

@@ -22,7 +22,7 @@
 #include <memory>
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger KinematicTrajectoryPredictor::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("KinematicTrajectoryPredictor"));

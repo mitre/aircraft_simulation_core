@@ -24,7 +24,7 @@
 
 #include "public/CustomMath.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 Units::UnsignedRadiansAngle AircraftState::GetHeadingCcwFromEastRadians() const {
    double result = atan3(m_yd.value(), m_xd.value());
@@ -35,8 +35,8 @@ Units::Speed AircraftState::GetGroundSpeed() const {
    return Units::sqrt(Units::sqr(GetSpeedEnuX()) + Units::sqr(GetSpeedEnuY()));
 }
 
-AircraftState AircraftState::FromAdsbReport(const aaesim::open_source::ADSBSVReport &adsb_report) {
-   return aaesim::open_source::AircraftState::Builder(adsb_report.GetId(), adsb_report.GetTime())
+AircraftState AircraftState::FromAdsbReport(const mitre::oss::simcore::ADSBSVReport &adsb_report) {
+   return mitre::oss::simcore::AircraftState::Builder(adsb_report.GetId(), adsb_report.GetTime())
          .Position(adsb_report.GetX(), adsb_report.GetY())
          ->Latitude(adsb_report.GetLatitude())
          ->Longitude(adsb_report.GetLongitude())
@@ -268,7 +268,7 @@ AircraftState::Builder *AircraftState::Builder::Psi(Units::Angle psi) {
 }
 
 AircraftState::Builder *AircraftState::Builder::DynamicsState(
-      const aaesim::open_source::DynamicsState &dynamics_state) {
+      const mitre::oss::simcore::DynamicsState &dynamics_state) {
    dynamics_state_ = dynamics_state;
    return this;
 }

@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct ScenarioEventNotifier {
    virtual void IterationBegin(const int &iteration_number) = 0;
    virtual void IterationEnd(const int &iteration_number) = 0;
@@ -30,4 +30,4 @@ struct ScenarioEventNotifier {
    virtual void ScenarioEnd(const std::string &scenario_name) = 0;
    virtual void ErrorOccurred(const int &iteration_number, const std::exception &exception_object) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

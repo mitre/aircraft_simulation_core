@@ -21,7 +21,7 @@
 
 #include "public/EuclideanTightTurnResolver.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class LawOfSinesResolver final : public EuclideanTightTurnResolver {
   public:
    LawOfSinesResolver() = default;
@@ -54,4 +54,4 @@ class LawOfSinesResolver final : public EuclideanTightTurnResolver {
       turnDist = AC;
    }
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -21,23 +21,20 @@
 
 #include "public/FlightDeckApplication.h"
 
-namespace aaesim {
-namespace open_source {
-class NullFlightDeckApplication final : public aaesim::open_source::FlightDeckApplication {
+namespace mitre::oss::simcore {
+class NullFlightDeckApplication final : public mitre::oss::simcore::FlightDeckApplication {
   public:
    NullFlightDeckApplication() = default;
    virtual ~NullFlightDeckApplication() = default;
    void Initialize(FlightDeckApplicationInitializer &initializer_visitor) override { /**/ }
-   aaesim::open_source::Guidance Update(const aaesim::open_source::SimulationTime &simtime,
-                                        const aaesim::open_source::Guidance &current_guidance,
-                                        const aaesim::open_source::DynamicsState &dynamics_state,
-                                        const aaesim::open_source::AircraftState &own_state) override {
-      aaesim::open_source::Guidance invalid_guidance{current_guidance};
+   mitre::oss::simcore::Guidance Update(const mitre::oss::simcore::SimulationTime &simtime,
+                                        const mitre::oss::simcore::Guidance &current_guidance,
+                                        const mitre::oss::simcore::DynamicsState &dynamics_state,
+                                        const mitre::oss::simcore::AircraftState &own_state) override {
+      mitre::oss::simcore::Guidance invalid_guidance{current_guidance};
       invalid_guidance.SetValid(false);
       return invalid_guidance;
    }
    bool IsActive() const override { return false; }
 };
-}  // namespace open_source
-
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

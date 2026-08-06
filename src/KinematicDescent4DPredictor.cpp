@@ -28,8 +28,8 @@
 #include "public/Waypoint.h"
 
 using namespace std;
-using namespace aaesim::open_source;
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
 
 log4cplus::Logger KinematicDescent4DPredictor::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("KinematicDescent4DPredictor"));
@@ -116,7 +116,7 @@ void KinematicDescent4DPredictor::ConstrainedVerticalPath(vector<HorizontalPath>
    trajTemp.true_airspeed.push_back(weather_prediction.CAS2TAS(m_ias_at_end_of_route, m_altitude_at_end_of_route));
    trajTemp.tas_rate_mps.push_back(0);
    trajTemp.theta_radians.push_back(0);
-   trajTemp.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+   trajTemp.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
    Units::Speed vwpara;
    Units::Speed vwperp;
@@ -535,7 +535,7 @@ VerticalPath KinematicDescent4DPredictor::ConstantCasVerticalPath(
       result.mass_kg.push_back(-1.0);
       curr_time = result.time_to_go_sec.back();
       result.time_to_go_sec.push_back(curr_time + fabs(delta_t));
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
       if (!bracket_found && dist_new > Units::MetersLength(aircraft_distance_to_go).value()) {
          bracket_found = true;
@@ -663,7 +663,7 @@ VerticalPath KinematicDescent4DPredictor::ConstantMachVerticalPath(
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::CONSTANT_MACH);
       result.mass_kg.push_back(-1.0);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
       curr_time = result.time_to_go_sec.back();
 
@@ -806,7 +806,7 @@ VerticalPath KinematicDescent4DPredictor::ConstantGeometricFpaVerticalPath(
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::FPA);
       result.mass_kg.push_back(-1.0);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
       curr_time = result.time_to_go_sec.back();
       result.time_to_go_sec.push_back(curr_time + fabs(delta_t));  // adds last time +0.5 to the end since
@@ -926,7 +926,7 @@ VerticalPath KinematicDescent4DPredictor::ConstantFpaDecelerationVerticalPath(
       result.wind_velocity_east.push_back(Vwx);
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::FPA_DECEL);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
       curr_time = result.time_to_go_sec.back();
       result.time_to_go_sec.push_back(curr_time + fabs(delta_t));  // adds last time +0.5 to the end since
                                                                    // fabs(delta_t) is 0.5
@@ -1033,7 +1033,7 @@ VerticalPath KinematicDescent4DPredictor::LevelDecelerationVerticalPath(const Ve
       result.wind_velocity_east.push_back(Vwx);
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::LEVEL_DECEL1);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
       curr_time = result.time_to_go_sec.back();
       result.time_to_go_sec.push_back(curr_time + fabs(delta_t));  // adds last time +0.5 to the end since
@@ -1124,7 +1124,7 @@ VerticalPath KinematicDescent4DPredictor::LevelDecelerationVerticalPath(const Ve
       result.wind_velocity_east.push_back(Vwx);
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::LEVEL_DECEL2);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
 
       curr_time = result.time_to_go_sec.back();
       result.time_to_go_sec.push_back(curr_time + fabs(delta_t));  // adds last time +0.5 to the end since
@@ -1217,7 +1217,7 @@ VerticalPath KinematicDescent4DPredictor::LevelVerticalPath(const VerticalPath &
       result.wind_velocity_east.push_back(Vwx);
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::LEVEL);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
       result.mass_kg.push_back(-1.0);
 
       curr_time = result.time_to_go_sec.back();
@@ -1315,7 +1315,7 @@ VerticalPath KinematicDescent4DPredictor::ConstantDecelerationVerticalPath(
       result.wind_velocity_east.push_back(Vwx);
       result.wind_velocity_north.push_back(Vwy);
       result.algorithm_type.push_back(VerticalPath::PredictionAlgorithmType::CONSTANT_DECEL);
-      result.flap_setting.push_back(aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED);
+      result.flap_setting.push_back(mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED);
       result.mass_kg.push_back(-1.0);
 
       curr_time = result.time_to_go_sec.back();

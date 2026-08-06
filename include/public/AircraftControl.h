@@ -31,15 +31,15 @@
 #include "public/TrueWeatherOperator.h"
 #include "public/VerticalController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct ControlCommands {
    Units::Angle roll_angle_command{Units::zero()};
    Units::Force thrust_command{Units::zero()};
    Units::Angle flight_path_angle_command{Units::zero()};
    Units::Speed true_airspeed_command{Units::zero()};
    double speed_brake_command{0.0};
-   aaesim::open_source::bada_utils::FlapConfiguration flap_configuration{
-         aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+   mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration{
+         mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
 };
 
 struct ControlGains {
@@ -52,17 +52,17 @@ struct ControlGains {
 class AircraftControl final {
   public:
    AircraftControl(
-         const std::map<aaesim::open_source::GuidanceFlightPhase,
-                        std::pair<std::shared_ptr<aaesim::open_source::LateralController>,
-                                  std::shared_ptr<aaesim::open_source::VerticalController>>> &controller_pairs);
+         const std::map<mitre::oss::simcore::GuidanceFlightPhase,
+                        std::pair<std::shared_ptr<mitre::oss::simcore::LateralController>,
+                                  std::shared_ptr<mitre::oss::simcore::VerticalController>>> &controller_pairs);
 
    virtual ~AircraftControl() = default;
 
-   void Initialize(std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> aircraft_performance);
+   void Initialize(std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> aircraft_performance);
 
    std::pair<ControlCommands, ControlGains> CalculateControlCommands(
          const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-         std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> sensed_weather);
+         std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> sensed_weather);
 
    class Builder {
      public:
@@ -91,23 +91,23 @@ class AircraftControl final {
          return *this;
       }
       std::shared_ptr<AircraftControl> Build() const {
-         std::map<aaesim::open_source::GuidanceFlightPhase,
-                  std::pair<std::shared_ptr<aaesim::open_source::LateralController>,
-                            std::shared_ptr<aaesim::open_source::VerticalController>>>
+         std::map<mitre::oss::simcore::GuidanceFlightPhase,
+                  std::pair<std::shared_ptr<mitre::oss::simcore::LateralController>,
+                            std::shared_ptr<mitre::oss::simcore::VerticalController>>>
                controller_map;
 
          if (takeoff_lateral_controller_ && takeoff_vertical_controller_) {
-            controller_map.emplace(aaesim::open_source::GuidanceFlightPhase::TAKEOFF_ROLL,
+            controller_map.emplace(mitre::oss::simcore::GuidanceFlightPhase::TAKEOFF_ROLL,
                                    std::make_pair(takeoff_lateral_controller_, takeoff_vertical_controller_));
          }
 
          if (climb_lateral_controller_ && climb_vertical_controller_) {
-            controller_map.emplace(aaesim::open_source::GuidanceFlightPhase::CLIMB,
+            controller_map.emplace(mitre::oss::simcore::GuidanceFlightPhase::CLIMB,
                                    std::make_pair(climb_lateral_controller_, climb_vertical_controller_));
          }
 
          if (cruise_descent_lateral_controller_ && descent_vertical_controller_) {
-            controller_map.emplace(aaesim::open_source::GuidanceFlightPhase::CRUISE_DESCENT,
+            controller_map.emplace(mitre::oss::simcore::GuidanceFlightPhase::CRUISE_DESCENT,
                                    std::make_pair(cruise_descent_lateral_controller_, descent_vertical_controller_));
          }
 
@@ -128,9 +128,9 @@ class AircraftControl final {
    };
 
   private:
-   std::map<aaesim::open_source::GuidanceFlightPhase,
-            std::pair<std::shared_ptr<aaesim::open_source::LateralController>,
-                      std::shared_ptr<aaesim::open_source::VerticalController>>>
+   std::map<mitre::oss::simcore::GuidanceFlightPhase,
+            std::pair<std::shared_ptr<mitre::oss::simcore::LateralController>,
+                      std::shared_ptr<mitre::oss::simcore::VerticalController>>>
          controller_map_{};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

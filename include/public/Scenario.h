@@ -21,7 +21,7 @@
 
 #include <string>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class Scenario {
   public:
    Scenario() : m_scenario_name() {}
@@ -37,4 +37,4 @@ class Scenario {
 inline const std::string &Scenario::GetScenarioName() const { return m_scenario_name; }
 
 inline void Scenario::SetScenarioName(const std::string &scenario_name) { m_scenario_name = scenario_name; }
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

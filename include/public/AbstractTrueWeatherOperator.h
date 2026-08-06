@@ -24,10 +24,10 @@
 #include "public/TrueWeatherOperator.h"
 #include "public/WeatherTruth.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class AbstractTrueWeatherOperator : public TrueWeatherOperator {
   public:
-   explicit AbstractTrueWeatherOperator(std::shared_ptr<aaesim::open_source::WeatherTruth> true_weather)
+   explicit AbstractTrueWeatherOperator(std::shared_ptr<mitre::oss::simcore::WeatherTruth> true_weather)
       : m_true_weather{true_weather} {}
    ~AbstractTrueWeatherOperator() = default;
    Units::KelvinTemperature GetTemperature() const override { return m_true_weather->GetTemperature(); }
@@ -36,9 +36,9 @@ class AbstractTrueWeatherOperator : public TrueWeatherOperator {
    std::shared_ptr<const Atmosphere> GetAtmosphere() const override {
       throw std::runtime_error("AAES-1545: Do not call this method. Design error that needs to be fixed!");
    }
-   std::shared_ptr<const aaesim::open_source::WeatherTruth> GetTrueWeather() const override { return m_true_weather; }
+   std::shared_ptr<const mitre::oss::simcore::WeatherTruth> GetTrueWeather() const override { return m_true_weather; }
 
   protected:
-   std::shared_ptr<aaesim::open_source::WeatherTruth> m_true_weather{};
+   std::shared_ptr<mitre::oss::simcore::WeatherTruth> m_true_weather{};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -26,6 +26,8 @@
 
 #include "utility/UtilityConstants.h"
 
+namespace mitre::oss::simcore {
+
 const double RandomGenerator::m_IA = 16807;
 const double RandomGenerator::m_IM = 2147483647;
 const double RandomGenerator::m_AM = 1.0 / m_IM;
@@ -112,3 +114,4 @@ void RandomGenerator::SetSeed(const double seed) {
 }
 
 const double RandomGenerator::GetSeed(void) { return m_seed; }
+}  // namespace mitre::oss::simcore

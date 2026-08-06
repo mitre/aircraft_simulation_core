@@ -35,6 +35,8 @@
 #include "public/Waypoint.h"
 #include "utility/CustomUnits.h"
 
+namespace mitre::oss::simcore {
+
 // can't include LocalTangentPlane.h here because of mutual dependency
 class LocalTangentPlane;
 
@@ -81,7 +83,7 @@ class EarthModel {
    class LocalPositionEnu {
      public:
       static LocalPositionEnu Of(Units::Length x, Units::Length y, Units::Length z);
-      static LocalPositionEnu Of(const aaesim::open_source::AircraftState &state);
+      static LocalPositionEnu Of(const mitre::oss::simcore::AircraftState &state);
       static LocalPositionEnu OfZeros();
       Units::Length x{}, y{}, z{};
    };
@@ -137,7 +139,7 @@ inline EarthModel::LocalPositionEnu EarthModel::LocalPositionEnu::Of(Units::Leng
    return lpe;
 }
 
-inline EarthModel::LocalPositionEnu EarthModel::LocalPositionEnu::Of(const aaesim::open_source::AircraftState &state) {
+inline EarthModel::LocalPositionEnu EarthModel::LocalPositionEnu::Of(const mitre::oss::simcore::AircraftState &state) {
    return Of(state.GetPositionEnuX(), state.GetPositionEnuY(), state.GetAltitudeMsl());
 }
 
@@ -148,3 +150,4 @@ inline EarthModel::LocalPositionEnu EarthModel::LocalPositionEnu::OfZeros() {
    lpe.z = Units::zero();
    return lpe;
 }
+}  // namespace mitre::oss::simcore

@@ -19,7 +19,7 @@
 
 #include "public/PrecalcConstraint.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 bool operator<=(ActiveFlagType l, ActiveFlagType r) { return ((static_cast<int>(l)) <= (static_cast<int>(r))); }
 

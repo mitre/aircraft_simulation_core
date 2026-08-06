@@ -21,11 +21,11 @@
 
 #include <memory>
 
-void aaesim::open_source::ClimbPhaseVerticalController::ComputeAscentCommands(
+void mitre::oss::simcore::ClimbPhaseVerticalController::ComputeAscentCommands(
       const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-      std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
+      std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
       Units::Angle &gamma_command, Units::Speed &tas_command,
-      aaesim::open_source::bada_utils::FlapConfiguration &flap_command) {
+      mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) {
    const Units::Frequency gain_altitude = Units::HertzFrequency(0.20);
    const Units::Frequency velocity_gain = Units::sqr(natural_frequency_) / thrust_gain_;
 
@@ -70,10 +70,10 @@ void aaesim::open_source::ClimbPhaseVerticalController::ComputeAscentCommands(
    // Thrust Limits
    Units::Force max_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_command,
-         aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS));
    Units::Force min_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_command,
-         aaesim::open_source::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
 
    DoLogging(error_alt, thrust_command, equations_of_motion_state.thrust, min_thrust, max_thrust, flap_command,
              error_tas, tas_command, gamma_command);

@@ -27,7 +27,10 @@
 
 #include "utility/UtilityConstants.h"
 
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
+
+namespace mitre::oss::simcore {
 
 // generate a uniform random number between 0 and 1
 // From "Numerical Recipe"
@@ -244,3 +247,5 @@ DMatrix CreateRotationMatrix(double l, double m, double n, const Units::Angle th
                      {l * n * cosT1 + m * sinT, m * n * cosT1 - l * sinT, n * n * cosT1 + cosT}};
    return DMatrix((double **)&a, 0, 2, 0, 2);
 }
+
+}  // namespace mitre::oss::simcore

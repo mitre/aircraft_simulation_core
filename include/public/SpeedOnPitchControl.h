@@ -24,18 +24,18 @@
 #include "public/AbstractDescentController.h"
 #include "public/SpeedOnThrustControl.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class SpeedOnPitchControl final : public AbstractDescentController {
   public:
    SpeedOnPitchControl(const Units::Speed speed_threshold, const Units::Length altitude_threshold)
       : speed_threshold_{speed_threshold}, altitude_threshold_{altitude_threshold} {};
    SpeedOnPitchControl() = delete;
-   void Initialize(std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &aircraft_performance) override;
+   void Initialize(std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &aircraft_performance) override;
    void ComputeVerticalCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                                std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                 Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
                                 BoundedValue<double, 0, 1> &speed_brake_command,
-                                aaesim::open_source::bada_utils::FlapConfiguration &flap_configuration) override;
+                                mitre::oss::simcore::bada_utils::FlapConfiguration &flap_configuration) override;
 
   private:
    inline static log4cplus::Logger logger_{log4cplus::Logger::getInstance("SpeedOnPitchControl")};
@@ -44,4 +44,4 @@ class SpeedOnPitchControl final : public AbstractDescentController {
    bool is_level_flight_{true};
    std::shared_ptr<SpeedOnThrustControl> speed_on_thrust_controller_{std::make_shared<SpeedOnThrustControl>()};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

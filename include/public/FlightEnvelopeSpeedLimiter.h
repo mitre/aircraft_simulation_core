@@ -21,19 +21,18 @@
 
 #include "public/SpeedCommandLimiter.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class FlightEnvelopeSpeedLimiter : public SpeedCommandLimiter {
   public:
-   FlightEnvelopeSpeedLimiter(const aaesim::open_source::bada_utils::FlapSpeeds &flap_speeds,
-                              const aaesim::open_source::bada_utils::FlightEnvelope &flight_envelope);
+   FlightEnvelopeSpeedLimiter(const mitre::oss::simcore::bada_utils::FlapSpeeds &flap_speeds,
+                              const mitre::oss::simcore::bada_utils::FlightEnvelope &flight_envelope);
 
    Units::Speed LimitSpeedCommand(const Units::Speed previous_ias_speed_command,
                                   const Units::Speed current_ias_speed_command,
                                   const Units::Speed reference_velocity_mps,
                                   const Units::Length speed_quantization_distance,
                                   const Units::Length distance_to_end_of_route, const Units::Length current_altitude,
-                                  const aaesim::open_source::bada_utils::FlapConfiguration flap_configuration) override;
+                                  const mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration) override;
 
    BoundedValue<double, 0, 2> LimitMachCommand(const BoundedValue<double, 0, 2> &previous_reference_speed_command_mach,
                                                const BoundedValue<double, 0, 2> &current_mach_command,
@@ -45,8 +44,7 @@ class FlightEnvelopeSpeedLimiter : public SpeedCommandLimiter {
    static const BoundedValue<double, 0, 2> MINIMUM_MACH_LIMIT;
 
   private:
-   aaesim::open_source::bada_utils::FlapSpeeds m_flap_speeds;
-   aaesim::open_source::bada_utils::FlightEnvelope m_flight_envelope;
+   mitre::oss::simcore::bada_utils::FlapSpeeds m_flap_speeds;
+   mitre::oss::simcore::bada_utils::FlightEnvelope m_flight_envelope;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

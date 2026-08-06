@@ -22,9 +22,9 @@
 #include <vector>
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-std::vector<HorizontalPath> aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(Quadrant quadrant) {
+std::vector<HorizontalPath> mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(Quadrant quadrant) {
    static const Units::MetersLength unity = Units::MetersLength(1);
    double course_radians = INFINITY;
    Units::MetersLength x_sign(0), y_sign(0);

@@ -22,19 +22,19 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 void SpeedOnPitchControl::Initialize(
-      std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &aircraft_performance) {
+      std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &aircraft_performance) {
    AbstractDescentController::Initialize(aircraft_performance);
    speed_on_thrust_controller_->Initialize(aircraft_performance_);
 }
 
 void SpeedOnPitchControl::ComputeVerticalCommands(
       const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-      std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
+      std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
       Units::Angle &gamma_command, Units::Speed &true_airspeed_command, BoundedValue<double, 0, 1> &speed_brake_command,
-      aaesim::open_source::bada_utils::FlapConfiguration &flap_configuration) {
+      mitre::oss::simcore::bada_utils::FlapConfiguration &flap_configuration) {
    Units::Force lift, drag;
    ConfigureFlapsAndEstimateKineticForces(equations_of_motion_state, sensed_weather, aircraft_performance_, lift, drag,
                                           flap_configuration);
@@ -52,10 +52,10 @@ void SpeedOnPitchControl::ComputeVerticalCommands(
    }
    const Units::Force max_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_configuration,
-         aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
    const Units::Force min_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_configuration,
-         aaesim::open_source::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
    const Units::Length alt_ref = Units::FeetLength(guidance.m_reference_altitude);
    const Units::Length error_alt = equations_of_motion_state.altitude_msl - alt_ref;
    const Units::Speed guidance_vertical_speed = guidance.m_vertical_speed;
@@ -131,8 +131,8 @@ void SpeedOnPitchControl::ComputeVerticalCommands(
 
    // Determine if speed brake is needed
    if (min_thrust_commanded) {
-      aaesim::open_source::bada_utils::FlapConfiguration updated_flap_configuration{
-            aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};
+      mitre::oss::simcore::bada_utils::FlapConfiguration updated_flap_configuration{
+            mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};
       if (error_alt > altitude_threshold_) {
          Units::Speed v_cas = sensed_weather->GetTrueWeather()->TAS2CAS(equations_of_motion_state.true_airspeed,
                                                                         equations_of_motion_state.altitude_msl);
@@ -140,7 +140,7 @@ void SpeedOnPitchControl::ComputeVerticalCommands(
                v_cas, Units::MetersLength(equations_of_motion_state.altitude_msl), updated_flap_configuration);
 
          if (updated_flap_configuration == flap_configuration &&
-             updated_flap_configuration <= aaesim::open_source::bada_utils::FlapConfiguration::LANDING) {
+             updated_flap_configuration <= mitre::oss::simcore::bada_utils::FlapConfiguration::LANDING) {
             speed_brake_controller_->Deploy();
          }
          flap_configuration = updated_flap_configuration;

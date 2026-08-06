@@ -27,7 +27,7 @@
 #include "public/CustomMath.h"
 #include "utility/CustomUnits.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 using namespace std;
 
 WindStack::WindStack() : m_altitude(), m_speed(), m_minimum_data_index(0), m_maximum_data_index(0) {

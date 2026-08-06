@@ -24,6 +24,8 @@
 
 #include "public/TangentPlaneSequence.h"
 
+namespace mitre::oss::simcore {
+
 class SingleTangentPlaneSequence final : public TangentPlaneSequence {
   public:
    static void ClearStaticMembers();
@@ -34,3 +36,4 @@ class SingleTangentPlaneSequence final : public TangentPlaneSequence {
    static std::list<Waypoint> m_master_waypoint_sequence;
    static log4cplus::Logger m_logger;
 };
+}  // namespace mitre::oss::simcore

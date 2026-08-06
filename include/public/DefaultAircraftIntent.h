@@ -40,7 +40,7 @@
 #include "utility/BoundedValue.h"
 #include "utility/UtilityConstants.h"
 
-namespace aaesim::open_source
+namespace mitre::oss::simcore
 {
    class DefaultAircraftIntent final : public AircraftIntent
    {
@@ -246,6 +246,6 @@ namespace aaesim::open_source
 
    inline const std::vector<Waypoint> &DefaultAircraftIntent::GetCruiseWaypoints() const { return m_cruise_waypoints; }
 
-} // namespace aaesim::open_source
+} // namespace mitre::oss::simcore
 
-using DefaultAircraftIntent = aaesim::open_source::DefaultAircraftIntent;
+using DefaultAircraftIntent = mitre::oss::simcore::DefaultAircraftIntent;

@@ -23,12 +23,12 @@
 
 #include "public/AircraftCalculations.h"
 
-aaesim::open_source::EuclideanWaypointMonitor::EuclideanWaypointMonitor(
-      const aaesim::LatitudeLongitudePoint &lat_lon_point)
+mitre::oss::simcore::EuclideanWaypointMonitor::EuclideanWaypointMonitor(
+      const mitre::oss::simcore::LatitudeLongitudePoint &lat_lon_point)
    : m_point_to_monitor(
-           aaesim::LatitudeLongitudePoint::CreateFromGeolibPrimitive(lat_lon_point.GetGeolibPrimitiveLLPoint())) {};
+           mitre::oss::simcore::LatitudeLongitudePoint::CreateFromGeolibPrimitive(lat_lon_point.GetGeolibPrimitiveLLPoint())) {};
 
-void aaesim::open_source::EuclideanWaypointMonitor::Update(const aaesim::LatitudeLongitudePoint &position,
+void mitre::oss::simcore::EuclideanWaypointMonitor::Update(const mitre::oss::simcore::LatitudeLongitudePoint &position,
                                                            const Units::SignedAngle &ground_course_enu) {
    // Treat the lat/lon values as y/x values
    Units::Length current_position_x(Units::infinity()), current_position_y(Units::infinity());
@@ -48,30 +48,30 @@ void aaesim::open_source::EuclideanWaypointMonitor::Update(const aaesim::Latitud
    m_is_passed_waypoint = Units::abs(angle) > Units::PI_RADIANS_ANGLE / 2;
 }
 
-void aaesim::open_source::EuclideanWaypointMonitor::PerformFakeTranslationToEuclidean(
-      const aaesim::LatitudeLongitudePoint &lat_lon_point, Units::Length &x, Units::Length &y) {
+void mitre::oss::simcore::EuclideanWaypointMonitor::PerformFakeTranslationToEuclidean(
+      const mitre::oss::simcore::LatitudeLongitudePoint &lat_lon_point, Units::Length &x, Units::Length &y) {
    x = Units::MetersLength(Units::SignedRadiansAngle(lat_lon_point.GetLongitude()).value());
    y = Units::MetersLength(Units::SignedRadiansAngle(lat_lon_point.GetLatitude()).value());
 }
 
-std::shared_ptr<aaesim::open_source::EuclideanWaypointMonitor>
-      aaesim::open_source::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(
-            const aaesim::open_source::Wgs84PrecalcWaypoint &waypoint) {
-   return std::make_shared<aaesim::open_source::EuclideanWaypointMonitor>(
-         aaesim::open_source::EuclideanWaypointMonitor(waypoint.m_position));
+std::shared_ptr<mitre::oss::simcore::EuclideanWaypointMonitor>
+      mitre::oss::simcore::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(
+            const mitre::oss::simcore::Wgs84PrecalcWaypoint &waypoint) {
+   return std::make_shared<mitre::oss::simcore::EuclideanWaypointMonitor>(
+         mitre::oss::simcore::EuclideanWaypointMonitor(waypoint.m_position));
 }
 
-std::shared_ptr<aaesim::open_source::EuclideanWaypointMonitor>
-      aaesim::open_source::EuclideanWaypointMonitor::OfEllipsoidalPoint(
-            const aaesim::LatitudeLongitudePoint &ellipsoidal_point) {
-   return std::make_shared<aaesim::open_source::EuclideanWaypointMonitor>(
-         aaesim::open_source::EuclideanWaypointMonitor(ellipsoidal_point));
+std::shared_ptr<mitre::oss::simcore::EuclideanWaypointMonitor>
+      mitre::oss::simcore::EuclideanWaypointMonitor::OfEllipsoidalPoint(
+            const mitre::oss::simcore::LatitudeLongitudePoint &ellipsoidal_point) {
+   return std::make_shared<mitre::oss::simcore::EuclideanWaypointMonitor>(
+         mitre::oss::simcore::EuclideanWaypointMonitor(ellipsoidal_point));
 }
 
-std::shared_ptr<aaesim::open_source::EuclideanWaypointMonitor>
-      aaesim::open_source::EuclideanWaypointMonitor::OfGeodeticPoint(
+std::shared_ptr<mitre::oss::simcore::EuclideanWaypointMonitor>
+      mitre::oss::simcore::EuclideanWaypointMonitor::OfGeodeticPoint(
             const EarthModel::GeodeticPosition &geodetic_point) {
    const LatitudeLongitudePoint monitor_this(geodetic_point.latitude, geodetic_point.longitude);
-   return std::make_shared<aaesim::open_source::EuclideanWaypointMonitor>(
-         aaesim::open_source::EuclideanWaypointMonitor(monitor_this));
+   return std::make_shared<mitre::oss::simcore::EuclideanWaypointMonitor>(
+         mitre::oss::simcore::EuclideanWaypointMonitor(monitor_this));
 }

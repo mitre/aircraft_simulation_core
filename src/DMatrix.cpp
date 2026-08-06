@@ -23,6 +23,8 @@
 
 #include "public/InvalidIndexException.h"
 
+namespace mitre::oss::simcore {
+
 char *DMatrix::MULTIPLICATION_DIMENSIONS_MESSAGE = (char *)"Cannot multiply DMatrix unless inner dimensions match.";
 
 DMatrix::DMatrix() {
@@ -249,3 +251,4 @@ DMatrix::IncompatibleDimensionsException::IncompatibleDimensionsException(char *
 DMatrix::IncompatibleDimensionsException::~IncompatibleDimensionsException() throw() {}
 
 const char *DMatrix::IncompatibleDimensionsException::what() const throw() { return m_explanation; }
+}  // namespace mitre::oss::simcore

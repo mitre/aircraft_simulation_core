@@ -21,7 +21,7 @@
 
 #include "utility/BoundedValue.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class SpeedBrakeController final {
   public:
    SpeedBrakeController() = default;
@@ -65,4 +65,4 @@ class SpeedBrakeController final {
    bool is_speedbrake_deployed_{false};
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

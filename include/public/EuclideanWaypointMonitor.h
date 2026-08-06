@@ -25,32 +25,30 @@
 #include "public/WaypointPassingMonitor.h"
 #include "public/Wgs84PrecalcWaypoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class EuclideanWaypointMonitor final : public WaypointPassingMonitor {
   public:
    ~EuclideanWaypointMonitor() = default;
 
-   void Update(const aaesim::LatitudeLongitudePoint &position, const Units::SignedAngle &ground_course_enu) override;
+   void Update(const mitre::oss::simcore::LatitudeLongitudePoint &position, const Units::SignedAngle &ground_course_enu) override;
 
    bool IsPassedWaypoint() const override { return m_is_passed_waypoint; }
 
    static std::shared_ptr<EuclideanWaypointMonitor> OfWgs84PrecalcWaypoint(
-         const aaesim::open_source::Wgs84PrecalcWaypoint &waypoint);
+         const mitre::oss::simcore::Wgs84PrecalcWaypoint &waypoint);
 
    static std::shared_ptr<EuclideanWaypointMonitor> OfEllipsoidalPoint(
-         const aaesim::LatitudeLongitudePoint &ellipsoidal_point);
+         const mitre::oss::simcore::LatitudeLongitudePoint &ellipsoidal_point);
 
    static std::shared_ptr<EuclideanWaypointMonitor> OfGeodeticPoint(const EarthModel::GeodeticPosition &geodetic_point);
 
   private:
-   EuclideanWaypointMonitor(const aaesim::LatitudeLongitudePoint &lat_lon_point);
+   EuclideanWaypointMonitor(const mitre::oss::simcore::LatitudeLongitudePoint &lat_lon_point);
 
-   void PerformFakeTranslationToEuclidean(const aaesim::LatitudeLongitudePoint &lat_lon_point, Units::Length &x,
+   void PerformFakeTranslationToEuclidean(const mitre::oss::simcore::LatitudeLongitudePoint &lat_lon_point, Units::Length &x,
                                           Units::Length &y);
 
    bool m_is_passed_waypoint{false};
-   aaesim::LatitudeLongitudePoint m_point_to_monitor{};
+   mitre::oss::simcore::LatitudeLongitudePoint m_point_to_monitor{};
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

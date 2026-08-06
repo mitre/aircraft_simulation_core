@@ -29,13 +29,15 @@
 #include "public/LocalTangentPlane.h"
 #include "public/WGS84EarthModelConstants.h"
 
+namespace mitre::oss::simcore {
+
 class EllipsoidalEarthModel final : public EarthModel {
   public:
    EllipsoidalEarthModel()
-      : m_semi_major_radius_squared(aaesim::open_source::kWgs84SemiMajorAxis *
-                                    aaesim::open_source::kWgs84SemiMajorAxis),
-        m_eccentricity_4(aaesim::open_source::kWgs84EccentricitySquared *
-                         aaesim::open_source::kWgs84EccentricitySquared) {}
+      : m_semi_major_radius_squared(mitre::oss::simcore::kWgs84SemiMajorAxis *
+                                    mitre::oss::simcore::kWgs84SemiMajorAxis),
+        m_eccentricity_4(mitre::oss::simcore::kWgs84EccentricitySquared *
+                         mitre::oss::simcore::kWgs84EccentricitySquared) {}
 
    ~EllipsoidalEarthModel() = default;
 
@@ -53,3 +55,4 @@ class EllipsoidalEarthModel final : public EarthModel {
    const Units::Area m_semi_major_radius_squared;
    const double m_eccentricity_4;
 };
+}  // namespace mitre::oss::simcore

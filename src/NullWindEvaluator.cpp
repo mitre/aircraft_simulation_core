@@ -21,7 +21,7 @@
 
 #include <memory>
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 std::shared_ptr<PredictedWindEvaluator> NullWindEvaluator::m_instance;
 
@@ -36,7 +36,7 @@ NullWindEvaluator::NullWindEvaluator() = default;
 
 NullWindEvaluator::~NullWindEvaluator() = default;
 
-bool NullWindEvaluator::ArePredictedWindsAccurate(const aaesim::open_source::AircraftState &state,
+bool NullWindEvaluator::ArePredictedWindsAccurate(const mitre::oss::simcore::AircraftState &state,
                                                   const WeatherPrediction &weather_prediction,
                                                   const Units::Speed reference_cas,
                                                   const Units::Length reference_altitude,

@@ -24,8 +24,8 @@
 #include "public/CoreUtils.h"
 
 using namespace std;
-using namespace aaesim::open_source;
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
 
 VerticalPredictor::VerticalPredictor()
    : LOW_GROUNDSPEED_WARNING(50),

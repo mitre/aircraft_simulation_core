@@ -28,7 +28,7 @@
 #include "public/LatitudeLongitudePoint.h"
 #include "public/PrecalcConstraint.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 struct Wgs84PrecalcWaypoint final {
    Wgs84PrecalcWaypoint() = default;
@@ -45,7 +45,7 @@ struct Wgs84PrecalcWaypoint final {
    Units::MetersLength m_radius_rf_leg{Units::zero()};
    Units::RadiansAngle m_bank_angle{Units::zero()};
    Units::MetersPerSecondSpeed m_ground_speed{Units::zero()};
-   open_source::PrecalcConstraint m_precalc_constraints{};
+   PrecalcConstraint m_precalc_constraints{};
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

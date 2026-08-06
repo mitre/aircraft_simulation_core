@@ -22,9 +22,9 @@
 #include "public/AircraftState.h"
 #include "public/WeatherPrediction.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct WindBlendingAlgorithm {
-   virtual void BlendSensedWithPredicted(const aaesim::open_source::AircraftState &current_state,
-                                         aaesim::open_source::WeatherPrediction &weather_prediction) = 0;
+   virtual void BlendSensedWithPredicted(const mitre::oss::simcore::AircraftState &current_state,
+                                         mitre::oss::simcore::WeatherPrediction &weather_prediction) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

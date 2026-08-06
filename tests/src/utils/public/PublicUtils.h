@@ -25,9 +25,7 @@
 #include "public/HorizontalPath.h"
 #include "public/DefaultAircraftIntent.h"
 
-namespace aaesim {
-namespace test {
-namespace utils {
+namespace mitre::oss::simcore::test::utils {
 static const double TOLERANCE_RADIANS = 1e-15;
 static const double TOLERANCE_METERS = 1.0;
 static const double TOLERANCE_METERS_TIGHT = 1e-8;
@@ -36,10 +34,8 @@ enum Quadrant { FIRST, SECOND, THIRD, FOURTH };
 
 class PublicUtils {
   public:
-   static std::vector<aaesim::open_source::HorizontalPath> CreateStraightHorizontalPath(Quadrant quadrant);
+   static std::vector<mitre::oss::simcore::HorizontalPath> CreateStraightHorizontalPath(Quadrant quadrant);
    static DefaultAircraftIntent LoadAircraftIntent(std::string parmsfile);
    static DefaultAircraftIntent PrepareAircraftIntent(std::string parmsfile);
 };
-}  // namespace utils
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test::utils

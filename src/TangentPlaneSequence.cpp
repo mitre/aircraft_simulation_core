@@ -26,6 +26,8 @@
 
 #include "public/Environment.h"
 
+namespace mitre::oss::simcore {
+
 using namespace std;
 
 TangentPlaneSequence::TangentPlaneSequence() {}
@@ -142,3 +144,4 @@ const std::vector<std::shared_ptr<LocalTangentPlane> > &TangentPlaneSequence::Ge
       const {
    return tangent_planes_from_initialization_;
 }
+}  // namespace mitre::oss::simcore

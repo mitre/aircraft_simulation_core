@@ -24,7 +24,7 @@
 
 #include "public/RandomGenerator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ScenarioUtils {
   public:
    ~ScenarioUtils() = default;
@@ -75,4 +75,4 @@ class ScenarioUtils {
    static std::map<std::string, int> m_aircraft_string_int_map;
    ScenarioUtils() = default;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

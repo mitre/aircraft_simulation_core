@@ -25,13 +25,13 @@
 #include "utility/CustomUnits.h"
 
 using namespace geolib_idealab;
-using namespace aaesim;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger ArcOnEllipsoid::m_logger = log4cplus::Logger::getInstance("ArcOnEllipsoid");
 
 ArcOnEllipsoid::ArcOnEllipsoid(const geolib_idealab::Arc &arc) : m_arc_primitive(arc) {}
 
-Units::Length aaesim::ArcOnEllipsoid::GetShapeLength() const {
+Units::Length mitre::oss::simcore::ArcOnEllipsoid::GetShapeLength() const {
    /*
     * Note: this implementation could call CalculateDistanceFromPointOnShapeToEnd and get the same result,
     * but that would also carry multiple extra iterative calls to geolib_idealab methods unnecessarily. In order to

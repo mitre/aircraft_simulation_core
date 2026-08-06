@@ -21,7 +21,7 @@
 
 #include "public/CustomMath.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 const ADSBSVReport ADSBSVReport::EMPTY_REPORT{};
 
 bool ADSBSVReport::operator==(const ADSBSVReport &in) {
@@ -154,4 +154,4 @@ ADSBSVReport::Builder *ADSBSVReport::Builder::VerticalVelocityQuantum(Units::Spe
    return this;
 }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -21,7 +21,7 @@
 
 #include "public/AircraftIntent.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 struct NullAircraftIntent final : AircraftIntent {
    std::optional<Waypoint> GetWaypoint(unsigned int) const override { return std::nullopt; }
@@ -43,6 +43,6 @@ struct NullAircraftIntent final : AircraftIntent {
    inline static const RouteData EMPTY_ROUTE_DATA{};
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore
 
-using NullAircraftIntent = aaesim::open_source::NullAircraftIntent;
+using NullAircraftIntent = mitre::oss::simcore::NullAircraftIntent;

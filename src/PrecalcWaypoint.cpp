@@ -19,6 +19,8 @@
 
 #include "public/PrecalcWaypoint.h"
 
+namespace mitre::oss::simcore {
+
 bool PrecalcWaypoint::operator==(const PrecalcWaypoint &obj) const {
    bool match = (m_leg_length == obj.m_leg_length);
    match = match && (m_course_angle == obj.m_course_angle);
@@ -31,3 +33,4 @@ bool PrecalcWaypoint::operator==(const PrecalcWaypoint &obj) const {
 
    return match;
 }
+}  // namespace mitre::oss::simcore

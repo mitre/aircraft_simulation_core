@@ -19,21 +19,21 @@
 
 #include "public/FlightEnvelopeSpeedLimiter.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 const Units::Speed FlightEnvelopeSpeedLimiter::MINIMUM_IAS_LIMIT = Units::KnotsSpeed(150);
 const BoundedValue<double, 0, 2> FlightEnvelopeSpeedLimiter::MINIMUM_MACH_LIMIT = BoundedValue<double, 0, 2>(0.6);
 
 FlightEnvelopeSpeedLimiter::FlightEnvelopeSpeedLimiter(
-      const aaesim::open_source::bada_utils::FlapSpeeds &flap_speeds,
-      const aaesim::open_source::bada_utils::FlightEnvelope &flight_envelope)
+      const mitre::oss::simcore::bada_utils::FlapSpeeds &flap_speeds,
+      const mitre::oss::simcore::bada_utils::FlightEnvelope &flight_envelope)
    : m_flap_speeds(flap_speeds), m_flight_envelope(flight_envelope) {}
 
 Units::Speed FlightEnvelopeSpeedLimiter::LimitSpeedCommand(
       const Units::Speed previous_ias_speed_command, const Units::Speed current_ias_speed_command,
       const Units::Speed reference_velocity_mps, const Units::Length speed_quantization_distance,
       const Units::Length distance_to_end_of_route, const Units::Length current_altitude,
-      const aaesim::open_source::bada_utils::FlapConfiguration flap_configuration) {
+      const mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration) {
    Units::Speed limited_ias = Units::max(MINIMUM_IAS_LIMIT, current_ias_speed_command);
 
    switch (flap_configuration) {

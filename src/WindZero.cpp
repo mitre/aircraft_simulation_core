@@ -19,7 +19,7 @@
 
 #include "public/WindZero.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 WindZero::WindZero(std::shared_ptr<Atmosphere> atmosphere) : m_atmosphere(atmosphere) {}
 
@@ -38,8 +38,8 @@ void WindZero::InterpolateWindScalar(Units::Angle lat_in, Units::Angle lon_in, U
 }
 
 void WindZero::InterpolateWindMatrix(Units::Angle lat_in, Units::Angle lon_in, Units::Length alt_in,
-                                     aaesim::open_source::WindStack &east_west,
-                                     aaesim::open_source::WindStack &north_south) {
+                                     mitre::oss::simcore::WindStack &east_west,
+                                     mitre::oss::simcore::WindStack &north_south) {
    for (int i = east_west.GetMinRow(); i <= east_west.GetMaxRow(); i++) {
       east_west.Insert(i, Units::FeetLength((i - 1) * 1000), Units::KnotsSpeed(0));
    }

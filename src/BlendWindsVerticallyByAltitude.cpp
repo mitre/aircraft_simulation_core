@@ -21,11 +21,11 @@
 
 #include "public/WindStack.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 void BlendWindsVerticallyByAltitude::BlendSensedWithPredicted(
-      const aaesim::open_source::AircraftState &current_state,
-      aaesim::open_source::WeatherPrediction &weather_prediction) {
+      const mitre::oss::simcore::AircraftState &current_state,
+      mitre::oss::simcore::WeatherPrediction &weather_prediction) {
    /*
     * Algorithm Description:
     * For all altitudes above and below the current_state altitude by less than
@@ -41,8 +41,8 @@ void BlendWindsVerticallyByAltitude::BlendSensedWithPredicted(
 
    // Local predicted wind WindStack to operate on. The returned matrices
    // will be updated just prior to return
-   aaesim::open_source::WindStack local_blended_x = weather_prediction.east_west();
-   aaesim::open_source::WindStack local_blended_y = weather_prediction.north_south();
+   mitre::oss::simcore::WindStack local_blended_x = weather_prediction.east_west();
+   mitre::oss::simcore::WindStack local_blended_y = weather_prediction.north_south();
 
    // Define the limits that we need to use for wind blending
 

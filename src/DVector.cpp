@@ -23,6 +23,8 @@
 
 #include "public/InvalidIndexException.h"
 
+namespace mitre::oss::simcore {
+
 using std::cout;
 using std::endl;
 
@@ -131,3 +133,4 @@ bool DVector::operator<(const DVector &other) const { return m_vector[0] < other
 int DVector::GetMin() { return m_min_index; }
 
 int DVector::GetMax() { return m_max_index; }
+}  // namespace mitre::oss::simcore

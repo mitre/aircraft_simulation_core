@@ -25,17 +25,16 @@
 #include "public/AircraftSpeed.h"
 #include "public/PrecalcWaypoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 enum GuidanceFlightPhase { TAKEOFF_ROLL, CLIMB, CRUISE_DESCENT };
 
 static std::string GuidanceFlightPhaseAsString(GuidanceFlightPhase guidance_flight_phase) {
    switch (guidance_flight_phase) {
-      case aaesim::open_source::GuidanceFlightPhase::TAKEOFF_ROLL:
+      case mitre::oss::simcore::GuidanceFlightPhase::TAKEOFF_ROLL:
          return "TAKEOFF_ROLL";
-      case aaesim::open_source::GuidanceFlightPhase::CLIMB:
+      case mitre::oss::simcore::GuidanceFlightPhase::CLIMB:
          return "CLIMB";
-      case aaesim::open_source::GuidanceFlightPhase::CRUISE_DESCENT:
+      case mitre::oss::simcore::GuidanceFlightPhase::CRUISE_DESCENT:
          return "CRUISE_DESCENT";
       default:
          throw std::logic_error("Invalid guidance flight phase encountered: " + std::to_string(guidance_flight_phase));
@@ -99,5 +98,4 @@ inline int Guidance::GetIasCommandIntegerKnots() const {
    return (int)result;
 }
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

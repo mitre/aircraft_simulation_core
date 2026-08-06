@@ -26,6 +26,8 @@
 
 #include "public/CustomMath.h"
 
+namespace mitre::oss::simcore {
+
 log4cplus::Logger Atmosphere::m_logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("Atmosphere"));
 
 void Atmosphere::AirDensity_Log(const Units::MetersLength h, const Units::KelvinTemperature t,
@@ -39,3 +41,4 @@ void Atmosphere::AirDensity_Log(const Units::MetersLength h, const Units::Kelvin
       LOG4CPLUS_TRACE(m_logger, j);
    }
 }
+}  // namespace mitre::oss::simcore

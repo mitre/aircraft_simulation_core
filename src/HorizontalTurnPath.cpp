@@ -28,7 +28,7 @@
  * The HorizontalPath object which owns this HorizontalTurnPath
  * would be p2.
  */
-aaesim::open_source::HorizontalTurnPath::TURN_DIRECTION aaesim::open_source::HorizontalTurnPath::GetTurnDirection(
+mitre::oss::simcore::HorizontalTurnPath::TURN_DIRECTION mitre::oss::simcore::HorizontalTurnPath::GetTurnDirection(
       const HorizontalPath &p0, const HorizontalPath &p1) const {
    if (turn_type == UNKNOWN) return NO_TURN;
 
