@@ -102,8 +102,6 @@ namespace mitre::oss::simcore
           {"CA", AircraftIntent::Arinc424LegType::CA},
       };
 
-      static std::vector<Waypoint> RemoveZeroLengthLegs(const std::vector<Waypoint> &waypoints);
-
       void GetLatLonFromXYZ(const Units::Length &xMeters, const Units::Length &yMeters,
                             const Units::Length &zMeters, Units::Angle &lat, Units::Angle &lon) const; // TODO remove when TangentPlaneSequence is fully removed
       std::vector<Waypoint> AddConnectingLeg(const std::vector<Waypoint> &first_waypoint_vector,

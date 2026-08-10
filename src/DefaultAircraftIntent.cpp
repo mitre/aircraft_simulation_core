@@ -212,9 +212,8 @@ void DefaultAircraftIntent::LoadWaypoints(const std::vector<Waypoint> &ascent_wa
    ClearAndResetRouteDataContent(ascent_waypoints_shortened_legs, cruise_waypoints_shortened_legs,
                                  descent_waypoints_shortened_legs);
 
-   const auto all_waypoints = RemoveZeroLengthLegs(m_ordered_waypoints);
    m_tangent_plane_sequence =
-         std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(all_waypoints));
+         std::shared_ptr<TangentPlaneSequence>(new SingleTangentPlaneSequence(m_ordered_waypoints));
    UpdateXYZFromLatLonWgs84();
    DoRouteDataLogging();
 }
@@ -355,29 +354,4 @@ Units::MetersLength DefaultAircraftIntent::GetWaypointY(unsigned int i) const {
       throw InvalidIndexException(i, 0, route_data_.m_y.size() - 1);
    }
    return route_data_.m_y[i];
-}
-
-std::vector<Waypoint> DefaultAircraftIntent::RemoveZeroLengthLegs(const std::vector<Waypoint> &waypoints) {
-   std::vector<Waypoint> resolved_waypoints;
-   if (waypoints.empty()) {
-      return resolved_waypoints;
-   }
-   auto wpt_itr = waypoints.begin();
-   auto next_itr = std::next(wpt_itr);
-   for (; next_itr != waypoints.end(); ++wpt_itr, ++next_itr) {
-      const auto lat1 = wpt_itr->GetLatitude();
-      const auto lon1 = wpt_itr->GetLongitude();
-      const auto lat2 = next_itr->GetLatitude();
-      const auto lon2 = next_itr->GetLongitude();
-      const auto lat_diff = Units::abs(lat1 - lat2);
-      const auto lon_diff = Units::abs(lon1 - lon2);
-      const auto tolerance = Units::DegreesAngle(1e-5);
-      const bool skip_waypoint = lat_diff < tolerance && lon_diff < tolerance;
-      if (!skip_waypoint) {
-         resolved_waypoints.push_back(*wpt_itr);
-      }
-   }
-   // always include the last waypoint
-   resolved_waypoints.push_back(waypoints.back());
-   return resolved_waypoints;
 }
