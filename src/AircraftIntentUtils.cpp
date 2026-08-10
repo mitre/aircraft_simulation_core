@@ -6,7 +6,7 @@ namespace mitre::oss::simcore {
 
 DefaultAircraftIntent AircraftIntentUtils::CopyAndTrimAfterNamedWaypoint(const AircraftIntent &intent,
                                                                           const std::string &waypoint_name) {
-   auto copy = *DefaultAircraftIntent::Builder(intent).Build();
+   auto copy = *DefaultAircraftIntent::Builder().CopyFrom(intent).Build();
    const auto &waypoints = intent.GetWaypoints();
    if (!intent.ContainsWaypointName(waypoint_name) || waypoints.empty() || waypoints.back().GetName() == waypoint_name) {
       return copy;

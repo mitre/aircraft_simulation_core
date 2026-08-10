@@ -33,7 +33,7 @@
 
 using namespace mitre::oss::simcore;
 
-DefaultAircraftIntent::Builder::Builder(const AircraftIntent &aircraft_intent) {
+DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::CopyFrom(const AircraftIntent &aircraft_intent) {
    if (!aircraft_intent.GetAscentWaypoints().empty()) {
       ascent_waypoints_ = aircraft_intent.GetAscentWaypoints();
    }
@@ -45,6 +45,7 @@ DefaultAircraftIntent::Builder::Builder(const AircraftIntent &aircraft_intent) {
    }
    planned_cruise_mach_ = aircraft_intent.GetPlannedCruiseMach();
    planned_cruise_altitude_ = aircraft_intent.GetPlannedCruiseAltitude();
+   return *this;
 }
 
 DefaultAircraftIntent::Builder &DefaultAircraftIntent::Builder::SetAscentWaypoints(const std::vector<Waypoint> &ascent_waypoints) {

@@ -137,7 +137,7 @@ TEST(DefaultAircraftIntent, BuilderCopiesDefaultIntentWithoutRenormalizingWaypoi
                                       .SetCruiseWaypoints(cruise_waypoints)
                                       .SetDescentWaypoints(descent_waypoints)
                                       .Build();
-   const auto copied_intent = *DefaultAircraftIntent::Builder(source_intent).Build();
+   const auto copied_intent = *DefaultAircraftIntent::Builder().CopyFrom(source_intent).Build();
 
    EXPECT_EQ(source_intent, copied_intent);
 }

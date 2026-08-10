@@ -49,7 +49,7 @@ namespace mitre::oss::simcore
       {
       public:
          Builder() = default;
-         Builder(const AircraftIntent &aircraft_intent);
+         Builder &CopyFrom(const AircraftIntent &aircraft_intent);
          Builder &SetAscentWaypoints(const std::vector<Waypoint> &ascent_waypoints);
          Builder &SetCruiseWaypoints(const std::vector<Waypoint> &cruise_waypoints);
          Builder &SetDescentWaypoints(const std::vector<Waypoint> &descent_waypoints);
