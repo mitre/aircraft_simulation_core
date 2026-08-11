@@ -50,21 +50,13 @@ class KinematicTrajectoryPredictor final : public mitre::oss::simcore::Euclidean
 
    const std::vector<double> &GetVerticalPathDistances() const; // TODO remove function if possible depending callers
 
-   const double GetVerticalPathDistanceByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
-
    const std::vector<double> &GetVerticalPathTimes() const; // TODO remove function if possible depending callers
-
-   const double GetVerticalPathTimeByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
 
    const std::vector<double> &GetVerticalPathGroundspeeds() const; // TODO remove function if possible depending callers
 
    const std::vector<double> &GetVerticalPathVelocities() const; // TODO remove function if possible depending callers
 
-   const Units::Speed GetVerticalPathCasByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
-
    const std::vector<double> &GetVerticalPathAltitudes() const; // TODO remove function if possible depending callers
-
-   const double GetVerticalPathAltitudeByIndex(const int index) const;  // TODO remove function...use GetPathDataAtIndex() instead
 
    std::shared_ptr<mitre::oss::simcore::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
 
@@ -77,16 +69,8 @@ inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredic
    return m_vertical_predictor->GetVerticalPath().along_path_distance_m;
 }
 
-inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathDistanceByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().along_path_distance_m[index];
-}
-
 inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathTimes() const {
    return m_vertical_predictor->GetVerticalPath().time_to_go_sec;
-}
-
-inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathTimeByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().time_to_go_sec[index];
 }
 
 inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathGroundspeeds()
@@ -98,16 +82,6 @@ inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredic
    return m_vertical_predictor->GetVerticalPath().cas_mps;
 }
 
-inline const Units::Speed mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathCasByIndex(
-      int index) const {
-   return Units::MetersPerSecondSpeed(m_vertical_predictor->GetVerticalPath().cas_mps[index]);
-}
-
 inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathAltitudes() const {
    return m_vertical_predictor->GetVerticalPath().altitude_m;
-}
-
-inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathAltitudeByIndex(
-      const int index) const {
-   return m_vertical_predictor->GetVerticalPath().altitude_m[index];
 }
