@@ -32,7 +32,7 @@
 #include "public/PrecalcWaypoint.h"
 
 namespace mitre::oss::simcore {
-class KinematicTrajectoryPredictor : public mitre::oss::simcore::EuclideanTrajectoryPredictor {
+class KinematicTrajectoryPredictor final : public mitre::oss::simcore::EuclideanTrajectoryPredictor {
   public:
    KinematicTrajectoryPredictor();
 
@@ -44,30 +44,27 @@ class KinematicTrajectoryPredictor : public mitre::oss::simcore::EuclideanTrajec
    virtual ~KinematicTrajectoryPredictor() = default;
 
    void CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
-                           const WeatherPrediction &weather_prediction) override final;
+                           const WeatherPrediction &weather_prediction) override;
 
    KinematicTrajectoryPredictor &operator=(const KinematicTrajectoryPredictor &obj);
 
-   const std::vector<double> &GetVerticalPathDistances() const;
+   const std::vector<double> &GetVerticalPathDistances() const; // TODO remove function if possible depending callers
 
-   const double GetVerticalPathDistanceByIndex(int index) const;
+   const double GetVerticalPathDistanceByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
 
-   const std::vector<double> &GetVerticalPathTimes() const;
+   const std::vector<double> &GetVerticalPathTimes() const; // TODO remove function if possible depending callers
 
-   const double GetVerticalPathTimeByIndex(int index) const;
+   const double GetVerticalPathTimeByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
 
-   const std::vector<double> &GetVerticalPathGroundspeeds() const;
+   const std::vector<double> &GetVerticalPathGroundspeeds() const; // TODO remove function if possible depending callers
 
-   const std::vector<double> &GetVerticalPathVelocities() const;
+   const std::vector<double> &GetVerticalPathVelocities() const; // TODO remove function if possible depending callers
 
-   // Deprecated
-   const double GetVerticalPathVelocityByIndex(int index) const;
+   const Units::Speed GetVerticalPathCasByIndex(int index) const; // TODO remove function...use GetPathDataAtIndex() instead
 
-   const Units::Speed GetVerticalPathCasByIndex(int index) const;
+   const std::vector<double> &GetVerticalPathAltitudes() const; // TODO remove function if possible depending callers
 
-   const std::vector<double> &GetVerticalPathAltitudes() const;
-
-   const double GetVerticalPathAltitudeByIndex(const int index) const;
+   const double GetVerticalPathAltitudeByIndex(const int index) const;  // TODO remove function...use GetPathDataAtIndex() instead
 
    std::shared_ptr<mitre::oss::simcore::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
 
@@ -99,10 +96,6 @@ inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredic
 
 inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathVelocities() const {
    return m_vertical_predictor->GetVerticalPath().cas_mps;
-}
-
-inline const double mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathVelocityByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().cas_mps[index];
 }
 
 inline const Units::Speed mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathCasByIndex(
