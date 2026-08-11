@@ -1053,18 +1053,6 @@ TEST(AircraftState, GetHeadingCcwFromEastRadians) {
    }
 }
 
-TEST(Guidance, GetIasCommandIntegerKnots) {
-   Guidance guidance;
-
-   // test rounding up
-   guidance.m_ias_command = Units::KnotsSpeed(209.9);
-   EXPECT_EQ(210, guidance.GetIasCommandIntegerKnots());
-
-   // test rounding down
-   guidance.m_ias_command = Units::KnotsSpeed(209.1);
-   EXPECT_EQ(209, guidance.GetIasCommandIntegerKnots());
-}
-
 /* Broken because we cannot access bada classes from here
 class PredictedWindEvaluatorTest : public ::testing::Test {
   protected:

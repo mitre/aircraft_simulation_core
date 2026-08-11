@@ -55,8 +55,6 @@ class Guidance {
 
    void SetSelectedSpeed(const AircraftSpeed &selected_speed);
 
-   int GetIasCommandIntegerKnots() const;  // FIXME Stuart is this needed anymore?
-
    double GetMachCommand() const;
 
    void SetMachCommand(double mach_value);
@@ -92,10 +90,5 @@ inline void Guidance::SetSelectedSpeed(const AircraftSpeed &selected_speed) { m_
 inline double Guidance::GetMachCommand() const { return m_mach_command; }
 
 inline void Guidance::SetMachCommand(double mach_value) { m_mach_command = mach_value; }
-
-inline int Guidance::GetIasCommandIntegerKnots() const {
-   double result = round(Units::KnotsSpeed(m_ias_command).value());
-   return (int)result;
-}
 
 }  // namespace mitre::oss::simcore
