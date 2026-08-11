@@ -62,10 +62,19 @@ struct VerticalPathUtils {
    static VerticalPathDataSet GetVerticalPathData(const VerticalPath &vertical_path,
                                                   Units::Length estimated_distance_to_path_end);
 
+   static VerticalPathDataSet GetPathDataAtTime(const VerticalPath &vertical_path, Units::Time time_to_go);
+
    static VerticalPathDataSet GetInterpolatedPathData(const VerticalPath &vertical_path,
                                                       Units::Length estimated_distance_to_path_end);
 
+   static VerticalPathDataSet GetInterpolatedPathDataAtTime(const VerticalPath &vertical_path,
+                                                            Units::Time time_to_go);
+
    static VerticalPathDataSet GetPathDataAtIndex(const VerticalPath &vertical_path, int index);
+
+   static std::size_t GetPathDataCount(const VerticalPath &vertical_path);
+   static VerticalPathDataSet GetFirstPathData(const VerticalPath &vertical_path);
+   static VerticalPathDataSet GetLastPathData(const VerticalPath &vertical_path);
 
    static std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet> ConvertToPathDataSet(
          const VerticalPath &vertical_path);
@@ -79,6 +88,29 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
    const auto reference_lookup_index =
          CoreUtils::FindNearestIndex(distance_to_go.value(), vertical_path.along_path_distance_m);
    return GetPathDataAtIndex(vertical_path, reference_lookup_index);
+}
+
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetPathDataAtTime(const VerticalPath &vertical_path,
+                                                                Units::Time time_to_go) {
+   const Units::SecondsTime seconds_to_go{time_to_go};
+   const auto reference_lookup_index =
+         CoreUtils::FindNearestIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
+   return GetPathDataAtIndex(vertical_path, reference_lookup_index);
+}
+
+inline std::size_t mitre::oss::simcore::VerticalPathUtils::GetPathDataCount(const VerticalPath &vertical_path) {
+   return vertical_path.along_path_distance_m.size();
+}
+
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetFirstPathData(const VerticalPath &vertical_path) {
+   return GetPathDataAtIndex(vertical_path, 0);
+}
+
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetLastPathData(const VerticalPath &vertical_path) {
+   return GetPathDataAtIndex(vertical_path, static_cast<int>(GetPathDataCount(vertical_path) - 1));
 }
 
 inline std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet>
@@ -156,6 +188,58 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
    single_data_row.wind_velocity_north =
          CoreUtils::LinearlyInterpolate(reference_lookup_index, distance_to_go, vertical_path.along_path_distance_m,
                                         vertical_path.wind_velocity_north);
+   single_data_row.flap_setting = vertical_path.flap_setting[reference_lookup_index];
+   single_data_row.algorithm_type = vertical_path.algorithm_type[reference_lookup_index];
+   return single_data_row;
+}
+
+inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
+      mitre::oss::simcore::VerticalPathUtils::GetInterpolatedPathDataAtTime(const VerticalPath &vertical_path,
+                                                                            Units::Time time_to_go) {
+   const Units::SecondsTime seconds_to_go{time_to_go};
+   const auto reference_lookup_index =
+         CoreUtils::FindNearestIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
+   if (reference_lookup_index < 1) {
+      return GetPathDataAtIndex(vertical_path, reference_lookup_index);
+   }
+
+   const auto interpolate_speed = [&](const std::vector<Units::Speed> &speeds) {
+      const auto lower_index = reference_lookup_index - 1;
+      const auto interpolation_fraction =
+            (seconds_to_go.value() - vertical_path.time_to_go_sec[lower_index]) /
+            (vertical_path.time_to_go_sec[reference_lookup_index] - vertical_path.time_to_go_sec[lower_index]);
+      const auto lower_speed = Units::MetersPerSecondSpeed(speeds[lower_index]);
+      const auto upper_speed = Units::MetersPerSecondSpeed(speeds[reference_lookup_index]);
+      return Units::MetersPerSecondSpeed(lower_speed.value() +
+                                         interpolation_fraction * (upper_speed.value() - lower_speed.value()));
+   };
+
+   VerticalPathDataSet single_data_row{};
+   single_data_row.resolved_index = reference_lookup_index;
+   single_data_row.along_path_distance = Units::MetersLength(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec,
+         vertical_path.along_path_distance_m));
+   single_data_row.altitude_msl = Units::MetersLength(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.altitude_m));
+   single_data_row.calibrated_airspeed = Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.cas_mps));
+   single_data_row.mach = CoreUtils::LinearlyInterpolate(reference_lookup_index, seconds_to_go.value(),
+                                                         vertical_path.time_to_go_sec, vertical_path.mach);
+   single_data_row.altitude_rate = Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec,
+         vertical_path.altitude_rate_mps));
+   single_data_row.true_airspeed = interpolate_speed(vertical_path.true_airspeed);
+   single_data_row.tas_rate = Units::MetersSecondAcceleration(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.tas_rate_mps));
+   single_data_row.theta = Units::RadiansAngle(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.theta_radians));
+   single_data_row.ground_speed = Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.gs_mps));
+   single_data_row.time_to_go = time_to_go;
+   single_data_row.mass = Units::KilogramsMass(CoreUtils::LinearlyInterpolate(
+         reference_lookup_index, seconds_to_go.value(), vertical_path.time_to_go_sec, vertical_path.mass_kg));
+   single_data_row.wind_velocity_east = interpolate_speed(vertical_path.wind_velocity_east);
+   single_data_row.wind_velocity_north = interpolate_speed(vertical_path.wind_velocity_north);
    single_data_row.flap_setting = vertical_path.flap_setting[reference_lookup_index];
    single_data_row.algorithm_type = vertical_path.algorithm_type[reference_lookup_index];
    return single_data_row;

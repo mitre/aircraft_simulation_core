@@ -48,40 +48,9 @@ class KinematicTrajectoryPredictor final : public mitre::oss::simcore::Euclidean
 
    KinematicTrajectoryPredictor &operator=(const KinematicTrajectoryPredictor &obj);
 
-   const std::vector<double> &GetVerticalPathDistances() const; // TODO remove function if possible depending callers
-
-   const std::vector<double> &GetVerticalPathTimes() const; // TODO remove function if possible depending callers
-
-   const std::vector<double> &GetVerticalPathGroundspeeds() const; // TODO remove function if possible depending callers
-
-   const std::vector<double> &GetVerticalPathVelocities() const; // TODO remove function if possible depending callers
-
-   const std::vector<double> &GetVerticalPathAltitudes() const; // TODO remove function if possible depending callers
-
    std::shared_ptr<mitre::oss::simcore::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
 
   private:
    static log4cplus::Logger m_logger;
 };
 }  // namespace mitre::oss::simcore
-
-inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathDistances() const {
-   return m_vertical_predictor->GetVerticalPath().along_path_distance_m;
-}
-
-inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathTimes() const {
-   return m_vertical_predictor->GetVerticalPath().time_to_go_sec;
-}
-
-inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathGroundspeeds()
-      const {
-   return m_vertical_predictor->GetVerticalPath().gs_mps;
-}
-
-inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathVelocities() const {
-   return m_vertical_predictor->GetVerticalPath().cas_mps;
-}
-
-inline const std::vector<double> &mitre::oss::simcore::KinematicTrajectoryPredictor::GetVerticalPathAltitudes() const {
-   return m_vertical_predictor->GetVerticalPath().altitude_m;
-}
