@@ -25,11 +25,19 @@
 #include "public/AircraftSpeed.h"
 #include "public/PrecalcWaypoint.h"
 
-namespace mitre::oss::simcore {
-enum GuidanceFlightPhase { TAKEOFF_ROLL, CLIMB, CRUISE_DESCENT };
+namespace mitre::oss::simcore
+{
+   enum GuidanceFlightPhase
+   {
+      TAKEOFF_ROLL,
+      CLIMB,
+      CRUISE_DESCENT
+   };
 
-static std::string GuidanceFlightPhaseAsString(GuidanceFlightPhase guidance_flight_phase) {
-   switch (guidance_flight_phase) {
+   static std::string GuidanceFlightPhaseAsString(GuidanceFlightPhase guidance_flight_phase)
+   {
+      switch (guidance_flight_phase)
+      {
       case mitre::oss::simcore::GuidanceFlightPhase::TAKEOFF_ROLL:
          return "TAKEOFF_ROLL";
       case mitre::oss::simcore::GuidanceFlightPhase::CLIMB:
@@ -38,57 +46,60 @@ static std::string GuidanceFlightPhaseAsString(GuidanceFlightPhase guidance_flig
          return "CRUISE_DESCENT";
       default:
          throw std::logic_error("Invalid guidance flight phase encountered: " + std::to_string(guidance_flight_phase));
+      }
    }
-}
 
-class Guidance {
-  public:
-   Guidance() = default;
+   class Guidance
+   {
+   public:
+      Guidance() = default;
 
-   virtual ~Guidance() = default;
+      virtual ~Guidance() = default;
 
-   void SetValid(bool value);
+      void SetValid(bool value);
 
-   const bool IsValid() const;
+      const bool IsValid() const;
 
-   const AircraftSpeed &GetSelectedSpeed() const;
+      SpeedValueType GetSelectedSpeedType() const;
 
-   void SetSelectedSpeed(const AircraftSpeed &selected_speed);
+      void SetSelectedSpeedType(SpeedValueType selected_speed_type);
 
-   double GetMachCommand() const;
+      double GetMachCommand() const;
 
-   void SetMachCommand(double mach_value);
+      void SetMachCommand(double mach_value);
 
-   PrecalcConstraint m_active_precalc_constraints;
+      PrecalcConstraint m_active_precalc_constraints;
 
-   Units::Speed m_ias_command{Units::ZERO_SPEED};
-   double m_mach_command{0};
-   Units::Speed m_ground_speed{Units::ZERO_SPEED};
-   Units::Speed m_vertical_speed{Units::ZERO_SPEED};
-   Units::Length m_reference_altitude{Units::ZERO_LENGTH};
-   Units::Length m_cross_track_error{Units::ZERO_LENGTH};
-   Units::Angle m_reference_bank_angle{Units::ZERO_ANGLE};
-   Units::SignedAngle m_enu_track_angle{Units::ZERO_ANGLE};
-   GuidanceFlightPhase m_active_guidance_phase{GuidanceFlightPhase::TAKEOFF_ROLL};
+      Units::Speed m_ias_command{Units::ZERO_SPEED};
+      double m_mach_command{0};
+      Units::Speed m_ground_speed{Units::ZERO_SPEED};
+      Units::Speed m_vertical_speed{Units::ZERO_SPEED};
+      Units::Length m_reference_altitude{Units::ZERO_LENGTH};
+      Units::Length m_cross_track_error{Units::ZERO_LENGTH};
+      Units::Angle m_reference_bank_angle{Units::ZERO_ANGLE};
+      Units::SignedAngle m_enu_track_angle{Units::ZERO_ANGLE};
+      GuidanceFlightPhase m_active_guidance_phase{GuidanceFlightPhase::TAKEOFF_ROLL};
 
-   bool m_use_cross_track{false};
+      bool m_use_cross_track{false};
 
-  private:
-   bool m_valid{false};
-   AircraftSpeed m_selected_speed{};  // FIXME Stuart this is super dangerous...get rid of and only keep SpeedValueType
-                                      // in here
-};
+   private:
+      bool m_valid{false};
+      SpeedValueType m_selected_speed_type{UNSPECIFIED_SPEED};
+   };
 
-inline void Guidance::SetValid(bool value) { m_valid = value; }
+   inline void Guidance::SetValid(bool value) { m_valid = value; }
 
-inline const bool Guidance::IsValid() const { return m_valid; }
+   inline const bool Guidance::IsValid() const { return m_valid; }
 
-inline const AircraftSpeed &Guidance::GetSelectedSpeed() const { return m_selected_speed; }
+   inline SpeedValueType Guidance::GetSelectedSpeedType() const { return m_selected_speed_type; }
 
-inline void Guidance::SetSelectedSpeed(const AircraftSpeed &selected_speed) { m_selected_speed = selected_speed; }
+   inline void Guidance::SetSelectedSpeedType(SpeedValueType selected_speed_type)
+   {
+      m_selected_speed_type = selected_speed_type;
+   }
 
-inline double Guidance::GetMachCommand() const { return m_mach_command; }
+   inline double Guidance::GetMachCommand() const { return m_mach_command; }
 
-inline void Guidance::SetMachCommand(double mach_value) { m_mach_command = mach_value; }
+   inline void Guidance::SetMachCommand(double mach_value) { m_mach_command = mach_value; }
 
-}  // namespace mitre::oss::simcore
+} // namespace mitre::oss::simcore

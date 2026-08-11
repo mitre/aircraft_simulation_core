@@ -40,7 +40,7 @@ struct GuidanceCalculator {
       full_guidance.m_ias_command = vertical_guidance.m_ias_command;
       full_guidance.m_ground_speed = vertical_guidance.m_ground_speed;
       full_guidance.m_active_guidance_phase = vertical_guidance.m_active_guidance_phase;
-      full_guidance.SetSelectedSpeed(vertical_guidance.GetSelectedSpeed());
+      full_guidance.SetSelectedSpeedType(vertical_guidance.GetSelectedSpeedType());
       full_guidance.SetMachCommand(vertical_guidance.GetMachCommand());
 
       full_guidance.SetValid(true);

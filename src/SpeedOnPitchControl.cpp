@@ -40,7 +40,7 @@ void SpeedOnPitchControl::ComputeVerticalCommands(
                                           flap_configuration);
 
    // Commands
-   SpeedValueType speed_type = guidance.GetSelectedSpeed().GetSpeedType();
+   SpeedValueType speed_type = guidance.GetSelectedSpeedType();
    if (speed_type == SpeedValueType::MACH_SPEED) {
       const auto mach_cmd = guidance.m_mach_command;
       true_airspeed_command =

@@ -43,7 +43,7 @@ void SpeedOnThrustControl::ComputeVerticalCommands(
    }
    gamma_command = Units::RadiansAngle(asin(temp_gamma));
 
-   SpeedValueType speed_type = guidance.GetSelectedSpeed().GetSpeedType();
+   SpeedValueType speed_type = guidance.GetSelectedSpeedType();
    if (speed_type == SpeedValueType::MACH_SPEED) {
       tas_command = sensed_weather->GetTrueWeather()->MachToTAS(guidance.m_mach_command,
                                                                 equations_of_motion_state.altitude_msl);
