@@ -26,8 +26,7 @@
 /**
  * NullWindEvaluator always indicates that winds are accurate.
  */
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 class NullWindEvaluator final : public PredictedWindEvaluator {
   public:
@@ -35,7 +34,7 @@ class NullWindEvaluator final : public PredictedWindEvaluator {
 
    virtual ~NullWindEvaluator();
 
-   virtual bool ArePredictedWindsAccurate(const aaesim::open_source::AircraftState &state,
+   virtual bool ArePredictedWindsAccurate(const mitre::oss::simcore::AircraftState &state,
                                           const WeatherPrediction &weather_prediction, const Units::Speed reference_cas,
                                           const Units::Length reference_altitude,
                                           const std::shared_ptr<Atmosphere> &sensed_atmosphere) const;
@@ -45,5 +44,4 @@ class NullWindEvaluator final : public PredictedWindEvaluator {
 
    NullWindEvaluator();
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

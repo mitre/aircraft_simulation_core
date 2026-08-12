@@ -24,7 +24,7 @@
 
 #include <vector>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 /**
  * Use to define the direction of index travel along the horizontal path.
@@ -146,4 +146,4 @@ inline const HorizontalPath HorizontalPathTracker::GetActivePathSegment() const 
    return m_extended_horizontal_trajectory[m_current_index];
 }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

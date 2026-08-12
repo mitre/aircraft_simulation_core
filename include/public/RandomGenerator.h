@@ -21,6 +21,8 @@
 
 #include <log4cplus/logger.h>
 
+namespace mitre::oss::simcore {
+
 class RandomGenerator final {
   public:
    RandomGenerator();
@@ -99,3 +101,4 @@ class RandomGenerator final {
 
    double m_seed;
 };
+}  // namespace mitre::oss::simcore

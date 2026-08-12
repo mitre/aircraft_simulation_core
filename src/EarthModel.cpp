@@ -26,6 +26,8 @@
 
 #include "public/EarthModel.h"
 
+namespace mitre::oss::simcore {
+
 EarthModel::EarthModel() {}
 
 EarthModel::~EarthModel() {}
@@ -40,3 +42,4 @@ std::ostream &operator<<(std::ostream &out, const EarthModel::LocalPositionEnu &
        << Units::MetersLength(local.z) << ")";
    return out;
 }
+}  // namespace mitre::oss::simcore

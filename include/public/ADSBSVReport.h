@@ -24,7 +24,7 @@
 #include <scalar/Speed.h>
 #include <scalar/Time.h>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ADSBSVReport final {
   public:
    ADSBSVReport() = default;
@@ -132,4 +132,4 @@ inline Units::FeetPerSecondSpeed ADSBSVReport::GetVerticalSpeed() const { return
 inline Units::Angle ADSBSVReport::GetLatitude() const { return m_latitude; }
 inline Units::Angle ADSBSVReport::GetLongitude() const { return m_longitude; }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

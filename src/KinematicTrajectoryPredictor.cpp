@@ -22,7 +22,7 @@
 #include <memory>
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger KinematicTrajectoryPredictor::m_logger =
       log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("KinematicTrajectoryPredictor"));
@@ -44,12 +44,12 @@ KinematicTrajectoryPredictor::KinematicTrajectoryPredictor(Units::Angle maximum_
 
 KinematicTrajectoryPredictor::KinematicTrajectoryPredictor(const KinematicTrajectoryPredictor &obj) { operator=(obj); }
 
-void KinematicTrajectoryPredictor::CalculateWaypoints(const AircraftIntent &aircraft_intent,
+void KinematicTrajectoryPredictor::CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
                                                       const WeatherPrediction &weather_prediction) {
    Units::Length altitude_at_faf = Units::MetersLength(
-         aircraft_intent.GetRouteData().m_nominal_altitude[aircraft_intent.GetNumberOfWaypoints() - 1]);
+         aircraft_intent->GetRouteData().m_nominal_altitude[aircraft_intent->GetNumberOfWaypoints() - 1]);
    Units::Speed nominal_ias_at_faf = Units::FeetPerSecondSpeed(
-         aircraft_intent.GetRouteData().m_nominal_ias[aircraft_intent.GetNumberOfWaypoints() - 1]);
+         aircraft_intent->GetRouteData().m_nominal_ias[aircraft_intent->GetNumberOfWaypoints() - 1]);
 
    GetKinematicDescent4dPredictor()->SetConditionsAtEndOfRoute(altitude_at_faf, nominal_ias_at_faf);
    EuclideanTrajectoryPredictor::CalculateWaypoints(aircraft_intent, WeatherPrediction());

@@ -23,13 +23,13 @@
 #include <memory>
 #include <vector>
 
-#include "public/AircraftIntent.h"
+#include "public/DefaultAircraftIntent.h"
+#include "public/NullAircraftIntent.h"
 #include "public/SingleTangentPlaneSequence.h"
 #include "public/TangentPlaneSequence.h"
 #include "public/Waypoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 namespace test {
 static double TIGHT_TOLERANCE_DEGREES{1e-12};
 TEST(TangentPlaneSequence, StraightLineConsistency) {
@@ -80,11 +80,9 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    Waypoint wp1{"wp1", Units::DegreesAngle(37.5), Units::DegreesAngle(-76.0)};
    Waypoint wp2{"wp2", Units::DegreesAngle(37.6), Units::DegreesAngle(-71.0)};
    Waypoint end_waypoint{"end", Units::DegreesAngle(40.0), Units::DegreesAngle(-70.0)};
-   auto waypoints = std::list<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
-   AircraftIntent aircraft_intent;
-   aircraft_intent.LoadWaypointsFromList(waypoints, std::list<Waypoint>(), std::list<Waypoint>());
-   auto wplist = aircraft_intent.GetWaypointList();
-   auto tangent_plane_sequence = std::make_shared<TangentPlaneSequence>(wplist);
+   auto waypoints = std::vector<Waypoint>{start_waypoint, wp1, wp2, end_waypoint};
+   const auto aircraft_intent = *DefaultAircraftIntent::Builder().SetAscentWaypoints(waypoints).Build();
+   auto tangent_plane_sequence = std::make_shared<SingleTangentPlaneSequence>(aircraft_intent.GetWaypoints());
    auto route_data = aircraft_intent.GetRouteData();
 
    struct ZippedData {
@@ -126,6 +124,40 @@ TEST(TangentPlaneSequence, LineSequenceConsistency2) {
    std::for_each(zipped_route.begin(), zipped_route.end(), enu_comparator_high_tolerance);
 }
 
+TEST(DefaultAircraftIntent, BuilderCopiesDefaultIntentWithoutRenormalizingWaypoints) {
+   const std::vector<Waypoint> ascent_waypoints{
+         Waypoint{"ascent", Units::DegreesAngle(35.0), Units::DegreesAngle(-77.0)}};
+   const std::vector<Waypoint> cruise_waypoints{
+         Waypoint{"cruise", Units::DegreesAngle(36.0), Units::DegreesAngle(-76.0)}};
+   const std::vector<Waypoint> descent_waypoints{
+         Waypoint{"descent", Units::DegreesAngle(37.0), Units::DegreesAngle(-75.0)}};
+
+   const auto source_intent = *DefaultAircraftIntent::Builder()
+                                      .SetAscentWaypoints(ascent_waypoints)
+                                      .SetCruiseWaypoints(cruise_waypoints)
+                                      .SetDescentWaypoints(descent_waypoints)
+                                      .Build();
+   const auto copied_intent = *DefaultAircraftIntent::Builder().CopyFrom(source_intent).Build();
+
+   EXPECT_EQ(source_intent, copied_intent);
+}
+
+TEST(NullAircraftIntent, HasNoRouteData) {
+   const NullAircraftIntent aircraft_intent{};
+
+   EXPECT_FALSE(aircraft_intent.GetWaypoint(0).has_value());
+   EXPECT_TRUE(aircraft_intent.GetWaypoints().empty());
+   EXPECT_FALSE(aircraft_intent.GetWaypointName(0).has_value());
+   EXPECT_TRUE(aircraft_intent.GetRouteData().m_name.empty());
+   EXPECT_FALSE(aircraft_intent.GetWaypointIndexByName("unused").has_value());
+   EXPECT_EQ(std::make_pair(-1, -1), aircraft_intent.FindCommonWaypoint(aircraft_intent));
+   EXPECT_EQ(0U, aircraft_intent.GetNumberOfWaypoints());
+   EXPECT_TRUE(aircraft_intent.GetAscentWaypoints().empty());
+   EXPECT_TRUE(aircraft_intent.GetCruiseWaypoints().empty());
+   EXPECT_TRUE(aircraft_intent.GetDescentWaypoints().empty());
+   EXPECT_EQ(0.0, aircraft_intent.GetPlannedCruiseMach());
+   EXPECT_FALSE(aircraft_intent.ContainsWaypointName("unused"));
+}
+
 }  // namespace test
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

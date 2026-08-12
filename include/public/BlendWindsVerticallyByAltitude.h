@@ -23,7 +23,7 @@
 
 #include "public/WindBlendingAlgorithm.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class BlendWindsVerticallyByAltitude final : public WindBlendingAlgorithm {
   private:
    inline static const Units::FeetLength MAXIMUM_ALTITUDE_LIMIT{45000};
@@ -33,8 +33,8 @@ class BlendWindsVerticallyByAltitude final : public WindBlendingAlgorithm {
   public:
    BlendWindsVerticallyByAltitude() = default;
    ~BlendWindsVerticallyByAltitude() = default;
-   void BlendSensedWithPredicted(const aaesim::open_source::AircraftState &current_state,
-                                 aaesim::open_source::WeatherPrediction &weather_prediction) override;
+   void BlendSensedWithPredicted(const mitre::oss::simcore::AircraftState &current_state,
+                                 mitre::oss::simcore::WeatherPrediction &weather_prediction) override;
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

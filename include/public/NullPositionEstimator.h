@@ -21,7 +21,7 @@
 
 #include "public/EllipsoidalPositionEstimator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class NullPositionEstimator final : public EllipsoidalPositionEstimator {
   public:
    NullPositionEstimator() = default;
@@ -34,4 +34,4 @@ class NullPositionEstimator final : public EllipsoidalPositionEstimator {
       position_rate.longitude_time_derivative = Units::zero();
    };
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -23,17 +23,16 @@
 
 #include "public/AbstractDescentController.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class SpeedOnThrustControl final : public AbstractDescentController {
   public:
    SpeedOnThrustControl() = default;
    ~SpeedOnThrustControl() = default;
    void ComputeVerticalCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                                std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                 Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
                                 BoundedValue<double, 0, 1> &speed_brake_command,
-                                aaesim::open_source::bada_utils::FlapConfiguration &flap_configuration) override;
+                                mitre::oss::simcore::bada_utils::FlapConfiguration &flap_configuration) override;
 
   private:
    inline static log4cplus::Logger logger_{log4cplus::Logger::getInstance("SpeedOnThrustControl")};
@@ -41,5 +40,4 @@ class SpeedOnThrustControl final : public AbstractDescentController {
    inline static const Units::Frequency gain_true_airspeed_{Units::sqr(natural_frequency_) / thrust_gain_};
    unsigned int min_thrust_counter_{0};
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

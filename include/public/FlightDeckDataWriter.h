@@ -24,11 +24,9 @@
 #include "public/FlightDeckApplication.h"
 #include "public/OutputHandler.h"
 
-namespace aaesim {
-namespace open_source {
-struct FlightDeckApplicationDataWriter : public aaesim::open_source::OutputHandler {
+namespace mitre::oss::simcore {
+struct FlightDeckApplicationDataWriter : public mitre::oss::simcore::OutputHandler {
    virtual ~FlightDeckApplicationDataWriter() = default;
-   virtual void CollectData(std::shared_ptr<aaesim::open_source::FlightDeckApplication> application) = 0;
+   virtual void CollectData(std::shared_ptr<mitre::oss::simcore::FlightDeckApplication> application) = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

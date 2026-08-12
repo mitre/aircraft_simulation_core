@@ -26,8 +26,10 @@
 
 #include <memory>
 
-#include "public/AircraftIntent.h"
+#include "public/TangentPlaneSequence.h"
 #include "public/WeatherPrediction.h"
+
+namespace mitre::oss::simcore {
 
 class Wind {
   public:
@@ -35,7 +37,7 @@ class Wind {
    virtual ~Wind() = default;
 
    void InterpolateTrueWind(const Units::Angle lat_in, const Units::Angle lon_in, const Units::Length altitude,
-                            aaesim::open_source::WindStack &east_west, aaesim::open_source::WindStack &north_south);
+                            mitre::oss::simcore::WindStack &east_west, mitre::oss::simcore::WindStack &north_south);
 
    void InterpolateForecastWind(const std::shared_ptr<TangentPlaneSequence> &tangentPlaneSequence,
                                 const Units::Length x_in, const Units::Length y_in, const Units::Length altitude,
@@ -55,9 +57,10 @@ class Wind {
                                 Units::Speed &u, Units::Speed &v) = 0;
 
    virtual void InterpolateWindMatrix(Units::Angle lat_in, Units::Angle lon_in, Units::Length alt_in,
-                                      aaesim::open_source::WindStack &east_west,
-                                      aaesim::open_source::WindStack &north_south) = 0;
+                                      mitre::oss::simcore::WindStack &east_west,
+                                      mitre::oss::simcore::WindStack &north_south) = 0;
 
   private:
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("Wind"))};
 };
+}  // namespace mitre::oss::simcore

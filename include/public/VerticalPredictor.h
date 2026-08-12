@@ -38,6 +38,8 @@
 #include "public/VerticalPath.h"
 #include "public/WeatherPrediction.h"
 
+namespace mitre::oss::simcore {
+
 class VerticalPredictor {
   public:
    VerticalPredictor();
@@ -50,9 +52,9 @@ class VerticalPredictor {
 
    bool operator!=(const VerticalPredictor &obj) const;
 
-   virtual void BuildVerticalPrediction(std::vector<aaesim::open_source::HorizontalPath> &horizontal_path,
+   virtual void BuildVerticalPrediction(std::vector<mitre::oss::simcore::HorizontalPath> &horizontal_path,
                                         std::vector<PrecalcWaypoint> &precalc_waypoints,
-                                        const aaesim::open_source::WeatherPrediction &weather,
+                                        const mitre::oss::simcore::WeatherPrediction &weather,
                                         const Units::Length &start_altitude,
                                         const Units::Length &aircraft_distance_to_go) = 0;
 
@@ -60,8 +62,8 @@ class VerticalPredictor {
 
    virtual const Units::Length GetAltitudeAtEndOfRoute() const = 0;
 
-   aaesim::open_source::Guidance Update(const aaesim::open_source::AircraftState &current_state,
-                                        const aaesim::open_source::Guidance &current_guidance,
+   mitre::oss::simcore::Guidance Update(const mitre::oss::simcore::AircraftState &current_state,
+                                        const mitre::oss::simcore::Guidance &current_guidance,
                                         const Units::Length distance_to_go);
 
    const VerticalPath &GetVerticalPath() const;
@@ -90,17 +92,17 @@ class VerticalPredictor {
    double CalculateEsfUsingConstantMach(const double true_airspeed_mps, const double altitude_msl_meter,
                                         const Units::Temperature temperature);
 
-   aaesim::open_source::PrecalcConstraint CheckActiveConstraint(
+   mitre::oss::simcore::PrecalcConstraint CheckActiveConstraint(
          double along_path_distance_to_go_meter, double altitude_msl_meter, double calibrated_airspeed_mps,
-         const aaesim::open_source::PrecalcConstraint &constraints, double transition_altitude_meter);
+         const mitre::oss::simcore::PrecalcConstraint &constraints, double transition_altitude_meter);
 
-   aaesim::open_source::Guidance CalculateGuidanceCommands(const aaesim::open_source::AircraftState &state,
+   mitre::oss::simcore::Guidance CalculateGuidanceCommands(const mitre::oss::simcore::AircraftState &state,
                                                            const Units::Length distance_to_go,
-                                                           const aaesim::open_source::Guidance &current_guidance);
+                                                           const mitre::oss::simcore::Guidance &current_guidance);
 
    void TrimDuplicatesFromVerticalPath();
 
-   aaesim::open_source::PrecalcConstraint FindActiveConstraint(
+   mitre::oss::simcore::PrecalcConstraint FindActiveConstraint(
          const double &along_path_distance_to_go_meters, const std::vector<PrecalcWaypoint> &precalculated_waypoints);
 
    const bool IsCruiseMachValid() const;
@@ -121,14 +123,14 @@ class VerticalPredictor {
    Units::Length m_transition_altitude_msl;
    double m_cruise_mach;
    double m_transition_mach;
-   aaesim::open_source::PrecalcConstraint m_precalculated_constraints;
-   aaesim::open_source::CalcWindGradControl m_wind_calculator;
+   mitre::oss::simcore::PrecalcConstraint m_precalculated_constraints;
+   mitre::oss::simcore::CalcWindGradControl m_wind_calculator;
    Units::MetersLength m_start_altitude_msl;
    VerticalPath m_vertical_path;
-   aaesim::open_source::DirectionOfFlightCourseCalculator m_course_calculator;
+   mitre::oss::simcore::DirectionOfFlightCourseCalculator m_course_calculator;
    Units::Speed m_ias_at_end_of_route;
    std::shared_ptr<Atmosphere> m_atmosphere;
-   std::shared_ptr<const aaesim::open_source::FixedMassAircraftPerformance> m_bada_calculator;
+   std::shared_ptr<const mitre::oss::simcore::FixedMassAircraftPerformance> m_bada_calculator;
 };
 
 inline const VerticalPath &VerticalPredictor::GetVerticalPath() const { return m_vertical_path; }
@@ -156,3 +158,4 @@ inline void VerticalPredictor::SetAtmosphere(std::shared_ptr<Atmosphere> atmosph
 inline const bool VerticalPredictor::IsCruiseMachValid() const { return m_transition_mach > 0; }
 
 inline Units::KnotsSpeed VerticalPredictor::GetIasAtEndOfRoute() { return m_ias_at_end_of_route; }
+}  // namespace mitre::oss::simcore

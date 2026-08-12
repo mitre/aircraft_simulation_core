@@ -24,10 +24,9 @@
 #include "public/USStandardAtmosphere1976.h"
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-namespace aaesim {
-namespace test {
+namespace mitre::oss::simcore::test {
 
 TEST(USStandardAtmosphere1976, temperature) {
    Atmosphere *atm = new USStandardAtmosphere1976();
@@ -111,5 +110,4 @@ TEST(USStandardAtmosphere1976, mach_ias_transition_isa) {
    }
 }
 
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test

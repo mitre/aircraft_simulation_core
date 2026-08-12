@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 AircraftSpeed::AircraftSpeed() { SetSpeed(UNSPECIFIED_SPEED, INT16_MIN); }
 

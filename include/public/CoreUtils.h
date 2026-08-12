@@ -30,10 +30,11 @@
 #include <utility>
 #include <vector>
 
-#include "public/AircraftIntent.h"
 #include "public/AircraftState.h"
 #include "public/HorizontalPath.h"
 #include "public/LineOnEllipsoid.h"
+
+namespace mitre::oss::simcore {
 
 class CoreUtils {
   public:
@@ -107,6 +108,10 @@ class CoreUtils {
          const std::list<Waypoint> &ordered_waypoints,
          Units::Length maximum_allowable_length = MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH);
 
+   static std::vector<Waypoint> ShortenLongLegs(
+         const std::vector<Waypoint> &ordered_waypoints,
+         Units::Length maximum_allowable_length = MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH);
+
    /**
     * Visible for testing.
     *
@@ -139,7 +144,7 @@ class CoreUtils {
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CoreUtils"))};
    inline static Units::NauticalMilesLength MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH{Units::infinity()};
 
-   static std::list<Waypoint> GetIntermediateWaypointsForLongLeg(const aaesim::LineOnEllipsoid &line_on_ellipsoid,
+   static std::list<Waypoint> GetIntermediateWaypointsForLongLeg(const mitre::oss::simcore::LineOnEllipsoid &line_on_ellipsoid,
                                                                  Units::Length maximum_allowable_single_leg_distance);
 };
 
@@ -150,3 +155,4 @@ inline void CoreUtils::UpdateMaximumAllowableSingleLegLength(Units::Length new_v
 inline void CoreUtils::ResetMaximumAllowableSingleLegLength() {
    MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH = Units::NauticalMilesLength(Units::infinity());
 }
+}  // namespace mitre::oss::simcore

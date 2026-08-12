@@ -136,7 +136,7 @@ const InvertedLengthGain ZERO_INVERTED_LENGTH_GAIN = Units::SecondsSquaredPerMet
 const InvertedSpeed ZERO_INVERTED_SPEED = Units::SecondsPerMeterInvertedSpeed(0.0);
 
 const Units::Acceleration ONE_G_ACCELERATION =
-      MetersSecondAcceleration(aaesim::open_source::constants::GRAVITY_METERS_PER_SECOND);
+      MetersSecondAcceleration(mitre::oss::simcore::constants::GRAVITY_METERS_PER_SECOND);
 
 // angle constants
 const Units::Angle PI_RADIANS_ANGLE = DegreesAngle(180.0);

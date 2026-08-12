@@ -26,6 +26,8 @@
 
 #include "public/BadaUtils.h"
 
+namespace mitre::oss::simcore {
+
 class VerticalPath final {
   public:
    enum PredictionAlgorithmType {
@@ -74,5 +76,6 @@ class VerticalPath final {
    std::vector<Units::Speed> wind_velocity_east;
    std::vector<Units::Speed> wind_velocity_north;
    std::vector<PredictionAlgorithmType> algorithm_type;
-   std::vector<aaesim::open_source::bada_utils::FlapConfiguration> flap_setting;
+   std::vector<mitre::oss::simcore::bada_utils::FlapConfiguration> flap_setting;
 };
+}  // namespace mitre::oss::simcore

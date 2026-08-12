@@ -26,8 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class WindStack {
   public:
    WindStack();
@@ -80,5 +79,4 @@ inline bool WindStack::AltitudeComparator(std::pair<Units::Length, Units::Speed>
                                           std::pair<Units::Length, Units::Speed> item2) {
    return item1.first < item2.first;
 }
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

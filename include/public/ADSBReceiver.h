@@ -28,8 +28,7 @@
 #include "public/AircraftState.h"
 #include "public/SimulationTime.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct ADSBReceiver {
    virtual ADSBSVReport GetCurrentADSBReport(int id) const = 0;
    virtual ADSBSVReport GetADSBReportBefore(int id, Units::Time time) const = 0;
@@ -37,8 +36,7 @@ struct ADSBReceiver {
    virtual const std::map<int, std::vector<ADSBSVReport> > &GetAllReportsReceived() const = 0;
    virtual std::map<int, ADSBSVReport> const GetCurrentADSBReport() const = 0;
    virtual void Initialize(Units::Length adsb_reception_range_threshold) = 0;
-   virtual std::map<int, ADSBSVReport> Receive(const aaesim::open_source::SimulationTime &time,
-                                               const aaesim::open_source::AircraftState &state) = 0;
+   virtual std::map<int, ADSBSVReport> Receive(const mitre::oss::simcore::SimulationTime &time,
+                                               const mitre::oss::simcore::AircraftState &state) = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

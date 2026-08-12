@@ -21,10 +21,10 @@
 
 #include "public/AbstractTrueWeatherOperator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class FullWindTrueWeatherOperator final : public AbstractTrueWeatherOperator {
   public:
-   FullWindTrueWeatherOperator(std::shared_ptr<aaesim::open_source::WeatherTruth> true_weather)
+   FullWindTrueWeatherOperator(std::shared_ptr<mitre::oss::simcore::WeatherTruth> true_weather)
       : AbstractTrueWeatherOperator(true_weather) {}
    ~FullWindTrueWeatherOperator() = default;
    void CalculateEnvironmentalWind(const EarthModel::GeodeticPosition &position,
@@ -40,4 +40,4 @@ class FullWindTrueWeatherOperator final : public AbstractTrueWeatherOperator {
    Units::Frequency m_vertical_derivative_east{Units::zero()};
    Units::Frequency m_vertical_derivative_north{Units::zero()};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 /**
  * @brief Calculates the forward course along a horizontal path. "Forward" is defined as the direction of flight.
@@ -69,4 +69,4 @@ inline Units::UnsignedAngle DirectionOfFlightCourseCalculator::GetCourseAtPathEn
 
 inline Units::UnsignedAngle DirectionOfFlightCourseCalculator::GetCourseAtPathStart() const { return m_start_course; }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

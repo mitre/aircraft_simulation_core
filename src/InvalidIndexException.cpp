@@ -24,9 +24,12 @@
 
 #include <iostream>
 
+namespace mitre::oss::simcore {
+
 InvalidIndexException::InvalidIndexException(const int value, const int low_limit, const int high_limit) : exception() {
    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("InvalidIndexException"));
    LOG4CPLUS_ERROR(logger, "attempted to access index " << value << " between " << low_limit << " and " << high_limit);
 }
 
 InvalidIndexException::InvalidIndexException(char *value) : exception() { std::cout << value << std::endl; }
+}  // namespace mitre::oss::simcore

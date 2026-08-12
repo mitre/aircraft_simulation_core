@@ -19,11 +19,13 @@
 
 #pragma once
 
-class Wind;
-
 #include <memory>
 
 #include "public/EarthModel.h"
+
+namespace mitre::oss::simcore {
+
+class Wind;
 
 class Environment final {
   public:
@@ -40,3 +42,4 @@ class Environment final {
 
    Environment();
 };
+}  // namespace mitre::oss::simcore

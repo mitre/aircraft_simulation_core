@@ -30,7 +30,7 @@
 #include "public/SpeedOnThrustControl.h"
 #include "public/TakeOffVerticalController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class AircraftControllerFactory final {
   public:
    enum DescentSpeedControlStrategy { THRUST, PITCH, NONE };
@@ -48,26 +48,26 @@ class AircraftControllerFactory final {
       auto lateral_controller = std::make_shared<DefaultLateralController>(config.maximum_allowable_roll_angle);
       AircraftControl::Builder builder{};
       if (config.descent_controller_config.type == DescentSpeedControlStrategy::NONE and
-          aircraft_intent.ContainsDescentWaypoints()) {
+          !aircraft_intent.GetDescentWaypoints().empty()) {
          throw std::runtime_error(
                "Invalid vertical controller configuration for descent. Must specify the descent strategy");
       }
 
-      if (aircraft_intent.ContainsDescentWaypoints() || aircraft_intent.ContainsCruiseWaypoints()) {
+      if (!aircraft_intent.GetDescentWaypoints().empty() || !aircraft_intent.GetCruiseWaypoints().empty()) {
          builder.WithCruiseDescentLateralController(lateral_controller);
          if (config.descent_controller_config.type == THRUST) {
-            auto descent_controller = std::make_shared<aaesim::open_source::SpeedOnThrustControl>();
+            auto descent_controller = std::make_shared<mitre::oss::simcore::SpeedOnThrustControl>();
             builder.WithCruiseDescentVerticalController(descent_controller);
          } else if (config.descent_controller_config.type == PITCH) {
-            auto descent_controller = std::make_shared<aaesim::open_source::SpeedOnPitchControl>(
+            auto descent_controller = std::make_shared<mitre::oss::simcore::SpeedOnPitchControl>(
                   config.descent_controller_config.speed_threshold,
                   config.descent_controller_config.altitude_threshold);
             builder.WithCruiseDescentVerticalController(descent_controller);
          }
       }
 
-      if (aircraft_intent.ContainsAscentWaypoints()) {
-         auto ascent_controller = std::make_shared<aaesim::open_source::ClimbPhaseVerticalController>();
+      if (!aircraft_intent.GetAscentWaypoints().empty()) {
+         auto ascent_controller = std::make_shared<mitre::oss::simcore::ClimbPhaseVerticalController>();
          builder.WithClimbVerticalController(ascent_controller);
          builder.WithClimbLateralController(lateral_controller);
          builder.WithTakeoffLateralController(std::make_shared<NoTurnLateralController>());
@@ -85,14 +85,14 @@ class AircraftControllerFactory final {
       auto lateral_controller = std::make_shared<DefaultLateralController>(config.maximum_allowable_roll_angle);
       builder.WithCruiseDescentLateralController(lateral_controller);
       if (config.descent_controller_config.type == THRUST) {
-         auto descent_controller = std::make_shared<aaesim::open_source::SpeedOnThrustControl>();
+         auto descent_controller = std::make_shared<mitre::oss::simcore::SpeedOnThrustControl>();
          builder.WithCruiseDescentVerticalController(descent_controller);
       } else if (config.descent_controller_config.type == PITCH) {
-         auto descent_controller = std::make_shared<aaesim::open_source::SpeedOnPitchControl>(
+         auto descent_controller = std::make_shared<mitre::oss::simcore::SpeedOnPitchControl>(
                config.descent_controller_config.speed_threshold, config.descent_controller_config.altitude_threshold);
          builder.WithCruiseDescentVerticalController(descent_controller);
       }
       return builder.Build();
    };
 };
-};  // namespace aaesim::open_source
+};  // namespace mitre::oss::simcore

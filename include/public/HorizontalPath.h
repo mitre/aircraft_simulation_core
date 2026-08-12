@@ -23,7 +23,7 @@
 
 #include "public/HorizontalTurnPath.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class HorizontalPath final {
   public:
    enum SegmentType { STRAIGHT, TURN, UNSET };
@@ -61,4 +61,4 @@ class HorizontalPath final {
    double m_x_position_meters{0};
    double m_y_position_meters{0};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

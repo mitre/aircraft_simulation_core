@@ -22,6 +22,8 @@
 #include <scalar/Angle.h>
 #include <scalar/Length.h>
 
+namespace mitre::oss::simcore {
+
 class StereographicProjection {
   public:
    StereographicProjection() = default;
@@ -56,3 +58,4 @@ class StereographicProjection {
    static double GEOD_CONST_A;
    static double GEOD_CONST_B;
 };
+}  // namespace mitre::oss::simcore

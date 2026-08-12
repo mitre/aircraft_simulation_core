@@ -21,6 +21,8 @@
 
 #include <scalar/AngularSpeed.h>
 
+namespace mitre::oss::simcore {
+
 class EquationsOfMotionStateDeriv {
   public:
    Units::Speed enu_velocity_x{}, enu_velocity_y{}, enu_velocity_z{};  // east, north, altitude change
@@ -31,6 +33,7 @@ class EquationsOfMotionStateDeriv {
    Units::ForceChange thrust_deriv{};    // thrust change
    Units::AngularSpeed roll_rate{};      // roll angle change
    double speed_brake_deriv{0};          // speed brake (% of deployment) change rate
-   aaesim::open_source::bada_utils::FlapConfiguration flap_configuration{
-         aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED};  // flap configuration
+   mitre::oss::simcore::bada_utils::FlapConfiguration flap_configuration{
+         mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED};  // flap configuration
 };
+}  // namespace mitre::oss::simcore

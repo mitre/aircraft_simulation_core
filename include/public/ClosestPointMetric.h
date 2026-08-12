@@ -21,6 +21,8 @@
 
 #include <scalar/Length.h>
 
+namespace mitre::oss::simcore {
+
 
 // Class used to compute the closest point metric, which is used to determine
 // closest point between the IM and target aircrafts.
@@ -55,3 +57,4 @@ private:
    Units::Length mMinDist;
 
 };
+}  // namespace mitre::oss::simcore

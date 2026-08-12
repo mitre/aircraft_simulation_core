@@ -19,7 +19,7 @@
 
 #include "public/Wgs84PrecalcWaypoint.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 bool Wgs84PrecalcWaypoint::operator==(const Wgs84PrecalcWaypoint &obj) const {
    bool match = (m_leg_length == obj.m_leg_length);

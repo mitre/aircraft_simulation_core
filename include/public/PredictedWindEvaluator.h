@@ -24,18 +24,16 @@
 #include "public/AircraftState.h"
 #include "public/WeatherPrediction.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct PredictedWindEvaluator {
   public:
    PredictedWindEvaluator() = default;
 
    virtual ~PredictedWindEvaluator() = default;
 
-   virtual bool ArePredictedWindsAccurate(const aaesim::open_source::AircraftState &state,
-                                          const aaesim::open_source::WeatherPrediction &weather,
+   virtual bool ArePredictedWindsAccurate(const mitre::oss::simcore::AircraftState &state,
+                                          const mitre::oss::simcore::WeatherPrediction &weather,
                                           const Units::Speed reference_cas, const Units::Length reference_altitude,
                                           const std::shared_ptr<Atmosphere> &sensed_atmosphere) const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

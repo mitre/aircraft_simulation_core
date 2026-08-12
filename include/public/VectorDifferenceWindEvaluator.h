@@ -24,18 +24,17 @@
 
 #include "public/PredictedWindEvaluator.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
-class VectorDifferenceWindEvaluator : public aaesim::open_source::PredictedWindEvaluator {
+class VectorDifferenceWindEvaluator : public mitre::oss::simcore::PredictedWindEvaluator {
   public:
-   const static std::shared_ptr<aaesim::open_source::PredictedWindEvaluator> GetInstance(
+   const static std::shared_ptr<mitre::oss::simcore::PredictedWindEvaluator> GetInstance(
          const Units::Speed maxSpeedDiff);
 
    virtual ~VectorDifferenceWindEvaluator();
 
-   virtual bool ArePredictedWindsAccurate(const aaesim::open_source::AircraftState &state,
-                                          const aaesim::open_source::WeatherPrediction &weather_prediction,
+   virtual bool ArePredictedWindsAccurate(const mitre::oss::simcore::AircraftState &state,
+                                          const mitre::oss::simcore::WeatherPrediction &weather_prediction,
                                           const Units::Speed reference_cas, const Units::Length reference_altitude,
                                           const std::shared_ptr<Atmosphere> &sensed_atmosphere) const;
 
@@ -45,5 +44,4 @@ class VectorDifferenceWindEvaluator : public aaesim::open_source::PredictedWindE
 
    explicit VectorDifferenceWindEvaluator(const Units::Speed &max_allowed_difference);
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

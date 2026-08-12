@@ -31,9 +31,9 @@
 
 using json = nlohmann::json;
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-AircraftState ThreeDOFDynamics::Update(const int unique_acid, const aaesim::open_source::SimulationTime &simtime,
+AircraftState ThreeDOFDynamics::Update(const int unique_acid, const mitre::oss::simcore::SimulationTime &simtime,
                                        const Guidance &guidance, const shared_ptr<AircraftControl> &aircraft_control) {
    auto dynamics_state = Integrate(guidance, aircraft_control);
    m_dynamics_history.insert(std::make_pair(simtime, dynamics_state));
@@ -191,7 +191,7 @@ void ThreeDOFDynamics::CalculateKineticForces(Units::Force &lift, Units::Force &
       j["cL"] = cL;
       j["lift_newtons"] = Units::NewtonsForce(lift).value();
       j["speed_brake_setting"] = speed_brake_setting;
-      j["updated_flap_setting"] = aaesim::open_source::bada_utils::GetFlapConfigurationAsString(
+      j["updated_flap_setting"] = mitre::oss::simcore::bada_utils::GetFlapConfigurationAsString(
             m_bada_calculator->GetCurrentFlapConfiguration());
       LOG4CPLUS_TRACE(m_logger, j.dump());
    }
@@ -233,13 +233,13 @@ Units::SignedRadiansAngle ThreeDOFDynamics::CalculateTrimmedPsiForWind(Units::Si
 }
 
 void ThreeDOFDynamics::Initialize(
-      const aaesim::open_source::SimulationTime &simulation_time,
-      std::shared_ptr<const aaesim::open_source::FixedMassAircraftPerformance> aircraft_performance,
+      const mitre::oss::simcore::SimulationTime &simulation_time,
+      std::shared_ptr<const mitre::oss::simcore::FixedMassAircraftPerformance> aircraft_performance,
       const EarthModel::GeodeticPosition &initial_position, const EarthModel::LocalPositionEnu &initial_position_enu,
       Units::Length initial_altitude_msl, Units::Speed initial_true_airspeed, Units::Angle initial_ground_course_enu,
       double initial_mass_fraction,
-      std::shared_ptr<aaesim::open_source::EllipsoidalPositionEstimator> position_estimator,
-      std::shared_ptr<aaesim::open_source::TrueWeatherOperator> true_weather_operator) {
+      std::shared_ptr<mitre::oss::simcore::EllipsoidalPositionEstimator> position_estimator,
+      std::shared_ptr<mitre::oss::simcore::TrueWeatherOperator> true_weather_operator) {
    m_bada_calculator = aircraft_performance;
    m_position_estimator = position_estimator;
    m_true_weather_operator = true_weather_operator;
@@ -278,8 +278,8 @@ void ThreeDOFDynamics::Initialize(
       initial_dynamics_state.yd = initial_dynamics_state.v_true_airspeed * sin(initial_dynamics_state.psi);
 
       Units::Force takeoff_max_thrust = m_bada_calculator->GetMaxThrust(
-            Units::MetersLength(initial_dynamics_state.h), aaesim::open_source::bada_utils::FlapConfiguration::TAKEOFF,
-            aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS);
+            Units::MetersLength(initial_dynamics_state.h), mitre::oss::simcore::bada_utils::FlapConfiguration::TAKEOFF,
+            mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS);
       m_equations_of_motion_state.thrust = takeoff_max_thrust;
    } else {
       // Now that the initial state has been determined, still need to trim laterally for wind
@@ -298,11 +298,11 @@ void ThreeDOFDynamics::Initialize(
       CalculateKineticForces(lift, drag);
       Units::Force equilibrium_thrust_required = drag - ac_mass * Units::ONE_G_ACCELERATION * sin(asin(0.0));
       const Units::Force max_thrust = m_bada_calculator->GetMaxThrust(
-            Units::MetersLength(initial_dynamics_state.h), aaesim::open_source::bada_utils::FlapConfiguration::CRUISE,
-            aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS);
+            Units::MetersLength(initial_dynamics_state.h), mitre::oss::simcore::bada_utils::FlapConfiguration::CRUISE,
+            mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS);
       const Units::Force min_thrust = m_bada_calculator->GetMaxThrust(
             Units::MetersLength(initial_dynamics_state.h), initial_dynamics_state.flap_configuration,
-            aaesim::open_source::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS);
+            mitre::oss::simcore::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS);
       if (equilibrium_thrust_required > max_thrust * m_max_thrust_percent) {
          equilibrium_thrust_required = max_thrust * m_max_thrust_percent;
       } else if (equilibrium_thrust_required < min_thrust * m_min_thrust_percent) {
@@ -370,31 +370,31 @@ DynamicsState ThreeDOFDynamics::ComputeDynamicsState(
    dynamics_state.xd = equations_of_motion_state_derivative.enu_velocity_x;
    dynamics_state.yd = equations_of_motion_state_derivative.enu_velocity_y;
 
-   aaesim::open_source::bada_utils::FlapConfiguration mode = m_bada_calculator->GetCurrentFlapConfiguration();
+   mitre::oss::simcore::bada_utils::FlapConfiguration mode = m_bada_calculator->GetCurrentFlapConfiguration();
    Units::Force max_thrust, min_thrust;
    switch (mode) {
-      case aaesim::open_source::bada_utils::FlapConfiguration::CRUISE:
-      case aaesim::open_source::bada_utils::FlapConfiguration::APPROACH:
-      case aaesim::open_source::bada_utils::FlapConfiguration::LANDING:
-      case aaesim::open_source::bada_utils::FlapConfiguration::GEAR_DOWN:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::CRUISE:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::APPROACH:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::LANDING:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::GEAR_DOWN:
          max_thrust = Units::NewtonsForce(m_bada_calculator->GetMaxThrust(
                Units::MetersLength(dynamics_state.h), mode,
-               aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
+               mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
          break;
 
-      case aaesim::open_source::bada_utils::FlapConfiguration::TAKEOFF:
-      case aaesim::open_source::bada_utils::FlapConfiguration::INITIAL_CLIMB:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::TAKEOFF:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::INITIAL_CLIMB:
          max_thrust = Units::NewtonsForce(m_bada_calculator->GetMaxThrust(
                Units::MetersLength(dynamics_state.h), mode,
-               aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS));
+               mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CLIMB, Units::ZERO_CELSIUS));
          break;
 
-      case aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED:
+      case mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED:
       default:
          throw std::logic_error("Design Error: should never get here");
    }
    min_thrust = Units::NewtonsForce(m_bada_calculator->GetMaxThrust(
-         Units::MetersLength(dynamics_state.h), mode, aaesim::open_source::bada_utils::EngineThrustMode::DESCENT,
+         Units::MetersLength(dynamics_state.h), mode, mitre::oss::simcore::bada_utils::EngineThrustMode::DESCENT,
          Units::ZERO_CELSIUS));
 
    if (dynamics_state.thrust > max_thrust) {

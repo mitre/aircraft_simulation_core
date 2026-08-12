@@ -31,7 +31,7 @@
 #include "public/Atmosphere.h"
 #include "public/PilotDelay.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class StatisticalPilotDelay final : public PilotDelay {
   public:
    static StatisticalPilotDelay NoDelay();
@@ -113,4 +113,4 @@ inline StatisticalPilotDelay StatisticalPilotDelay::WithDelayDefaults(std::share
    return delayed;
 }
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -19,10 +19,10 @@
 
 #pragma once
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct EuclideanTightTurnResolver {
    // TODO use units here
    virtual void ResolveTightTurnGeometry(const double courseChange1, const double courseChange2, const double legLength,
                                          double &radius, double &turnDist) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -24,7 +24,7 @@
 #include "public/LatitudeLongitudePoint.h"
 #include "public/ShapeOnEllipsoid.h"
 
-namespace aaesim {
+namespace mitre::oss::simcore {
 class ArcOnEllipsoid final : public ShapeOnEllipsoid {
   public:
    ArcOnEllipsoid() = default;
@@ -100,4 +100,4 @@ inline Units::SignedAngle ArcOnEllipsoid::GetForwardCourseEnuAtEndPoint() const 
 
 inline ShapeOnEllipsoid::kShapeType ArcOnEllipsoid::GetShapeType() const { return ARC; }
 
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

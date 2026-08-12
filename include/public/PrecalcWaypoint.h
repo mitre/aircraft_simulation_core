@@ -25,6 +25,8 @@
 
 #include "public/PrecalcConstraint.h"
 
+namespace mitre::oss::simcore {
+
 class PrecalcWaypoint final {
   public:
    PrecalcWaypoint() = default;
@@ -48,5 +50,6 @@ class PrecalcWaypoint final {
    Units::RadiansAngle m_bank_angle{Units::zero()};
    Units::MetersPerSecondSpeed m_ground_speed{Units::zero()};
 
-   aaesim::open_source::PrecalcConstraint m_precalc_constraints{};
+   mitre::oss::simcore::PrecalcConstraint m_precalc_constraints{};
 };
+}  // namespace mitre::oss::simcore

@@ -28,15 +28,15 @@
 #include "public/AbstractAscentController.h"
 #include "public/FixedMassAircraftPerformance.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class ClimbPhaseVerticalController final : public AbstractAscentController {
   public:
    ClimbPhaseVerticalController() = default;
    ~ClimbPhaseVerticalController() = default;
    void ComputeAscentCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                              std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                              std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                               Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
-                              aaesim::open_source::bada_utils::FlapConfiguration &flap_command) override;
+                              mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) override;
 
   private:
    inline static log4cplus::Logger logger_{log4cplus::Logger::getInstance("ClimbPhaseVerticalController")};
@@ -60,4 +60,4 @@ class ClimbPhaseVerticalController final : public AbstractAscentController {
       }
    }
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

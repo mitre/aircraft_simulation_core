@@ -21,7 +21,7 @@
 
 #include "public/EuclideanTightTurnResolver.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class KiteTightTurnResolver final : public EuclideanTightTurnResolver {
   public:
    KiteTightTurnResolver() = default;
@@ -108,4 +108,4 @@ class KiteTightTurnResolver final : public EuclideanTightTurnResolver {
       turnDist = AC - c;
    }
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

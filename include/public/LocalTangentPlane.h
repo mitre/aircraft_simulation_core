@@ -33,6 +33,8 @@
 #include "public/DMatrix.h"
 #include "public/EarthModel.h"
 
+namespace mitre::oss::simcore {
+
 class LocalTangentPlane {
   public:
    static void printCoordinates(const std::string &title, Units::Length x, Units::Length y, Units::Length z);
@@ -97,3 +99,4 @@ class LocalTangentPlane {
    DMatrix m_enu_to_ecef;
    const static double identity3x3[3][3];  // = { { 1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 };
+}  // namespace mitre::oss::simcore

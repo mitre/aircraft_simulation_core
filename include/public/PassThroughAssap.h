@@ -24,22 +24,20 @@
 #include "public/ASSAP.h"
 #include "utility/CustomUnits.h"
 
-namespace aaesim {
-namespace open_source {
-class PassThroughAssap final : public aaesim::open_source::ASSAP {
+namespace mitre::oss::simcore {
+class PassThroughAssap final : public mitre::oss::simcore::ASSAP {
   public:
    PassThroughAssap();
-   aaesim::open_source::AircraftState Update(const aaesim::open_source::AircraftState &state_to_sync_with,
-                                             const aaesim::open_source::ADSBSVReport &most_recent_ads_b) const override;
+   mitre::oss::simcore::AircraftState Update(const mitre::oss::simcore::AircraftState &state_to_sync_with,
+                                             const mitre::oss::simcore::ADSBSVReport &most_recent_ads_b) const override;
 
-   void Initialize(std::shared_ptr<const aaesim::open_source::ADSBReceiver> adsb_receiver) override;
+   void Initialize(std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> adsb_receiver) override;
 
-   std::shared_ptr<const aaesim::open_source::ADSBReceiver> GetAdsbReceiver() const override { return m_adsb_receiver; }
+   std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> GetAdsbReceiver() const override { return m_adsb_receiver; }
 
    const Units::SecondsTime GetMaxCoastTime() const override { return Units::ZERO_TIME; }
 
   private:
-   std::shared_ptr<const aaesim::open_source::ADSBReceiver> m_adsb_receiver;
+   std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> m_adsb_receiver;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

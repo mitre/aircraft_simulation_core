@@ -27,8 +27,7 @@
 #include "public/SimulationTime.h"
 #include "public/Waypoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 static const Units::FeetLength ADS_B_HOR_POS_QUANT(7.83);
 static const Units::FeetPerSecondSpeed ADS_B_HOR_VEL_QUANT(1.68);
@@ -42,9 +41,8 @@ static const Units::FeetLength CPR_ALT_QUANT(25.0);
 
 struct ADSBTransmitter {
    virtual void Initialize(const std::list<Waypoint> &waypoints_along_route) = 0;
-   virtual void Transmit(const aaesim::open_source::SimulationTime &simulation_time,
-                         const aaesim::open_source::AircraftState &nav_measurement) = 0;
-   virtual const std::vector<aaesim::open_source::ADSBSVReport> &GetAllTransmissions() const = 0;
+   virtual void Transmit(const mitre::oss::simcore::SimulationTime &simulation_time,
+                         const mitre::oss::simcore::AircraftState &nav_measurement) = 0;
+   virtual const std::vector<mitre::oss::simcore::ADSBSVReport> &GetAllTransmissions() const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

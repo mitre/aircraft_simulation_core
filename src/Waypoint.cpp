@@ -23,6 +23,8 @@
 #include <ostream>
 #include <string>
 
+namespace mitre::oss::simcore {
+
 const Units::FeetLength Waypoint::MAX_ALTITUDE_CONSTRAINT(50000);
 const Units::FeetLength Waypoint::MIN_ALTITUDE_CONSTRAINT(0);
 const Units::KnotsSpeed Waypoint::MAX_SPEED_CONSTRAINT(1000);
@@ -70,3 +72,4 @@ std::ostream &operator<<(std::ostream &out, const std::list<Waypoint> &waypoints
    }
    return out;
 }
+}  // namespace mitre::oss::simcore

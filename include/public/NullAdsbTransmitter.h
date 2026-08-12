@@ -24,16 +24,14 @@
 
 #include "public/ADSBTransmitter.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class NullAdsbTransmitter final : public ADSBTransmitter {
-   const std::vector<aaesim::open_source::ADSBSVReport> &GetAllTransmissions() const {
-      static std::vector<aaesim::open_source::ADSBSVReport> empty;
+   const std::vector<mitre::oss::simcore::ADSBSVReport> &GetAllTransmissions() const {
+      static std::vector<mitre::oss::simcore::ADSBSVReport> empty;
       return empty;
    }
    void Initialize(const std::list<Waypoint> &waypoints_along_route) {}
-   void Transmit(const aaesim::open_source::SimulationTime &simulation_time,
-                 const aaesim::open_source::AircraftState &nav_measurement) {}
+   void Transmit(const mitre::oss::simcore::SimulationTime &simulation_time,
+                 const mitre::oss::simcore::AircraftState &nav_measurement) {}
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

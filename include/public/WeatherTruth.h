@@ -23,8 +23,7 @@
 
 #include "public/WeatherEstimate.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class WeatherTruth : public WeatherEstimate {
   public:
    WeatherTruth();
@@ -33,5 +32,4 @@ class WeatherTruth : public WeatherEstimate {
 
    virtual ~WeatherTruth();
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

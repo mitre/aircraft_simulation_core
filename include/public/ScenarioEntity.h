@@ -21,8 +21,7 @@
 
 #include "public/SimulationTime.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct ScenarioEntity {
    ScenarioEntity() = default;
    virtual ~ScenarioEntity() = default;
@@ -30,5 +29,4 @@ struct ScenarioEntity {
    virtual const int GetStartTime() const = 0;
    virtual bool IsFinished() const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

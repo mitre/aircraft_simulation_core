@@ -33,6 +33,8 @@
 
 #include "public/CustomMath.h"
 
+namespace mitre::oss::simcore {
+
 using namespace std;
 
 log4cplus::Logger LocalTangentPlane::logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("LocalTangentPlane"));
@@ -57,13 +59,11 @@ void LocalTangentPlane::InitializeRotationForGeodeticOrigin() {
 }
 
 void LocalTangentPlane::RotateEnuFrame(const double x, const double y, const double z, const Units::Angle theta) {
-   auto rotation = std::unique_ptr<DMatrix>(&CreateRotationMatrix(x, y, z, theta));
-   auto ecef_to_enu = std::unique_ptr<DMatrix>(&(m_ecef_to_enu * *rotation));
-   m_ecef_to_enu = *ecef_to_enu;
+   const DMatrix rotation = CreateRotationMatrix(x, y, z, theta);
+   m_ecef_to_enu = m_ecef_to_enu * rotation;
 
-   auto inverse_rotation = std::unique_ptr<DMatrix>(&CreateRotationMatrix(x, y, z, -theta));
-   auto enu_to_ecef = std::unique_ptr<DMatrix>(&(*inverse_rotation * m_enu_to_ecef));
-   m_enu_to_ecef = *enu_to_ecef;
+   const DMatrix inverse_rotation = CreateRotationMatrix(x, y, z, -theta);
+   m_enu_to_ecef = inverse_rotation * m_enu_to_ecef;
 }
 
 void LocalTangentPlane::ConvertGeodeticToAbsolute(const EarthModel::GeodeticPosition &geo,
@@ -141,3 +141,4 @@ const EarthModel::LocalPositionEnu &LocalTangentPlane::getPointOfTangencyEnu() c
 const EarthModel::AbsolutePositionEcef &LocalTangentPlane::getPointOfTangencyEcef() const {
    return pointOfTangencyEcef;
 }
+}  // namespace mitre::oss::simcore

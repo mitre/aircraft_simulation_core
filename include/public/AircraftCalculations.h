@@ -31,7 +31,7 @@
 #include "public/Atmosphere.h"
 #include "public/HorizontalPath.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 class AircraftCalculations {
   public:
@@ -146,4 +146,4 @@ class AircraftCalculations {
                                int current_trajectory_index, const std::vector<HorizontalPath> &horizontal_trajectory,
                                int &next_trajectory_index, Units::Length &cross_track_error);
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -29,7 +29,7 @@
  * An interface class for shapes on an ellipsoid. Lines, arcs, and any other defined shape
  * should inherit from this class.
  */
-namespace aaesim {
+namespace mitre::oss::simcore {
 class ShapeOnEllipsoid {
   public:
    enum kShapeType { NO_SHAPE = INT32_MIN, LINE = 0, ARC = 1 };
@@ -130,4 +130,4 @@ class ShapeOnEllipsoid {
       return Units::negInfinity();
    }
 };
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

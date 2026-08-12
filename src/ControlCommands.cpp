@@ -18,3 +18,6 @@
 // ****************************************************************************
 
 #include "public/ControlCommands.h"
+
+namespace mitre::oss::simcore {
+}  // namespace mitre::oss::simcore

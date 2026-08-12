@@ -23,9 +23,9 @@
 
 #include "public/CoreUtils.h"
 
-Units::Angle aaesim::open_source::DefaultLateralController::ComputeRollCommand(
+Units::Angle mitre::oss::simcore::DefaultLateralController::ComputeRollCommand(
       const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-      std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather) {
+      std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather) {
    const Units::InvertedLength k_xtrk = Units::PerMeterInvertedLength(5e-4);  // meters^-1
    const double k_trk = 3;                                                    // unitless
 

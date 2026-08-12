@@ -24,8 +24,7 @@
 #include "public/Atmosphere.h"
 #include "public/Wind.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class WindZero final : public Wind {
   public:
    WindZero(std::shared_ptr<Atmosphere> atmosphere);
@@ -39,8 +38,8 @@ class WindZero final : public Wind {
                               Units::Speed &north_south) override;
 
    void InterpolateWindMatrix(Units::Angle lat_in, Units::Angle lon_in, Units::Length alt_in,
-                              aaesim::open_source::WindStack &east_west,
-                              aaesim::open_source::WindStack &north_south) override;
+                              mitre::oss::simcore::WindStack &east_west,
+                              mitre::oss::simcore::WindStack &north_south) override;
 
    Units::KelvinTemperature InterpolateTemperature(Units::Angle latitude_in, Units::Angle longitude_in,
                                                    Units::Length alt) override;
@@ -50,5 +49,4 @@ class WindZero final : public Wind {
   private:
    std::shared_ptr<Atmosphere> m_atmosphere;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

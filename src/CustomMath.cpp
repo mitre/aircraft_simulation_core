@@ -27,7 +27,10 @@
 
 #include "utility/UtilityConstants.h"
 
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
+
+namespace mitre::oss::simcore {
 
 // generate a uniform random number between 0 and 1
 // From "Numerical Recipe"
@@ -220,7 +223,7 @@ void matrix_times_vector(DMatrix &matrix_in, DVector &vector_in, int n, DVector 
  * matrix [x y z] is post-multiplied by the rotation
  * matrix.
  */
-DMatrix &CreateRotationMatrix(double l, double m, double n, const Units::Angle theta) {
+DMatrix CreateRotationMatrix(double l, double m, double n, const Units::Angle theta) {
    // basic formula acquired from:
    // https://en.wikipedia.org/wiki/Transformation_matrix#Rotation_2
    // Wikipedia uses T * coord_column, while we use coord_row * T.
@@ -242,6 +245,7 @@ DMatrix &CreateRotationMatrix(double l, double m, double n, const Units::Angle t
    double a[3][3] = {{l * l * cosT1 + cosT, m * l * cosT1 + n * sinT, n * l * cosT1 - m * sinT},
                      {l * m * cosT1 - n * sinT, m * m * cosT1 + cosT, n * m * cosT1 + l * sinT},
                      {l * n * cosT1 + m * sinT, m * n * cosT1 - l * sinT, n * n * cosT1 + cosT}};
-   DMatrix *result = new DMatrix((double **)&a, 0, 2, 0, 2);
-   return *result;
+   return DMatrix((double **)&a, 0, 2, 0, 2);
 }
+
+}  // namespace mitre::oss::simcore

@@ -24,38 +24,35 @@
 
 #include "public/ADSBReceiver.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class NullADSBReceiver final : public ADSBReceiver {
   public:
    NullADSBReceiver() = default;
    virtual ~NullADSBReceiver() = default;
-   aaesim::open_source::ADSBSVReport GetCurrentADSBReport(int id) const override {
-      return aaesim::open_source::ADSBSVReport::EMPTY_REPORT;
+   mitre::oss::simcore::ADSBSVReport GetCurrentADSBReport(int id) const override {
+      return mitre::oss::simcore::ADSBSVReport::EMPTY_REPORT;
    }
-   aaesim::open_source::ADSBSVReport GetADSBReportBefore(int id, Units::Time time) const override {
-      return aaesim::open_source::ADSBSVReport::EMPTY_REPORT;
+   mitre::oss::simcore::ADSBSVReport GetADSBReportBefore(int id, Units::Time time) const override {
+      return mitre::oss::simcore::ADSBSVReport::EMPTY_REPORT;
    }
-   const std::vector<aaesim::open_source::ADSBSVReport> &GetReportsReceivedByTime(
+   const std::vector<mitre::oss::simcore::ADSBSVReport> &GetReportsReceivedByTime(
          const SimulationTime &time) const override {
-      static std::vector<aaesim::open_source::ADSBSVReport> empty;
+      static std::vector<mitre::oss::simcore::ADSBSVReport> empty;
       return empty;
    }
-   const std::map<int, std::vector<aaesim::open_source::ADSBSVReport> > &GetAllReportsReceived() const override {
-      static std::map<int, std::vector<aaesim::open_source::ADSBSVReport> > empty;
+   const std::map<int, std::vector<mitre::oss::simcore::ADSBSVReport> > &GetAllReportsReceived() const override {
+      static std::map<int, std::vector<mitre::oss::simcore::ADSBSVReport> > empty;
       return empty;
    }
-   std::map<int, aaesim::open_source::ADSBSVReport> const GetCurrentADSBReport() const override {
-      static std::map<int, aaesim::open_source::ADSBSVReport> empty;
+   std::map<int, mitre::oss::simcore::ADSBSVReport> const GetCurrentADSBReport() const override {
+      static std::map<int, mitre::oss::simcore::ADSBSVReport> empty;
       return empty;
    }
    void Initialize(Units::Length adsb_reception_range_threshold) override {}
-   std::map<int, aaesim::open_source::ADSBSVReport> Receive(const aaesim::open_source::SimulationTime &time,
-                                                            const aaesim::open_source::AircraftState &state) override {
-      static std::map<int, aaesim::open_source::ADSBSVReport> empty;
+   std::map<int, mitre::oss::simcore::ADSBSVReport> Receive(const mitre::oss::simcore::SimulationTime &time,
+                                                            const mitre::oss::simcore::AircraftState &state) override {
+      static std::map<int, mitre::oss::simcore::ADSBSVReport> empty;
       return empty;
    }
 };
-}  // namespace open_source
-
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

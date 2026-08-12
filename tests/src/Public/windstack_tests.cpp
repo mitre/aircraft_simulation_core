@@ -27,11 +27,9 @@
 #include "public/WindStack.h"
 #include "utility/CustomUnits.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-namespace aaesim {
-namespace test {
-namespace open_source {
+namespace mitre::oss::simcore::test {
 TEST(WindStack, operatorEqEq) {
    // 1.empty vs empty
    WindStack ws0;
@@ -210,6 +208,4 @@ TEST(WindStack, AscendSort) {
    EXPECT_EQ(Units::MetersLength(test_stack.GetAltitude(4)).value(), Units::MetersLength(200).value());
 }
 
-}  // namespace open_source
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test

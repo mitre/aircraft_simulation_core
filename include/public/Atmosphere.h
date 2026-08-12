@@ -29,6 +29,8 @@
 #include "public/WindStack.h"
 #include "utility/CustomUnits.h"
 
+namespace mitre::oss::simcore {
+
 // Standard air pressure at sea level
 const Units::PascalsPressure P0_ISA(101325.);
 
@@ -145,3 +147,4 @@ class Atmosphere {
   private:
    static log4cplus::Logger m_logger;
 };
+}  // namespace mitre::oss::simcore

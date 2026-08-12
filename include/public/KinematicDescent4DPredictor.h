@@ -23,8 +23,7 @@
 
 #include "public/VerticalPredictor.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class KinematicDescent4DPredictor : public VerticalPredictor {
   public:
    enum KinematicDescentType { CONSTRAINED };
@@ -138,24 +137,23 @@ class KinematicDescent4DPredictor : public VerticalPredictor {
 
    static log4cplus::Logger m_logger;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore
 
-inline aaesim::open_source::KinematicDescent4DPredictor::KinematicDescentType
-      aaesim::open_source::KinematicDescent4DPredictor::GetDescentType() const {
+inline mitre::oss::simcore::KinematicDescent4DPredictor::KinematicDescentType
+      mitre::oss::simcore::KinematicDescent4DPredictor::GetDescentType() const {
    return m_kinematic_descent_type;
 }
 
-inline const Units::Length aaesim::open_source::KinematicDescent4DPredictor::GetAltitudeAtEndOfRoute() const {
+inline const Units::Length mitre::oss::simcore::KinematicDescent4DPredictor::GetAltitudeAtEndOfRoute() const {
    return m_altitude_at_end_of_route;
 }
 
-inline void aaesim::open_source::KinematicDescent4DPredictor::SetConditionsAtEndOfRoute(
+inline void mitre::oss::simcore::KinematicDescent4DPredictor::SetConditionsAtEndOfRoute(
       const Units::Length altitude_at_end_of_route, const Units::Speed ias_at_end_of_route) {
    m_altitude_at_end_of_route = altitude_at_end_of_route;
    m_ias_at_end_of_route = ias_at_end_of_route;
 }
 
-inline const double aaesim::open_source::KinematicDescent4DPredictor::GetDecelerationRateFPA() const {
+inline const double mitre::oss::simcore::KinematicDescent4DPredictor::GetDecelerationRateFPA() const {
    return m_deceleration_fpa_mps;
 }

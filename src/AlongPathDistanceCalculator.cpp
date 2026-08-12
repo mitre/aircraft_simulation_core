@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <vector>
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 log4cplus::Logger AlongPathDistanceCalculator::m_logger = log4cplus::Logger::getInstance("AlongPathDistanceCalculator");
 Units::Length AlongPathDistanceCalculator::CROSS_TRACK_TOLERANCE = Units::NauticalMilesLength(2.5);

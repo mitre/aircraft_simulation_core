@@ -27,13 +27,13 @@
 #include "public/TrueWeatherOperator.h"
 #include "public/VerticalController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class AbstractDescentController : public VerticalController {
   public:
    AbstractDescentController() = default;
    ~AbstractDescentController() = default;
    void Initialize(
-         std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &performance_calculator) override {
+         std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &performance_calculator) override {
       aircraft_performance_ = performance_calculator;
    }
    double GetSpeedBrakeGain() const override { return speed_brake_controller_->GetSpeedBrakeGain(); };
@@ -63,4 +63,4 @@ class AbstractDescentController : public VerticalController {
    std::shared_ptr<SpeedBrakeController> speed_brake_controller_{std::make_shared<SpeedBrakeController>()};
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

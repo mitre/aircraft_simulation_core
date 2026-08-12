@@ -23,16 +23,16 @@
 
 #include "public/NullADSBReceiver.h"
 
-aaesim::open_source::PassThroughAssap::PassThroughAssap()
-   : m_adsb_receiver(std::make_shared<aaesim::open_source::NullADSBReceiver>()) {}
+mitre::oss::simcore::PassThroughAssap::PassThroughAssap()
+   : m_adsb_receiver(std::make_shared<mitre::oss::simcore::NullADSBReceiver>()) {}
 
-aaesim::open_source::AircraftState aaesim::open_source::PassThroughAssap::Update(
-      const aaesim::open_source::AircraftState &state_to_sync_with,
-      const aaesim::open_source::ADSBSVReport &most_recent_ads_b) const {
-   return aaesim::open_source::AircraftState::FromAdsbReport(most_recent_ads_b);
+mitre::oss::simcore::AircraftState mitre::oss::simcore::PassThroughAssap::Update(
+      const mitre::oss::simcore::AircraftState &state_to_sync_with,
+      const mitre::oss::simcore::ADSBSVReport &most_recent_ads_b) const {
+   return mitre::oss::simcore::AircraftState::FromAdsbReport(most_recent_ads_b);
 }
 
-void aaesim::open_source::PassThroughAssap::Initialize(
-      std::shared_ptr<const aaesim::open_source::ADSBReceiver> adsb_receiver) {
+void mitre::oss::simcore::PassThroughAssap::Initialize(
+      std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> adsb_receiver) {
    m_adsb_receiver = adsb_receiver;
 }

@@ -28,6 +28,8 @@
 
 #include <public/Atmosphere.h>
 
+namespace mitre::oss::simcore {
+
 class USStandardAtmosphere1976 final : public Atmosphere {
   public:
    USStandardAtmosphere1976();
@@ -72,3 +74,4 @@ class USStandardAtmosphere1976 final : public Atmosphere {
    static const double P_T_EXPONENT;
    static const double RHO_T_EXPONENT;
 };
+}  // namespace mitre::oss::simcore

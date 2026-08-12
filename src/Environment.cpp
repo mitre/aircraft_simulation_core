@@ -23,6 +23,8 @@
 
 #include "public/EllipsoidalEarthModel.h"
 
+namespace mitre::oss::simcore {
+
 std::unique_ptr<Environment> Environment::m_instance = nullptr;
 
 Environment::Environment() : m_earth_model(new EllipsoidalEarthModel()) {}
@@ -35,3 +37,4 @@ Environment *Environment::GetInstance() {
 }
 
 EarthModel *Environment::GetEarthModel() const { return m_earth_model.get(); }
+}  // namespace mitre::oss::simcore

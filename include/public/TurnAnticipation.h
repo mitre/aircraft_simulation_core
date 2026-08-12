@@ -19,8 +19,7 @@
 
 #pragma once
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 struct TurnAnticipation {
    double distance;     // turn anticipation in meters
@@ -34,5 +33,4 @@ struct TurnAnticipation {
    TurnAnticipation(double pDist, double pBank, double pMaxBank, double pRadius, double pgs)
       : distance(pDist), bankAngle(pBank), maxAngle(pMaxBank), radius(pRadius), groundspeed(pgs) {};
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

@@ -57,6 +57,14 @@ compile_commands.json
 *.log
 *.bak
 *.swp
+sbowman.md
+.DS_Store
+
+# Python maintenance tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 
 # vcpkg
 vcpkg_installed/
@@ -67,3 +75,6 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+cppcheck-output/
+cppcheck.xml
+cppcheck-report.html

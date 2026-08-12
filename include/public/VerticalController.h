@@ -32,16 +32,16 @@
 #include "public/TrueWeatherOperator.h"
 #include "utility/BoundedValue.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct VerticalController {
    virtual void Initialize(
-         std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &performance_calculator) = 0;
+         std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &performance_calculator) = 0;
    virtual void ComputeVerticalCommands(const Guidance &guidance,
                                         const EquationsOfMotionState &equations_of_motion_state,
-                                        std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                        std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                         Units::Force &thrust_command, Units::Angle &gamma_command,
                                         Units::Speed &tas_command, BoundedValue<double, 0, 1> &speed_brake_command,
-                                        aaesim::open_source::bada_utils::FlapConfiguration &flap_command) = 0;
+                                        mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) = 0;
 
    virtual Units::Frequency GetGammaGain() const { return gain_flight_path_angle_; };
    virtual Units::Frequency GetThrustGain() const { return thrust_gain_; };
@@ -57,9 +57,9 @@ struct VerticalController {
    inline static const Units::Frequency thrust_gain_{CalculateThrustGain()};
    inline static void ConfigureFlapsAndEstimateKineticForces(
          const EquationsOfMotionState &equations_of_motion_state,
-         std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+         std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
          std::shared_ptr<FixedMassAircraftPerformance> aircraft_performance, Units::Force &lift, Units::Force &drag,
-         aaesim::open_source::bada_utils::FlapConfiguration &flap_configuration) {
+         mitre::oss::simcore::bada_utils::FlapConfiguration &flap_configuration) {
       Units::Speed calibrated_airspeed = sensed_weather->GetTrueWeather()->TAS2CAS(
             Units::MetersPerSecondSpeed(equations_of_motion_state.true_airspeed),
             Units::MetersLength(equations_of_motion_state.altitude_msl));
@@ -92,12 +92,12 @@ class NullVerticalController final : public VerticalController {
    NullVerticalController() = default;
    ~NullVerticalController() = default;
    void Initialize(
-         std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &performance_calculator) override {}
+         std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &performance_calculator) override {}
    void ComputeVerticalCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                                std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                 Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
                                 BoundedValue<double, 0, 1> &speed_brake_command,
-                                aaesim::open_source::bada_utils::FlapConfiguration &flap_command) override {
+                                mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) override {
       thrust_command = equations_of_motion_state.thrust;
       gamma_command = equations_of_motion_state.gamma;
       tas_command = equations_of_motion_state.true_airspeed;
@@ -107,4 +107,4 @@ class NullVerticalController final : public VerticalController {
    double GetSpeedBrakeGain() const override { return 0.0; };
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

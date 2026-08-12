@@ -24,12 +24,10 @@
 #include "public/AircraftState.h"
 #include "public/LatitudeLongitudePoint.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct WaypointPassingMonitor {
-   virtual void Update(const aaesim::LatitudeLongitudePoint &position, const Units::SignedAngle &ground_course_enu) = 0;
+   virtual void Update(const mitre::oss::simcore::LatitudeLongitudePoint &position, const Units::SignedAngle &ground_course_enu) = 0;
 
    virtual bool IsPassedWaypoint() const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

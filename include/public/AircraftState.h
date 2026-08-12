@@ -35,8 +35,7 @@
 #include "public/BadaUtils.h"
 #include "public/DynamicsState.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 
 class AircraftState final {
   public:
@@ -62,7 +61,7 @@ class AircraftState final {
    Units::AngularSpeed GetLongitudeRate() const;
    Units::Angle GetFlightPathAngle() const;
    Units::SecondsTime GetTime() const;
-   const aaesim::open_source::DynamicsState &GetDynamicsState() const;
+   const mitre::oss::simcore::DynamicsState &GetDynamicsState() const;
    Units::Angle GetPsi() const;
    Units::UnsignedRadiansAngle GetHeadingCcwFromEastRadians() const;
    Units::Speed GetGroundSpeed() const;
@@ -96,7 +95,7 @@ class AircraftState final {
       Units::SignedAngle latitude_{Units::zero()}, longitude_{Units::zero()};
       Units::AngularSpeed latitude_rate_{Units::zero()}, longitude_rate_{Units::zero()};
       Units::RadiansAngle psi_{Units::zero()};
-      aaesim::open_source::DynamicsState dynamics_state_{};
+      mitre::oss::simcore::DynamicsState dynamics_state_{};
 
      public:
       Builder(int unique_acid, int time_since_epoch_seconds);
@@ -120,7 +119,7 @@ class AircraftState final {
       Builder *Longitude(Units::SignedAngle longitude);
       Builder *LatitudeRate(Units::AngularSpeed latitude_rate);
       Builder *LongitudeRate(Units::AngularSpeed longitude_rate);
-      Builder *DynamicsState(const aaesim::open_source::DynamicsState &dynamics_state);
+      Builder *DynamicsState(const mitre::oss::simcore::DynamicsState &dynamics_state);
       Builder *Psi(Units::Angle psi);
       Builder *SensedWindsPerpendicular(Units::Speed wind_perpendicular_component);
       Builder *SensedWindsParallel(Units::Speed wind_parallel_component);
@@ -152,7 +151,7 @@ class AircraftState final {
       Units::SignedAngle GetLongitude() const { return longitude_; };
       Units::AngularSpeed GetLatitudeRate() const { return latitude_rate_; };
       Units::AngularSpeed GetLongitudeRate() const { return longitude_rate_; };
-      const aaesim::open_source::DynamicsState &GetDynamicsState() const { return dynamics_state_; };
+      const mitre::oss::simcore::DynamicsState &GetDynamicsState() const { return dynamics_state_; };
       Units::Angle GetPsi() const { return psi_; };
    };
 
@@ -176,7 +175,7 @@ class AircraftState final {
    Units::Pressure m_sensed_pressure{Units::zero()};
    Units::SignedAngle m_latitude{Units::zero()}, m_longitude{Units::zero()};
    Units::AngularSpeed m_latitude_rate{Units::zero()}, m_longitude_rate{Units::zero()};
-   aaesim::open_source::DynamicsState m_dynamics_state{};
+   mitre::oss::simcore::DynamicsState m_dynamics_state{};
 };
 
 inline Units::Length AircraftState::GetPositionEnuX() const { return m_x; }
@@ -189,7 +188,7 @@ inline Units::SignedAngle AircraftState::GetLatitude() const { return m_latitude
 inline Units::SignedAngle AircraftState::GetLongitude() const { return m_longitude; }
 inline Units::AngularSpeed AircraftState::GetLatitudeRate() const { return m_latitude_rate; }
 inline Units::AngularSpeed AircraftState::GetLongitudeRate() const { return m_longitude_rate; }
-inline const aaesim::open_source::DynamicsState &AircraftState::GetDynamicsState() const { return m_dynamics_state; }
+inline const mitre::oss::simcore::DynamicsState &AircraftState::GetDynamicsState() const { return m_dynamics_state; }
 inline Units::SecondsTime AircraftState::GetTime() const { return m_time; }
 inline int AircraftState::GetUniqueId() const { return m_id; }
 inline Units::Angle AircraftState::GetPsi() const { return m_psi; }
@@ -205,5 +204,4 @@ inline Units::Speed AircraftState::GetSensedWindPerpendicular() const { return m
 inline Units::Frequency AircraftState::GetVerticalWindDerivativeEastComponent() const { return m_Vwx_dh; }
 inline Units::Frequency AircraftState::GetVerticalWindDerivativeNorthComponent() const { return m_Vwy_dh; }
 
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

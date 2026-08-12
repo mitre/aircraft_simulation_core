@@ -32,6 +32,7 @@
 #include "public/SimulationTime.h"
 
 using namespace std;
+using namespace mitre::oss::simcore;
 
 int CoreUtils::FindNearestIndex(const double &value_to_find, const vector<double> &vector_to_search) {
    int idx;
@@ -106,7 +107,7 @@ const int CoreUtils::SignOfValue(double value) { return (((value) == (0)) ? 0 : 
 std::list<Waypoint> CoreUtils::ShortenLongLegs(const std::list<Waypoint> &ordered_waypoints,
                                                Units::Length maximum_allowable_length) {
    using namespace geolib_idealab;
-   using namespace aaesim;
+   using namespace mitre::oss::simcore;
 
    std::list<Waypoint> replacement_waypoints = {};
    Waypoint previous_waypoint = (ordered_waypoints).front();
@@ -132,10 +133,18 @@ std::list<Waypoint> CoreUtils::ShortenLongLegs(const std::list<Waypoint> &ordere
    return std::list<Waypoint>(replacement_waypoints);
 }
 
-std::list<Waypoint> CoreUtils::GetIntermediateWaypointsForLongLeg(const aaesim::LineOnEllipsoid &line_on_ellipsoid,
+std::vector<Waypoint> CoreUtils::ShortenLongLegs(const std::vector<Waypoint> &ordered_waypoints,
+                                                 Units::Length maximum_allowable_length) {
+   if (ordered_waypoints.empty()) return {};
+   const auto shortened = ShortenLongLegs(std::list<Waypoint>(ordered_waypoints.begin(), ordered_waypoints.end()),
+                                          maximum_allowable_length);
+   return {shortened.begin(), shortened.end()};
+}
+
+std::list<Waypoint> CoreUtils::GetIntermediateWaypointsForLongLeg(const mitre::oss::simcore::LineOnEllipsoid &line_on_ellipsoid,
                                                                   Units::Length maximum_allowable_single_leg_distance) {
    using namespace geolib_idealab;
-   using namespace aaesim;
+   using namespace mitre::oss::simcore;
 
    Units::NauticalMilesLength distance_to_end_point(line_on_ellipsoid.GetShapeLength());
 

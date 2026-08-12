@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(aircraft_simulation_core VERSION 1.0.0 LANGUAGES CXX)
+project(aircraft_simulation_core VERSION 2.0.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -113,9 +113,9 @@ set(SIMCORE_SOURCE_FILES
    src/ADSBSVReport.cpp
    src/AircraftCalculations.cpp
    src/AircraftControl.cpp
-   src/AircraftIntent.cpp
    src/AircraftSpeed.cpp
    src/AircraftState.cpp
+   src/AircraftIntentUtils.cpp
    src/AlongPathDistanceCalculator.cpp
    src/ArcOnEllipsoid.cpp
    src/Atmosphere.cpp
@@ -129,6 +129,7 @@ set(SIMCORE_SOURCE_FILES
    src/DMatrix.cpp
    src/DVector.cpp
    src/DataReader.cpp
+   src/DefaultAircraftIntent.cpp
    src/DefaultLateralController.cpp
    src/DirectionOfFlightCourseCalculator.cpp
    src/EarthModel.cpp

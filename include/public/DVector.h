@@ -22,6 +22,8 @@
 #ifndef DVECTOR_H
 #define DVECTOR_H
 
+namespace mitre::oss::simcore {
+
 class DVector {
   public:
    DVector();
@@ -58,3 +60,4 @@ class DVector {
    double *m_vector;
 };
 #endif
+}  // namespace mitre::oss::simcore

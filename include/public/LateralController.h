@@ -27,11 +27,11 @@
 #include "public/Guidance.h"
 #include "public/TrueWeatherOperator.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct LateralController {
    virtual Units::Angle ComputeRollCommand(
          const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-         std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather) = 0;
+         std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather) = 0;
    virtual Units::Frequency GetRollGain() const = 0;
 };
 
@@ -41,9 +41,9 @@ class NoTurnLateralController final : public LateralController {
    ~NoTurnLateralController() = default;
    Units::Angle ComputeRollCommand(
          const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-         std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather) override {
+         std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather) override {
       return Units::zero();
    };
    Units::Frequency GetRollGain() const override { return Units::zero(); }
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

@@ -23,6 +23,8 @@
 
 #include "MiniCSV/minicsv.h"
 
+namespace mitre::oss::simcore {
+
 struct OutputHandler {
   public:
    OutputHandler() = default;
@@ -73,3 +75,4 @@ struct OutputHandler {
 inline void OutputHandler::SetScenarioName(const std::string &scenario_name) {
    filename.assign(scenario_name + m_file_suffix);
 }
+}  // namespace mitre::oss::simcore

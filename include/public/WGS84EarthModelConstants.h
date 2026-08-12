@@ -22,8 +22,8 @@
 #include "geolib/Constants.h"
 #include "utility/CustomUnits.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 inline static const Units::MetersLength kWgs84SemiMinorAxis{SEMI_MINOR_AXIS_METERS};
 inline static const Units::MetersLength kWgs84SemiMajorAxis{SEMI_MAJOR_AXIS_METERS};
 inline constexpr double kWgs84EccentricitySquared{ECCENTRICITY_SQ};
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

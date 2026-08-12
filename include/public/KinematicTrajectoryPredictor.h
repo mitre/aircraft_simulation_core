@@ -31,9 +31,8 @@
 #include "public/KinematicDescent4DPredictor.h"
 #include "public/PrecalcWaypoint.h"
 
-namespace aaesim {
-namespace open_source {
-class KinematicTrajectoryPredictor : public aaesim::open_source::EuclideanTrajectoryPredictor {
+namespace mitre::oss::simcore {
+class KinematicTrajectoryPredictor final : public mitre::oss::simcore::EuclideanTrajectoryPredictor {
   public:
    KinematicTrajectoryPredictor();
 
@@ -44,79 +43,14 @@ class KinematicTrajectoryPredictor : public aaesim::open_source::EuclideanTrajec
 
    virtual ~KinematicTrajectoryPredictor() = default;
 
-   void CalculateWaypoints(const AircraftIntent &aircraft_intent,
-                           const WeatherPrediction &weather_prediction) override final;
+   void CalculateWaypoints(const std::shared_ptr<const AircraftIntent> &aircraft_intent,
+                           const WeatherPrediction &weather_prediction) override;
 
    KinematicTrajectoryPredictor &operator=(const KinematicTrajectoryPredictor &obj);
 
-   const std::vector<double> &GetVerticalPathDistances() const;
-
-   const double GetVerticalPathDistanceByIndex(int index) const;
-
-   const std::vector<double> &GetVerticalPathTimes() const;
-
-   const double GetVerticalPathTimeByIndex(int index) const;
-
-   const std::vector<double> &GetVerticalPathGroundspeeds() const;
-
-   const std::vector<double> &GetVerticalPathVelocities() const;
-
-   // Deprecated
-   const double GetVerticalPathVelocityByIndex(int index) const;
-
-   const Units::Speed GetVerticalPathCasByIndex(int index) const;
-
-   const std::vector<double> &GetVerticalPathAltitudes() const;
-
-   const double GetVerticalPathAltitudeByIndex(const int index) const;
-
-   std::shared_ptr<aaesim::open_source::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
+   std::shared_ptr<mitre::oss::simcore::KinematicDescent4DPredictor> GetKinematicDescent4dPredictor() const;
 
   private:
    static log4cplus::Logger m_logger;
 };
-}  // namespace open_source
-}  // namespace aaesim
-
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathDistances() const {
-   return m_vertical_predictor->GetVerticalPath().along_path_distance_m;
-}
-
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathDistanceByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().along_path_distance_m[index];
-}
-
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathTimes() const {
-   return m_vertical_predictor->GetVerticalPath().time_to_go_sec;
-}
-
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathTimeByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().time_to_go_sec[index];
-}
-
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathGroundspeeds()
-      const {
-   return m_vertical_predictor->GetVerticalPath().gs_mps;
-}
-
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathVelocities() const {
-   return m_vertical_predictor->GetVerticalPath().cas_mps;
-}
-
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathVelocityByIndex(int index) const {
-   return m_vertical_predictor->GetVerticalPath().cas_mps[index];
-}
-
-inline const Units::Speed aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathCasByIndex(
-      int index) const {
-   return Units::MetersPerSecondSpeed(m_vertical_predictor->GetVerticalPath().cas_mps[index]);
-}
-
-inline const std::vector<double> &aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathAltitudes() const {
-   return m_vertical_predictor->GetVerticalPath().altitude_m;
-}
-
-inline const double aaesim::open_source::KinematicTrajectoryPredictor::GetVerticalPathAltitudeByIndex(
-      const int index) const {
-   return m_vertical_predictor->GetVerticalPath().altitude_m[index];
-}
+}  // namespace mitre::oss::simcore

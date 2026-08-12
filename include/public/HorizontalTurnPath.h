@@ -26,7 +26,7 @@
 
 #include <string>
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 
 class HorizontalPath;  // avoid recursive class defs
 
@@ -61,4 +61,4 @@ class HorizontalTurnPath final {
    Units::MetersPerSecondSpeed groundspeed{0};
    TURN_TYPE turn_type{UNKNOWN};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

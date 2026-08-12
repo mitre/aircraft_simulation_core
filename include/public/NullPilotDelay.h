@@ -21,8 +21,8 @@
 
 #include "public/PilotDelay.h"
 
-namespace aaesim::open_source {
-class NullPilotDelay final : public aaesim::open_source::PilotDelay {
+namespace mitre::oss::simcore {
+class NullPilotDelay final : public mitre::oss::simcore::PilotDelay {
   public:
    NullPilotDelay() = default;
 
@@ -36,4 +36,4 @@ class NullPilotDelay final : public aaesim::open_source::PilotDelay {
       return Units::zero();
    }
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

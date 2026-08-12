@@ -29,8 +29,7 @@ enum SpeedValueType {
    MACH_SPEED,
 };
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class AircraftSpeed final {
   public:
    static AircraftSpeed OfMach(const BoundedValue<double, 0, 1> mach_value);
@@ -56,5 +55,4 @@ inline AircraftSpeed AircraftSpeed::OfMach(const BoundedValue<double, 0, 1> mach
 inline AircraftSpeed AircraftSpeed::OfIndicatedAirspeed(const Units::Speed ias) {
    return AircraftSpeed(INDICATED_AIR_SPEED, ias);
 }
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

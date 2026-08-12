@@ -25,7 +25,7 @@
 #include "public/Wind.h"
 #include "public/WindZero.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 WeatherEstimate::WeatherEstimate()
    : m_shared_members(std::make_shared<shared_members>()),

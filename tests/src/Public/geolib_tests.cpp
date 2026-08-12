@@ -33,11 +33,9 @@
 #include "public/LineOnEllipsoid.h"
 
 using namespace geolib_idealab;
-using namespace aaesim;
+using namespace mitre::oss::simcore;
 
-namespace aaesim {
-namespace test {
-namespace open_source {
+namespace mitre::oss::simcore::test {
 
 TEST(GeolibLibrary, basic_internal_consistency_test) {
    /*
@@ -1685,6 +1683,4 @@ TEST(GeolibUtils, HasErrorBitSet_Combo) {
    EXPECT_TRUE(GeolibUtils::HasErrorBitSet(error_set, geolib_idealab::ErrorCodes::ERROR_MAX_REACHED_ERR));
 }
 
-}  // namespace open_source
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test

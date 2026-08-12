@@ -23,12 +23,12 @@
 
 #include "public/VerticalController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 struct AscentController {
    virtual void ComputeAscentCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                                      std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                      std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                       Units::Force &thrust_command, Units::Angle &gamma_command,
                                       Units::Speed &tas_command,
-                                      aaesim::open_source::bada_utils::FlapConfiguration &flap_command) = 0;
+                                      mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) = 0;
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

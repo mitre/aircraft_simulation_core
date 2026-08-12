@@ -25,6 +25,8 @@
 
 #include "utility/CustomUnits.h"
 
+namespace mitre::oss::simcore {
+
 class Waypoint {
   public:
    static const Units::FeetLength MAX_ALTITUDE_CONSTRAINT;
@@ -178,3 +180,4 @@ inline const std::string &Waypoint::GetArinc424LegType() const { return m_arinc4
 std::ostream &operator<<(std::ostream &out, const Waypoint &waypoint);
 
 std::ostream &operator<<(std::ostream &out, const std::list<Waypoint> &waypoints);
+}  // namespace mitre::oss::simcore

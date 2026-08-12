@@ -33,10 +33,9 @@
 #include "public/WindZero.h"
 #include "public/ZeroWindTrueWeatherOperator.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-namespace aaesim {
-namespace test {
+namespace mitre::oss::simcore::test {
 namespace {
 
 class SimulationTimeStepGuard {
@@ -270,5 +269,4 @@ TEST(ThreeDofGliderKinematics, level_motion_resolves_three_four_five_heading_com
                Units::RadiansAngle(state.GetHeadingCcwFromEastRadians()).value(), 1e-12);
 }
 
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test

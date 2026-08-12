@@ -19,7 +19,7 @@
 
 #include "public/LegacyPositionEstimator.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 EarthModel::GeodeticPosition LegacyPositionEstimator::ComputeLatLon(const EquationsOfMotionState &eqm_state) const {
    auto local_position = EarthModel::LocalPositionEnu{};

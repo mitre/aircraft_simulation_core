@@ -22,6 +22,8 @@
 
 #include <exception>
 
+namespace mitre::oss::simcore {
+
 class InvalidIndexException : public std::exception {
   public:
    InvalidIndexException(const int value, const int low_limit, const int high_limit);
@@ -30,3 +32,4 @@ class InvalidIndexException : public std::exception {
 };
 
 #endif
+}  // namespace mitre::oss::simcore

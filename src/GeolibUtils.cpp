@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-using namespace aaesim;
+using namespace mitre::oss::simcore;
 using namespace geolib_idealab;
 
 LatitudeLongitudePoint GeolibUtils::CalculateNewPoint(const LatitudeLongitudePoint &start_point,

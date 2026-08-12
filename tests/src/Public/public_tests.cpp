@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "public/AircraftCalculations.h"
-#include "public/AircraftIntent.h"
 #include "public/AlongPathDistanceCalculator.h"
 #include "public/CoreUtils.h"
 #include "public/CustomMath.h"
@@ -46,12 +45,10 @@
 #include "utils/public/PublicUtils.h"
 
 using namespace std;
-using namespace aaesim::test::utils;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore::test::utils;
+using namespace mitre::oss::simcore;
 
-namespace aaesim {
-namespace test {
-namespace open_source {
+namespace mitre::oss::simcore::test {
 
 class TestHorizontalPathTracker : public HorizontalPathTracker {
    // A mock implementation that allows us to get at protected methods
@@ -276,10 +273,10 @@ TEST(HorizontalPathTracker, consistency_check_straight_line_reverse) {
     */
    const Units::MetersLength tolXY(100.0), tol_distance(1e-9);
    const Units::DegreesAngle tolCrs(0.5);
-   for (int quad = aaesim::test::utils::Quadrant::FIRST; quad <= aaesim::test::utils::Quadrant::FOURTH; ++quad) {
+   for (int quad = mitre::oss::simcore::test::utils::Quadrant::FIRST; quad <= mitre::oss::simcore::test::utils::Quadrant::FOURTH; ++quad) {
       const std::vector<HorizontalPath> horizontal_trajectory =
-            aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(
-                  static_cast<aaesim::test::utils::Quadrant>(quad));
+            mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(
+                  static_cast<mitre::oss::simcore::test::utils::Quadrant>(quad));
       PositionCalculator position_calculator(horizontal_trajectory, TrajectoryIndexProgressionDirection::DECREMENTING);
       AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                       TrajectoryIndexProgressionDirection::DECREMENTING);
@@ -311,19 +308,19 @@ TEST(HorizontalPathTracker, consistency_check_straight_line_reverse) {
       // test off end of route
       Units::MetersLength x1(0), y1(0);
       switch (quad) {
-         case aaesim::test::utils::Quadrant::FIRST:
+         case mitre::oss::simcore::test::utils::Quadrant::FIRST:
             x1 = Units::MetersLength(-10);
             y1 = Units::MetersLength(-10);
             break;
-         case aaesim::test::utils::Quadrant::SECOND:
+         case mitre::oss::simcore::test::utils::Quadrant::SECOND:
             x1 = Units::MetersLength(10);
             y1 = Units::MetersLength(-10);
             break;
-         case aaesim::test::utils::Quadrant::THIRD:
+         case mitre::oss::simcore::test::utils::Quadrant::THIRD:
             x1 = Units::MetersLength(10);
             y1 = Units::MetersLength(10);
             break;
-         case aaesim::test::utils::Quadrant::FOURTH:
+         case mitre::oss::simcore::test::utils::Quadrant::FOURTH:
             x1 = Units::MetersLength(-10);
             y1 = Units::MetersLength(10);
             break;
@@ -354,7 +351,7 @@ TEST(HorizontalPathTracker, consistency_check_straight_line_forward) {
     */
 
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    PositionCalculator position_calculator(horizontal_trajectory, TrajectoryIndexProgressionDirection::INCREMENTING);
    AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                    TrajectoryIndexProgressionDirection::INCREMENTING);
@@ -417,7 +414,7 @@ TEST(HorizontalPathTracker, consistency_check_straight_line_nodirection) {
     */
 
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    PositionCalculator position_calculator(horizontal_trajectory, TrajectoryIndexProgressionDirection::UNDEFINED);
    AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                    TrajectoryIndexProgressionDirection::UNDEFINED);
@@ -486,7 +483,7 @@ TEST(HorizontalPathTracker, consistency_check_straight_line_nodirection) {
 
 TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_incrementing) {
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                    TrajectoryIndexProgressionDirection::INCREMENTING);
 
@@ -671,11 +668,10 @@ TEST(DMatrix, multiply) {
    DMatrix b((double **)&b1, 0, 1, 0, 1);
    EXPECT_THROW(a * b, DMatrix::IncompatibleDimensionsException);
 
-   DMatrix &ba = b * a;
+   const DMatrix ba = b * a;
    EXPECT_EQ(ba[0][0], 39);
    EXPECT_EQ(ba.GetMaxRow(), 1);
    EXPECT_EQ(ba.GetMaxColumn(), 2);
-   delete &ba;
 }
 
 TEST(AircraftState, extrapolate) {
@@ -717,7 +713,7 @@ TEST(Units, CustomUnits) {
 
 TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_decrementing) {
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                    TrajectoryIndexProgressionDirection::DECREMENTING);
 
@@ -739,7 +735,7 @@ TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_decreme
 }
 TEST(PositionCalculator, check_for_throw_when_invalid_call_made) {
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    PositionCalculator position_calculator(horizontal_trajectory, TrajectoryIndexProgressionDirection::INCREMENTING);
 
    // Jump to the end of the route and test. Expect a throw
@@ -759,7 +755,7 @@ TEST(HorizontalPathCourseCalculator, consistency_check_straight_line_nodirection
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    DirectionOfFlightCourseCalculator course_calculator(horizontal_trajectory,
                                                        TrajectoryIndexProgressionDirection::UNDEFINED);
 
@@ -798,7 +794,7 @@ TEST(BackwardCourseCalculator, consistency_check_start_end_course) {
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    DirectionOfFlightCourseCalculator course_calculator(horizontal_trajectory,
                                                        TrajectoryIndexProgressionDirection::UNDEFINED);
 
@@ -816,7 +812,7 @@ TEST(BackwardCourseCalculator, consistency_check_incrementing) {
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    DirectionOfFlightCourseCalculator course_calculator(horizontal_trajectory,
                                                        TrajectoryIndexProgressionDirection::INCREMENTING);
 
@@ -845,7 +841,7 @@ TEST(BackwardCourseCalculator, course_throws_for_wrong_progression) {
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    DirectionOfFlightCourseCalculator course_calculator(horizontal_trajectory,
                                                        TrajectoryIndexProgressionDirection::INCREMENTING);
    HorizontalPath start_of_path = horizontal_trajectory.back();
@@ -874,7 +870,7 @@ TEST(BackwardCourseCalculator, consistency_check_decrementing) {
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    DirectionOfFlightCourseCalculator course_calculator(horizontal_trajectory,
                                                        TrajectoryIndexProgressionDirection::DECREMENTING);
 
@@ -904,7 +900,7 @@ TEST(AlongPathDistanceCalculator, consistency_check_two_public_methods) {
    const Units::SignedDegreesAngle known_course(45.0);
    const Units::SignedDegreesAngle expected_reciprocal_course(known_course + Units::SignedDegreesAngle(180.0));
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
    AlongPathDistanceCalculator distance_calculator(horizontal_trajectory,
                                                    TrajectoryIndexProgressionDirection::UNDEFINED);
 
@@ -942,7 +938,7 @@ atm(aaesim::bada::Bada3Factory::MakeAtmosphereFromTemperatureOffset(Atmosphere::
 
 TEST(TestHorizontalPathTracker, check_is_on_node_position) {
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
 
    // Decrementing
    {
@@ -987,7 +983,7 @@ TEST(TestHorizontalPathTracker, check_is_on_node_position) {
 
 TEST(TestHorizontalPathTracker, check_is_on_node_distance) {
    const std::vector<HorizontalPath> horizontal_trajectory =
-         aaesim::test::utils::PublicUtils::CreateStraightHorizontalPath(aaesim::test::utils::Quadrant::FIRST);
+         mitre::oss::simcore::test::utils::PublicUtils::CreateStraightHorizontalPath(mitre::oss::simcore::test::utils::Quadrant::FIRST);
 
    // Decrementing
    {
@@ -1057,18 +1053,6 @@ TEST(AircraftState, GetHeadingCcwFromEastRadians) {
    }
 }
 
-TEST(Guidance, GetIasCommandIntegerKnots) {
-   Guidance guidance;
-
-   // test rounding up
-   guidance.m_ias_command = Units::KnotsSpeed(209.9);
-   EXPECT_EQ(210, guidance.GetIasCommandIntegerKnots());
-
-   // test rounding down
-   guidance.m_ias_command = Units::KnotsSpeed(209.1);
-   EXPECT_EQ(209, guidance.GetIasCommandIntegerKnots());
-}
-
 /* Broken because we cannot access bada classes from here
 class PredictedWindEvaluatorTest : public ::testing::Test {
   protected:
@@ -1080,7 +1064,7 @@ class PredictedWindEvaluatorTest : public ::testing::Test {
                                                                             Units::CelsiusTemperature(0))),
         weather_prediction(Wind::CreateZeroWindPrediction(sensed_atmosphere)) {}
 
-   aaesim::open_source::AircraftState aircraft_state;
+   mitre::oss::simcore::AircraftState aircraft_state;
    Units::Speed reference_cas;
    Units::Length reference_altitude;
    std::shared_ptr<Atmosphere> sensed_atmosphere;
@@ -1102,12 +1086,12 @@ TEST_F(PredictedWindEvaluatorTest, VectorDifferenceWindEvaluator) {
 
 TEST(EuclideanWaypointMonitor, passed_waypoint_first_update) {
    const Waypoint test_waypoint("monitor_me", Units::DegreesAngle(38), Units::DegreesAngle(-77));
-   aaesim::open_source::Wgs84PrecalcWaypoint point_to_monitor;
-   point_to_monitor.m_position = aaesim::LatitudeLongitudePoint::CreateFromWaypoint(test_waypoint);
-   std::shared_ptr<aaesim::open_source::EuclideanWaypointMonitor> test_monitor =
-         aaesim::open_source::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(point_to_monitor);
+   mitre::oss::simcore::Wgs84PrecalcWaypoint point_to_monitor;
+   point_to_monitor.m_position = mitre::oss::simcore::LatitudeLongitudePoint::CreateFromWaypoint(test_waypoint);
+   std::shared_ptr<mitre::oss::simcore::EuclideanWaypointMonitor> test_monitor =
+         mitre::oss::simcore::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(point_to_monitor);
 
-   aaesim::LatitudeLongitudePoint test_point = point_to_monitor.m_position.ProjectDistanceAlongCourse(
+   mitre::oss::simcore::LatitudeLongitudePoint test_point = point_to_monitor.m_position.ProjectDistanceAlongCourse(
          Units::MetersLength(100), Units::SignedDegreesAngle(80));
 
    // This is the tested method
@@ -1118,24 +1102,24 @@ TEST(EuclideanWaypointMonitor, passed_waypoint_first_update) {
 
 TEST(EuclideanWaypointMonitor, passes_waypoint_second_call) {
    const Waypoint test_waypoint("monitor_me", Units::DegreesAngle(38), Units::DegreesAngle(-77));
-   aaesim::open_source::Wgs84PrecalcWaypoint point_to_monitor;
-   point_to_monitor.m_position = aaesim::LatitudeLongitudePoint::CreateFromWaypoint(test_waypoint);
-   std::shared_ptr<aaesim::open_source::EuclideanWaypointMonitor> test_monitor =
-         aaesim::open_source::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(point_to_monitor);
+   mitre::oss::simcore::Wgs84PrecalcWaypoint point_to_monitor;
+   point_to_monitor.m_position = mitre::oss::simcore::LatitudeLongitudePoint::CreateFromWaypoint(test_waypoint);
+   std::shared_ptr<mitre::oss::simcore::EuclideanWaypointMonitor> test_monitor =
+         mitre::oss::simcore::EuclideanWaypointMonitor::OfWgs84PrecalcWaypoint(point_to_monitor);
 
-   const aaesim::LatitudeLongitudePoint test_point1 = point_to_monitor.m_position.ProjectDistanceAlongCourse(
+   const mitre::oss::simcore::LatitudeLongitudePoint test_point1 = point_to_monitor.m_position.ProjectDistanceAlongCourse(
          Units::MetersLength(100), Units::SignedDegreesAngle(91));
    test_monitor->Update(test_point1, Units::SignedDegreesAngle(0));
    EXPECT_FALSE(test_monitor->IsPassedWaypoint());
 
-   const aaesim::LatitudeLongitudePoint test_point2 = point_to_monitor.m_position.ProjectDistanceAlongCourse(
+   const mitre::oss::simcore::LatitudeLongitudePoint test_point2 = point_to_monitor.m_position.ProjectDistanceAlongCourse(
          Units::MetersLength(100), Units::SignedDegreesAngle(89));
    test_monitor->Update(test_point2, Units::SignedDegreesAngle(0));
    EXPECT_TRUE(test_monitor->IsPassedWaypoint());
 }
 
 TEST(FlightEnvelopeSpeedLimiter, limit_speed_command) {
-   aaesim::open_source::bada_utils::FlightEnvelope flight_envelope;
+   mitre::oss::simcore::bada_utils::FlightEnvelope flight_envelope;
    flight_envelope.V_mo = Units::KnotsSpeed(250);
    flight_envelope.M_mo = 1.0;
    flight_envelope.h_mo = Units::ZERO_LENGTH;
@@ -1143,7 +1127,7 @@ TEST(FlightEnvelopeSpeedLimiter, limit_speed_command) {
    flight_envelope.G_w = Units::zero();
    flight_envelope.G_t = 0.0;
 
-   aaesim::open_source::bada_utils::FlapSpeeds flap_speeds;
+   mitre::oss::simcore::bada_utils::FlapSpeeds flap_speeds;
    flap_speeds.cas_approach_minimum = Units::KnotsSpeed(200);
    flap_speeds.cas_approach_maximum = Units::KnotsSpeed(210);
    flap_speeds.cas_landing_minimum = Units::KnotsSpeed(200);
@@ -1158,7 +1142,7 @@ TEST(FlightEnvelopeSpeedLimiter, limit_speed_command) {
    Units::Speed limited_speed = flight_envelope_speed_limiter.LimitSpeedCommand(
          Units::ZERO_SPEED, flap_speeds.cas_takeoff_minimum - Units::KnotsSpeed(1), Units::ZERO_SPEED,
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::ZERO_LENGTH,
-         aaesim::open_source::bada_utils::FlapConfiguration::TAKEOFF);
+         mitre::oss::simcore::bada_utils::FlapConfiguration::TAKEOFF);
    ASSERT_EQ(limited_speed, flap_speeds.cas_takeoff_minimum);
 
    limited_speed = flight_envelope_speed_limiter.LimitSpeedCommand(
@@ -1178,7 +1162,7 @@ TEST(FlightEnvelopeSpeedLimiter, limit_speed_command) {
 }
 
 TEST(FlightEnvelopeSpeedLimiter, limit_mach_command) {
-   aaesim::open_source::bada_utils::FlightEnvelope flight_envelope;
+   mitre::oss::simcore::bada_utils::FlightEnvelope flight_envelope;
    flight_envelope.V_mo = Units::KnotsSpeed(10);
    flight_envelope.M_mo = 1.0;
    flight_envelope.h_mo = Units::ZERO_LENGTH;
@@ -1186,7 +1170,7 @@ TEST(FlightEnvelopeSpeedLimiter, limit_mach_command) {
    flight_envelope.G_w = Units::zero();
    flight_envelope.G_t = 0.0;
 
-   aaesim::open_source::bada_utils::FlapSpeeds flap_speeds;
+   mitre::oss::simcore::bada_utils::FlapSpeeds flap_speeds;
    flap_speeds.cas_approach_minimum = Units::KnotsSpeed(1);
    flap_speeds.cas_approach_maximum = Units::KnotsSpeed(10);
    flap_speeds.cas_landing_minimum = Units::KnotsSpeed(1);
@@ -1287,6 +1271,4 @@ TEST(CustomUnits, ToSigned) {
    ASSERT_DOUBLE_EQ(-45, quad4_signed_angle.value());
 }
 
-}  // namespace open_source
-}  // namespace test
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore::test

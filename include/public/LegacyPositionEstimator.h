@@ -24,7 +24,7 @@
 #include "public/EllipsoidalPositionEstimator.h"
 #include "public/TangentPlaneSequence.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class LegacyPositionEstimator final : public EllipsoidalPositionEstimator {
   public:
    LegacyPositionEstimator(const std::shared_ptr<TangentPlaneSequence> &position_converter,
@@ -40,4 +40,4 @@ class LegacyPositionEstimator final : public EllipsoidalPositionEstimator {
    std::shared_ptr<TangentPlaneSequence> m_tangent_plane_sequence;
    EarthModel::GeodeticPosition m_last_resolved_position{};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

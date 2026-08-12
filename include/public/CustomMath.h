@@ -27,6 +27,8 @@
 #include "public/DMatrix.h"
 #include "public/DVector.h"
 
+namespace mitre::oss::simcore {
+
 double atan3(double x,
              double y);  // arc tangent from 0 - 2pi
 double quantize(double value,
@@ -44,4 +46,5 @@ bool inverse(DMatrix &in, int n, DMatrix &inverse);
 
 void matrix_times_vector(DMatrix &matrix_in, DVector &vector_in, int n, DVector &vector_out);
 
-DMatrix &CreateRotationMatrix(double l, double m, double n, const Units::Angle theta);
+DMatrix CreateRotationMatrix(double l, double m, double n, const Units::Angle theta);
+}  // namespace mitre::oss::simcore

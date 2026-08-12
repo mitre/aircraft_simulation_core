@@ -23,9 +23,9 @@
 #include "public/WeatherPrediction.h"
 
 using namespace std;
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
-namespace aaesim::test {
+namespace mitre::oss::simcore::test {
 
 TEST(BlendWindsVerticallyByAltitude, update_predicted_winds_at_altitude_from_sensed_wind) {
    // Get expected values
@@ -53,7 +53,7 @@ TEST(BlendWindsVerticallyByAltitude, update_predicted_winds_at_altitude_from_sen
    predicted_wind.north_south() = predicted_wind_x;  // copy
 
    // Test
-   aaesim::open_source::BlendWindsVerticallyByAltitude wind_blender{};
+   mitre::oss::simcore::BlendWindsVerticallyByAltitude wind_blender{};
    wind_blender.BlendSensedWithPredicted(test_state, predicted_wind);
 
    // Assert
@@ -118,7 +118,7 @@ TEST(BlendWindsVerticallyByAltitude, update_predicted_winds_at_higher_altitude) 
    predicted_wind.north_south() = predicted_wind_x;  // copy
 
    // Test
-   aaesim::open_source::BlendWindsVerticallyByAltitude wind_blender{};
+   mitre::oss::simcore::BlendWindsVerticallyByAltitude wind_blender{};
    wind_blender.BlendSensedWithPredicted(test_state, predicted_wind);
 
    // Assert
@@ -131,4 +131,4 @@ TEST(BlendWindsVerticallyByAltitude, update_predicted_winds_at_higher_altitude) 
                                                                                                    // correct location
 }
 
-}  // namespace aaesim::test
+}  // namespace mitre::oss::simcore::test

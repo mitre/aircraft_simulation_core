@@ -25,6 +25,8 @@
 #include <math.h>
 #include <unistd.h>
 
+namespace mitre::oss::simcore {
+
 static bool logging_initialized_ = false;
 
 static void LoadLoggerProperties() {
@@ -48,3 +50,4 @@ static void LoadLoggerProperties() {
    config.configure();
    LOG4CPLUS_TRACE(logger, "LOG4CPLUS_PROPERTIES file is " << LOG4CPLUS_TEXT(prop_file));
 }
+}  // namespace mitre::oss::simcore

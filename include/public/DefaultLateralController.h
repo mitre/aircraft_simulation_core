@@ -27,14 +27,14 @@
 
 #include "public/LateralController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class DefaultLateralController final : public LateralController {
   public:
    DefaultLateralController(const Units::Angle &max_bank_angle) : max_bank_angle_{max_bank_angle} {};
    virtual ~DefaultLateralController() = default;
    Units::Angle ComputeRollCommand(
          const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-         std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather) override;
+         std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather) override;
    Units::Frequency GetRollGain() const override { return gain_phi_; }
 
   private:
@@ -53,4 +53,4 @@ class DefaultLateralController final : public LateralController {
    }
    Units::Angle max_bank_angle_{};
 };
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore

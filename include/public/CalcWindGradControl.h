@@ -27,8 +27,7 @@
 
 #include "public/WeatherPrediction.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 class CalcWindGradControl {
   public:
    CalcWindGradControl();
@@ -54,8 +53,8 @@ class CalcWindGradControl {
                              Units::Frequency &wind_gradient_y);
 
   private:
-   aaesim::open_source::WindStack m_wind_x;
-   aaesim::open_source::WindStack m_wind_y;
+   mitre::oss::simcore::WindStack m_wind_x;
+   mitre::oss::simcore::WindStack m_wind_y;
 
    Units::Length m_altitude;
    Units::Speed m_wind_speed_x;
@@ -63,5 +62,4 @@ class CalcWindGradControl {
    Units::Frequency m_wind_gradient_x;
    Units::Frequency m_wind_gradient_y;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

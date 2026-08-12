@@ -24,8 +24,8 @@
 #include "public/CoreUtils.h"
 
 using namespace std;
-using namespace aaesim::open_source;
-using namespace aaesim::open_source::constants;
+using namespace mitre::oss::simcore;
+using namespace mitre::oss::simcore::constants;
 
 VerticalPredictor::VerticalPredictor()
    : LOW_GROUNDSPEED_WARNING(50),
@@ -161,15 +161,14 @@ Guidance VerticalPredictor::CalculateGuidanceCommands(const AircraftState &state
                                                       const Guidance &current_guidance) {
    Guidance result = current_guidance;
 
-   if (result.GetSelectedSpeed().GetSpeedType() == UNSPECIFIED_SPEED) {
+   if (result.GetSelectedSpeedType() == UNSPECIFIED_SPEED) {
       // no selected speed, so set it to Mach or IAS depending on altitude
       if (Units::FeetLength(state.GetAltitudeMsl()) > m_transition_altitude_msl) {
          // Mach
-         result.SetSelectedSpeed(AircraftSpeed::OfMach(BoundedValue<double, 0, 1>(m_transition_mach)));
+         result.SetSelectedSpeedType(MACH_SPEED);
       } else {
          // IAS
-         result.SetSelectedSpeed(AircraftSpeed::OfIndicatedAirspeed(
-               Units::MetersPerSecondSpeed(m_vertical_path.cas_mps[m_current_trajectory_index])));
+         result.SetSelectedSpeedType(INDICATED_AIR_SPEED);
       }
    }
 

@@ -24,7 +24,7 @@
 
 #include "public/Environment.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 std::map<Units::Speed, std::weak_ptr<PredictedWindEvaluator> > VectorDifferenceWindEvaluator::m_instances;
 
@@ -46,7 +46,7 @@ VectorDifferenceWindEvaluator::VectorDifferenceWindEvaluator(const Units::Speed 
 VectorDifferenceWindEvaluator::~VectorDifferenceWindEvaluator() {}
 
 bool VectorDifferenceWindEvaluator::ArePredictedWindsAccurate(
-      const aaesim::open_source::AircraftState &state, const aaesim::open_source::WeatherPrediction &weather_prediction,
+      const mitre::oss::simcore::AircraftState &state, const mitre::oss::simcore::WeatherPrediction &weather_prediction,
       const Units::Speed reference_cas, const Units::Length reference_altitude,
       const std::shared_ptr<Atmosphere> &sensed_atmosphere) const {
    Units::MetersPerSecondSpeed wind_east, wind_north;

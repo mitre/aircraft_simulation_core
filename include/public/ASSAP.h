@@ -26,20 +26,18 @@
 #include "public/ADSBSVReport.h"
 #include "public/AircraftState.h"
 
-namespace aaesim {
-namespace open_source {
+namespace mitre::oss::simcore {
 struct ASSAP {  // Airborne Surveillance & Separation Assurance Processing
    virtual ~ASSAP() = default;
 
-   virtual aaesim::open_source::AircraftState Update(
-         const aaesim::open_source::AircraftState &state_to_sync_with,
-         const aaesim::open_source::ADSBSVReport &most_recent_ads_b) const = 0;
+   virtual mitre::oss::simcore::AircraftState Update(
+         const mitre::oss::simcore::AircraftState &state_to_sync_with,
+         const mitre::oss::simcore::ADSBSVReport &most_recent_ads_b) const = 0;
 
-   virtual std::shared_ptr<const aaesim::open_source::ADSBReceiver> GetAdsbReceiver() const = 0;
+   virtual std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> GetAdsbReceiver() const = 0;
 
-   virtual void Initialize(std::shared_ptr<const aaesim::open_source::ADSBReceiver> adsb_receiver) = 0;
+   virtual void Initialize(std::shared_ptr<const mitre::oss::simcore::ADSBReceiver> adsb_receiver) = 0;
 
    virtual const Units::SecondsTime GetMaxCoastTime() const = 0;
 };
-}  // namespace open_source
-}  // namespace aaesim
+}  // namespace mitre::oss::simcore

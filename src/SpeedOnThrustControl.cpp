@@ -24,13 +24,13 @@
 
 #include "public/Environment.h"
 
-using namespace aaesim::open_source;
+using namespace mitre::oss::simcore;
 
 void SpeedOnThrustControl::ComputeVerticalCommands(
       const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-      std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
+      std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather, Units::Force &thrust_command,
       Units::Angle &gamma_command, Units::Speed &tas_command, BoundedValue<double, 0, 1> &speed_brake_command,
-      aaesim::open_source::bada_utils::FlapConfiguration &flap_configuration) {
+      mitre::oss::simcore::bada_utils::FlapConfiguration &flap_configuration) {
    const Units::Speed hdot_ref = guidance.m_vertical_speed;
    const Units::Length alt_ref = guidance.m_reference_altitude;
    const Units::Length error_alt = alt_ref - equations_of_motion_state.altitude_msl;
@@ -43,7 +43,7 @@ void SpeedOnThrustControl::ComputeVerticalCommands(
    }
    gamma_command = Units::RadiansAngle(asin(temp_gamma));
 
-   SpeedValueType speed_type = guidance.GetSelectedSpeed().GetSpeedType();
+   SpeedValueType speed_type = guidance.GetSelectedSpeedType();
    if (speed_type == SpeedValueType::MACH_SPEED) {
       tas_command = sensed_weather->GetTrueWeather()->MachToTAS(guidance.m_mach_command,
                                                                 equations_of_motion_state.altitude_msl);
@@ -69,10 +69,10 @@ void SpeedOnThrustControl::ComputeVerticalCommands(
                sin(equations_of_motion_state.gamma) * cos(equations_of_motion_state.gamma);
    const Units::Force max_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_configuration,
-         aaesim::open_source::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::MAXIMUM_CRUISE, Units::ZERO_CELSIUS));
    const Units::Force min_thrust = Units::NewtonsForce(aircraft_performance_->GetMaxThrust(
          equations_of_motion_state.altitude_msl, flap_configuration,
-         aaesim::open_source::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
+         mitre::oss::simcore::bada_utils::EngineThrustMode::DESCENT, Units::ZERO_CELSIUS));
 
    // Check Configuration if min_thrust is commanded
    thrust_command = thrust_equilibrium;
@@ -85,8 +85,8 @@ void SpeedOnThrustControl::ComputeVerticalCommands(
       const Units::Speed calibrated_airspeed = sensed_weather->GetTrueWeather()->TAS2CAS(
             equations_of_motion_state.true_airspeed, equations_of_motion_state.altitude_msl);
 
-      aaesim::open_source::bada_utils::FlapConfiguration updated_flap_configuration =
-            aaesim::open_source::bada_utils::FlapConfiguration::UNDEFINED;
+      mitre::oss::simcore::bada_utils::FlapConfiguration updated_flap_configuration =
+            mitre::oss::simcore::bada_utils::FlapConfiguration::UNDEFINED;
       aircraft_performance_->GetConfigurationForIncreasedDrag(
             calibrated_airspeed, equations_of_motion_state.altitude_msl, updated_flap_configuration);
       flap_configuration = updated_flap_configuration;
@@ -100,7 +100,7 @@ void SpeedOnThrustControl::ComputeVerticalCommands(
    static const Units::KnotsSpeed tas_error_tolerance{-5};
    static const unsigned int minimum_thrust_duration{15};
    if (min_thrust_counter_ > minimum_thrust_duration and error_tas < tas_error_tolerance) {
-      if (flap_configuration <= aaesim::open_source::bada_utils::FlapConfiguration::LANDING) {
+      if (flap_configuration <= mitre::oss::simcore::bada_utils::FlapConfiguration::LANDING) {
          speed_brake_controller_->Deploy();
       } else {
          speed_brake_controller_->Retract();

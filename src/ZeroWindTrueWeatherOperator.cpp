@@ -21,14 +21,14 @@
 
 #include <memory>
 
-aaesim::open_source::ZeroWindTrueWeatherOperator::ZeroWindTrueWeatherOperator(
-      std::shared_ptr<aaesim::open_source::WeatherTruth> true_weather)
+mitre::oss::simcore::ZeroWindTrueWeatherOperator::ZeroWindTrueWeatherOperator(
+      std::shared_ptr<mitre::oss::simcore::WeatherTruth> true_weather)
    : AbstractTrueWeatherOperator(true_weather) {
    m_true_weather->east_west() = ZERO_STACK;
    m_true_weather->north_south() = ZERO_STACK;
 }
 
-void aaesim::open_source::ZeroWindTrueWeatherOperator::CalculateEnvironmentalWind(
+void mitre::oss::simcore::ZeroWindTrueWeatherOperator::CalculateEnvironmentalWind(
       const EarthModel::GeodeticPosition &position, const Units::Length &altitude_msl) {
    m_true_weather->LoadConditionsAt(position.latitude, position.longitude, altitude_msl);
 }

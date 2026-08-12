@@ -21,7 +21,7 @@
 
 #include <vector>
 
-aaesim::open_source::HorizontalPathTracker::HorizontalPathTracker(
+mitre::oss::simcore::HorizontalPathTracker::HorizontalPathTracker(
       const std::vector<HorizontalPath> &horizontal_trajectory,
       TrajectoryIndexProgressionDirection expected_index_progression)
    : m_extended_horizontal_trajectory(ExtendHorizontalTrajectory(horizontal_trajectory)),
@@ -31,13 +31,13 @@ aaesim::open_source::HorizontalPathTracker::HorizontalPathTracker(
    InitializeStartingIndex();
 }
 
-std::vector<aaesim::open_source::HorizontalPath> aaesim::open_source::HorizontalPathTracker::ExtendHorizontalTrajectory(
-      const std::vector<aaesim::open_source::HorizontalPath> &horizontal_trajectory) {
+std::vector<mitre::oss::simcore::HorizontalPath> mitre::oss::simcore::HorizontalPathTracker::ExtendHorizontalTrajectory(
+      const std::vector<mitre::oss::simcore::HorizontalPath> &horizontal_trajectory) {
    // add one more straight segment to end
-   std::vector<aaesim::open_source::HorizontalPath> extended_trajectory;
+   std::vector<mitre::oss::simcore::HorizontalPath> extended_trajectory;
    Units::RadiansAngle crs(horizontal_trajectory[0].m_path_course);
-   aaesim::open_source::HorizontalPath hp;
-   hp.m_segment_type = aaesim::open_source::HorizontalPath::SegmentType::STRAIGHT;
+   mitre::oss::simcore::HorizontalPath hp;
+   hp.m_segment_type = mitre::oss::simcore::HorizontalPath::SegmentType::STRAIGHT;
    hp.SetXYPositionMeters(horizontal_trajectory[0].GetXPositionMeters() -
                                 Units::MetersLength(EXTENSION_LENGTH).value() * Units::cos(crs),
                           horizontal_trajectory[0].GetYPositionMeters() -
@@ -48,15 +48,15 @@ std::vector<aaesim::open_source::HorizontalPath> aaesim::open_source::Horizontal
 
    // extend all lengths
    for (auto itr = horizontal_trajectory.begin(); itr < horizontal_trajectory.end(); ++itr) {
-      aaesim::open_source::HorizontalPath element = itr.operator*();
+      mitre::oss::simcore::HorizontalPath element = itr.operator*();
       element.m_path_length_cumulative_meters += Units::MetersLength(EXTENSION_LENGTH).value();
       extended_trajectory.push_back(element);
    }
 
    // add one more straigt segment to the beginning
    Units::RadiansAngle crs_back(horizontal_trajectory.back().m_path_course);
-   aaesim::open_source::HorizontalPath hp_beginning;
-   hp_beginning.m_segment_type = aaesim::open_source::HorizontalPath::SegmentType::STRAIGHT;
+   mitre::oss::simcore::HorizontalPath hp_beginning;
+   hp_beginning.m_segment_type = mitre::oss::simcore::HorizontalPath::SegmentType::STRAIGHT;
    hp_beginning.SetXYPositionMeters(
          horizontal_trajectory.back().GetXPositionMeters() +
                Units::MetersLength(EXTENSION_LENGTH).value() * Units::cos(crs_back),
@@ -70,7 +70,7 @@ std::vector<aaesim::open_source::HorizontalPath> aaesim::open_source::Horizontal
    return extended_trajectory;
 }
 
-void aaesim::open_source::HorizontalPathTracker::InitializeStartingIndex() {
+void mitre::oss::simcore::HorizontalPathTracker::InitializeStartingIndex() {
    switch (m_index_progression_direction) {
       case TrajectoryIndexProgressionDirection::DECREMENTING:
          if (m_extended_horizontal_trajectory.size() > 1) {
@@ -92,8 +92,8 @@ void aaesim::open_source::HorizontalPathTracker::InitializeStartingIndex() {
    }
 }
 
-bool aaesim::open_source::HorizontalPathTracker::ValidateIndexProgression(
-      std::vector<aaesim::open_source::HorizontalPath>::size_type index_to_check) {
+bool mitre::oss::simcore::HorizontalPathTracker::ValidateIndexProgression(
+      std::vector<mitre::oss::simcore::HorizontalPath>::size_type index_to_check) {
    bool is_progress_valid;
    switch (m_index_progression_direction) {
       case TrajectoryIndexProgressionDirection::DECREMENTING:
@@ -116,8 +116,8 @@ bool aaesim::open_source::HorizontalPathTracker::ValidateIndexProgression(
    return is_progress_valid;
 }
 
-void aaesim::open_source::HorizontalPathTracker::UpdateHorizontalTrajectory(
-      const std::vector<aaesim::open_source::HorizontalPath> &horizontal_trajectory) {
+void mitre::oss::simcore::HorizontalPathTracker::UpdateHorizontalTrajectory(
+      const std::vector<mitre::oss::simcore::HorizontalPath> &horizontal_trajectory) {
    const auto hp_to_find = m_extended_horizontal_trajectory[m_current_index];
    m_unmodified_horizontal_trajectory = horizontal_trajectory;
    m_extended_horizontal_trajectory = ExtendHorizontalTrajectory(horizontal_trajectory);
@@ -131,9 +131,9 @@ void aaesim::open_source::HorizontalPathTracker::UpdateHorizontalTrajectory(
    m_current_index = std::distance(m_extended_horizontal_trajectory.begin(), find_result);
 }
 
-bool aaesim::open_source::HorizontalPathTracker::IsPositionOnNode(
+bool mitre::oss::simcore::HorizontalPathTracker::IsPositionOnNode(
       const Units::Length position_x, const Units::Length position_y,
-      std::vector<aaesim::open_source::HorizontalPath>::size_type &node_index) {
+      std::vector<mitre::oss::simcore::HorizontalPath>::size_type &node_index) {
    bool is_on_node =
          Units::abs(Units::MetersLength(m_extended_horizontal_trajectory[m_current_index].GetXPositionMeters()) -
                     position_x) < ON_NODE_TOLERANCE &&
@@ -141,7 +141,7 @@ bool aaesim::open_source::HorizontalPathTracker::IsPositionOnNode(
                     position_y) < ON_NODE_TOLERANCE;
 
    if (!is_on_node) {
-      std::vector<aaesim::open_source::HorizontalPath>::size_type next_index;
+      std::vector<mitre::oss::simcore::HorizontalPath>::size_type next_index;
       switch (m_index_progression_direction) {
          case TrajectoryIndexProgressionDirection::DECREMENTING:
             if (m_current_index > 0) {
@@ -196,9 +196,9 @@ bool aaesim::open_source::HorizontalPathTracker::IsPositionOnNode(
    return is_on_node;
 }
 
-bool aaesim::open_source::HorizontalPathTracker::IsDistanceAlongPathOnNode(
+bool mitre::oss::simcore::HorizontalPathTracker::IsDistanceAlongPathOnNode(
       const Units::Length distance_along_path,
-      std::vector<aaesim::open_source::HorizontalPath>::size_type &node_index) {
+      std::vector<mitre::oss::simcore::HorizontalPath>::size_type &node_index) {
    const Units::Length distance_to_check = distance_along_path + EXTENSION_LENGTH;
    bool is_on_node =
          Units::abs(
@@ -206,7 +206,7 @@ bool aaesim::open_source::HorizontalPathTracker::IsDistanceAlongPathOnNode(
                distance_to_check) < ON_NODE_TOLERANCE;
 
    if (!is_on_node) {
-      std::vector<aaesim::open_source::HorizontalPath>::size_type next_index;
+      std::vector<mitre::oss::simcore::HorizontalPath>::size_type next_index;
       switch (m_index_progression_direction) {
          case TrajectoryIndexProgressionDirection::DECREMENTING:
             next_index = m_current_index - 1;

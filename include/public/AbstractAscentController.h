@@ -23,22 +23,22 @@
 
 #include "public/AscentController.h"
 
-namespace aaesim::open_source {
+namespace mitre::oss::simcore {
 class AbstractAscentController : public AscentController, public VerticalController {
   public:
    AbstractAscentController() = default;
    ~AbstractAscentController() = default;
    void ComputeVerticalCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                                std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                                std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                                 Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
                                 BoundedValue<double, 0, 1> &speed_brake_command,
-                                aaesim::open_source::bada_utils::FlapConfiguration &flap_command) override {
+                                mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) override {
       speed_brake_command = 0.0;
       ComputeAscentCommands(guidance, equations_of_motion_state, sensed_weather, thrust_command, gamma_command,
                             tas_command, flap_command);
    }
    void Initialize(
-         std::shared_ptr<aaesim::open_source::FixedMassAircraftPerformance> &performance_calculator) override {
+         std::shared_ptr<mitre::oss::simcore::FixedMassAircraftPerformance> &performance_calculator) override {
       aircraft_performance_ = performance_calculator;
    }
    double GetSpeedBrakeGain() const override { return 0.0; };
@@ -52,9 +52,9 @@ class NullAscentController final : public AbstractAscentController {
    NullAscentController() = default;
    ~NullAscentController() = default;
    void ComputeAscentCommands(const Guidance &guidance, const EquationsOfMotionState &equations_of_motion_state,
-                              std::shared_ptr<const aaesim::open_source::TrueWeatherOperator> &sensed_weather,
+                              std::shared_ptr<const mitre::oss::simcore::TrueWeatherOperator> &sensed_weather,
                               Units::Force &thrust_command, Units::Angle &gamma_command, Units::Speed &tas_command,
-                              aaesim::open_source::bada_utils::FlapConfiguration &flap_command) override {
+                              mitre::oss::simcore::bada_utils::FlapConfiguration &flap_command) override {
       thrust_command = equations_of_motion_state.thrust;
       gamma_command = equations_of_motion_state.gamma;
       tas_command = equations_of_motion_state.true_airspeed;
@@ -62,4 +62,4 @@ class NullAscentController final : public AbstractAscentController {
    }
 };
 
-}  // namespace aaesim::open_source
+}  // namespace mitre::oss::simcore
