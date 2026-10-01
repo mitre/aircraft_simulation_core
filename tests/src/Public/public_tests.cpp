@@ -37,6 +37,7 @@
 #include "public/PositionCalculator.h"
 #include "public/ScenarioUtils.h"
 #include "public/SimulationTime.h"
+#include "public/USStandardAtmosphere1976.h"
 #include "public/VectorDifferenceWindEvaluator.h"
 #include "public/Wgs84PrecalcWaypoint.h"
 #include "public/WindZero.h"
@@ -1182,23 +1183,24 @@ TEST(FlightEnvelopeSpeedLimiter, limit_mach_command) {
    flap_speeds.cas_cruise_minimum = Units::KnotsSpeed(10);
 
    FlightEnvelopeSpeedLimiter flight_envelope_speed_limiter(flap_speeds, flight_envelope);
+   const auto weather = WeatherPrediction::CreateZeroWindPrediction(std::make_shared<USStandardAtmosphere1976>());
    BoundedValue<double, 0, 2> current_mach(flight_envelope.M_mo + BoundedValue<double, 0, 2>(0.1));
 
    BoundedValue<double, 0, 2> limited_mach = flight_envelope_speed_limiter.LimitMachCommand(
          BoundedValue<double, 0, 2>(0), current_mach, BoundedValue<double, 0, 2>(0), Units::ZERO_MASS,
-         Units::ZERO_LENGTH, WeatherPrediction());
+         Units::ZERO_LENGTH, weather);
    ASSERT_EQ(limited_mach, flight_envelope.M_mo);
 
    current_mach = FlightEnvelopeSpeedLimiter::MINIMUM_MACH_LIMIT - BoundedValue<double, 0, 2>(0.1);
    limited_mach = flight_envelope_speed_limiter.LimitMachCommand(BoundedValue<double, 0, 2>(0), current_mach,
                                                                  BoundedValue<double, 0, 2>(0), Units::ZERO_MASS,
-                                                                 Units::ZERO_LENGTH, WeatherPrediction());
+                                                                 Units::ZERO_LENGTH, weather);
    ASSERT_EQ(limited_mach, FlightEnvelopeSpeedLimiter::MINIMUM_MACH_LIMIT);
 
    current_mach = FlightEnvelopeSpeedLimiter::MINIMUM_MACH_LIMIT + BoundedValue<double, 0, 2>(0.1);
    limited_mach = flight_envelope_speed_limiter.LimitMachCommand(BoundedValue<double, 0, 2>(0), current_mach,
                                                                  BoundedValue<double, 0, 2>(0), Units::ZERO_MASS,
-                                                                 Units::ZERO_LENGTH, WeatherPrediction());
+                                                                 Units::ZERO_LENGTH, weather);
    ASSERT_EQ(limited_mach, current_mach);
 }
 

@@ -19,6 +19,11 @@
 
 #include "public/FlightEnvelopeSpeedLimiter.h"
 
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <stdexcept>
+
 using namespace mitre::oss::simcore;
 
 const Units::Speed FlightEnvelopeSpeedLimiter::MINIMUM_IAS_LIMIT = Units::KnotsSpeed(150);
@@ -78,15 +83,28 @@ Units::Speed FlightEnvelopeSpeedLimiter::LimitSpeedCommand(
    }
 }
 
+double FlightEnvelopeSpeedLimiter::GetMinimumMach(const Units::Length &altitude,
+                                                  const WeatherPrediction &weather_prediction) const {
+   const double cruise_minimum = weather_prediction.CAS2Mach(m_flap_speeds.cas_cruise_minimum, altitude);
+   if (!std::isfinite(cruise_minimum)) {
+      throw std::runtime_error("Cannot compute minimum cruise Mach: encountered nonfinite CAS-to-Mach conversion");
+   }
+   return std::max(static_cast<double>(MINIMUM_MACH_LIMIT), cruise_minimum);
+}
+
 BoundedValue<double, 0, 2> FlightEnvelopeSpeedLimiter::LimitMachCommand(
       const BoundedValue<double, 0, 2> &previous_reference_speed_command_mach,
       const BoundedValue<double, 0, 2> &current_mach_command, const BoundedValue<double, 0, 2> &nominal_mach,
       const Units::Mass &current_mass, const Units::Length &current_altitude,
       const WeatherPrediction &weather_prediction) {
-   if (current_mach_command > m_flight_envelope.M_mo) {
-      return BoundedValue<double, 0, 2>(m_flight_envelope.M_mo);
-   } else if (current_mach_command < MINIMUM_MACH_LIMIT) {
-      return MINIMUM_MACH_LIMIT;
+   const double minimum_mach = GetMinimumMach(current_altitude, weather_prediction);
+   const double maximum_mach = m_flight_envelope.M_mo;
+   if (!std::isfinite(maximum_mach) || minimum_mach > maximum_mach || maximum_mach > 2.0) {
+      std::ostringstream message;
+      message << "Encountered impossible cruise Mach interval with: minimum=" << minimum_mach << ", maximum=" << maximum_mach
+              << ", altitude_ft=" << Units::FeetLength(current_altitude).value()
+              << ", mass_kg=" << Units::KilogramsMass(current_mass).value() ;
+      throw std::runtime_error(message.str());
    }
-   return current_mach_command;
+   return BoundedValue<double, 0, 2>(std::clamp(static_cast<double>(current_mach_command), minimum_mach, maximum_mach));
 }

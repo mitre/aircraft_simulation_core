@@ -22,8 +22,11 @@
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 
+#include <cmath>
 #include <iomanip>
 #include <memory>
+#include <sstream>
+#include <stdexcept>
 #include <utility>
 
 #include "nlohmann/json.hpp"
@@ -88,11 +91,29 @@ DynamicsState ThreeDOFDynamics::Integrate(const Guidance &guidance,
             controller_response.second.k_roll, controller_response.second.k_speed_brake, controller_response.first);
    }
 
+   // Reject an invalid airspeed before integrating state
+   const Units::MetersPerSecondSpeed next_airspeed =
+         m_equations_of_motion_state.true_airspeed + m_equations_of_motion_state_derivative.true_airspeed_deriv * dt;
+   if (!std::isfinite(next_airspeed.value()) || next_airspeed.value() < 0.0 ||
+       (!perform_takeoff_roll_logic && next_airspeed.value() == 0.0)) {
+      std::ostringstream message;
+      message << "Invalid aircraft dynamics: integration would produce airspeed_mps=" << next_airspeed.value()
+              << ", previous_airspeed_mps="
+              << Units::MetersPerSecondSpeed(m_equations_of_motion_state.true_airspeed).value()
+              << ", acceleration_mps2="
+              << Units::MetersSecondAcceleration(m_equations_of_motion_state_derivative.true_airspeed_deriv).value()
+              << ", timestep_s=" << dt.value()
+              << ", altitude_ft=" << Units::FeetLength(m_equations_of_motion_state.altitude_msl).value()
+              << ", mass_kg=" << Units::KilogramsMass(m_bada_calculator->GetAircraftMass()).value()
+              << ". Check aircraft performance limits and scenario conditions.";
+      throw std::runtime_error(message.str());
+   }
+
    // Integrate the state
    m_equations_of_motion_state.enu_x += m_equations_of_motion_state_derivative.enu_velocity_x * dt;
    m_equations_of_motion_state.enu_y += m_equations_of_motion_state_derivative.enu_velocity_y * dt;
    m_equations_of_motion_state.altitude_msl += m_equations_of_motion_state_derivative.enu_velocity_z * dt;
-   m_equations_of_motion_state.true_airspeed += m_equations_of_motion_state_derivative.true_airspeed_deriv * dt;
+   m_equations_of_motion_state.true_airspeed = next_airspeed;
    m_equations_of_motion_state.gamma += m_equations_of_motion_state_derivative.gamma_deriv * dt;
    m_equations_of_motion_state.psi_enu += m_equations_of_motion_state_derivative.heading_deriv * dt;
    m_equations_of_motion_state.thrust += m_equations_of_motion_state_derivative.thrust_deriv * dt;

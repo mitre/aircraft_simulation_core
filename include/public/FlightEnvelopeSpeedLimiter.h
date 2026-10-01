@@ -43,6 +43,8 @@ class FlightEnvelopeSpeedLimiter : public SpeedCommandLimiter {
    static const Units::Speed MINIMUM_IAS_LIMIT;
    static const BoundedValue<double, 0, 2> MINIMUM_MACH_LIMIT;
 
+   double GetMinimumMach(const Units::Length &altitude, const WeatherPrediction &weather_prediction) const;
+   
   private:
    mitre::oss::simcore::bada_utils::FlapSpeeds m_flap_speeds;
    mitre::oss::simcore::bada_utils::FlightEnvelope m_flight_envelope;
