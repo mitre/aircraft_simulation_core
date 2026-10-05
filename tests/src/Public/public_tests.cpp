@@ -307,6 +307,100 @@ TEST(VerticalPathUtils, interpolate_typed_speeds) {
    EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(20)), std::domain_error);
 }
 
+TEST(VerticalPathUtils, guidance_upper_bound_lookup) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1.0, 1.0, 2.0};
+   path.cas_mps = {10.0, 20.0, 30.0, 50.0};
+   path.mach = {0.1, 0.2, 0.3, 0.5};
+   path.time_to_go_sec = {10.0, 20.0, 30.0, 50.0};
+
+   for (const double meters : {-0.5, 0.0}) {
+      const Units::MetersLength distance(meters);
+      EXPECT_DOUBLE_EQ(10.0, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance)).value());
+      EXPECT_DOUBLE_EQ(0.1, VerticalPathUtils::CalculateMachGuidance(path, distance));
+      EXPECT_DOUBLE_EQ(10.0, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, distance)).value());
+   }
+
+   // An exact match skips duplicate samples and uses the next interval.
+   for (const double meters : {1.0, 1.5}) {
+      const Units::MetersLength distance(meters);
+      const double expected = 30.0 + (meters - 1.0) * 20.0;
+      EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance)).value());
+      EXPECT_NEAR(expected / 100.0, VerticalPathUtils::CalculateMachGuidance(path, distance), 1e-12);
+      EXPECT_DOUBLE_EQ(expected, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, distance)).value());
+   }
+
+   for (const double meters : {2.0, 2.01, 3.0}) {
+      const Units::MetersLength distance(meters);
+      EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance), std::out_of_range);
+      EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance), std::out_of_range);
+      EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance), std::out_of_range);
+   }
+
+   const VerticalPath empty;
+   const Units::MetersLength distance(0);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(empty, distance), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(empty, distance), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(empty, distance), std::out_of_range);
+}
+
+TEST(VerticalPathUtils, guidance_optional_extrapolation) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1852.0, 3704.0};
+   path.cas_mps = {10.0, 30.0, 70.0};
+   path.mach = {0.1, 0.3, 0.7};
+   path.time_to_go_sec = {10.0, 30.0, 70.0};
+
+   // Different slopes at each end verify that the appropriate endpoint interval is used.
+   for (const auto &[nautical_miles, expected] : std::vector<std::pair<double, double>>{
+              {-1.0, -10.0}, {0.0, 10.0}, {0.5, 20.0}, {1.0, 30.0}, {2.0, 70.0}, {3.0, 110.0}}) {
+      const Units::NauticalMilesLength distance(nautical_miles);
+      EXPECT_NEAR(expected, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance, true)).value(), 1e-12);
+      EXPECT_NEAR(expected / 100.0, VerticalPathUtils::CalculateMachGuidance(path, distance, true), 1e-12);
+      EXPECT_NEAR(expected, Units::SecondsTime(
+            VerticalPathUtils::CalculateTimeToFly(path, distance, true)).value(), 1e-12);
+   }
+
+   const Units::NauticalMilesLength below(-1);
+   EXPECT_DOUBLE_EQ(10.0, Units::MetersPerSecondSpeed(
+         VerticalPathUtils::CalculateSpeedGuidance(path, below, false)).value());
+   EXPECT_DOUBLE_EQ(0.1, VerticalPathUtils::CalculateMachGuidance(path, below, false));
+   EXPECT_DOUBLE_EQ(10.0, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, below, false)).value());
+   const Units::NauticalMilesLength above(3);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, above, false), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, above, false), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, above, false), std::out_of_range);
+}
+
+TEST(VerticalPathUtils, guidance_extrapolation_requires_two_distinct_samples) {
+   for (const std::vector<double> &samples : std::vector<std::vector<double>>{{}, {0.0}}) {
+      VerticalPath path;
+      path.along_path_distance_m = samples;
+      path.cas_mps = samples;
+      path.mach = samples;
+      path.time_to_go_sec = samples;
+      for (const double meters : {-1.0, 1.0}) {
+         const Units::MetersLength distance(meters);
+         EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance, true), std::out_of_range);
+         EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance, true), std::out_of_range);
+         EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance, true), std::out_of_range);
+      }
+   }
+
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 0.0};
+   path.cas_mps = {10.0, 20.0};
+   path.mach = {0.1, 0.2};
+   path.time_to_go_sec = {10.0, 20.0};
+   const Units::MetersLength distance(1);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance, true), std::domain_error);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance, true), std::domain_error);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance, true), std::domain_error);
+}
+
 TEST(CoreUtils, interpolate_domain_error) {
    const int upper_index = 1;
    const double value = -0.5;
