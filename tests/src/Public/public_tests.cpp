@@ -50,6 +50,20 @@ using namespace mitre::oss::simcore;
 
 namespace mitre::oss::simcore::test {
 
+template <typename T>
+concept SupportsTypedInterpolation = requires(const std::vector<double> &x_values, const std::vector<T> &y_values) {
+   CoreUtils::LinearlyInterpolate<T>(1, Units::MetersLength(0.5), x_values, y_values);
+};
+
+static_assert(SupportsTypedInterpolation<Units::Speed>);
+static_assert(SupportsTypedInterpolation<Units::Length>);
+static_assert(SupportsTypedInterpolation<Units::Time>);
+static_assert(SupportsTypedInterpolation<Units::FeetLength>);
+static_assert(SupportsTypedInterpolation<Units::KnotsSpeed>);
+static_assert(!SupportsTypedInterpolation<double>);
+static_assert(!SupportsTypedInterpolation<int>);
+static_assert(!SupportsTypedInterpolation<std::string>);
+
 class TestHorizontalPathTracker : public HorizontalPathTracker {
    // A mock implementation that allows us to get at protected methods
   public:
@@ -80,6 +94,58 @@ TEST(CoreUtils, interpolate_trivial) {
    // Test
    double y_actual = CoreUtils::LinearlyInterpolate(upper_index, value, x_vals, y_vals);
    ASSERT_EQ(y_expected, y_actual);
+}
+
+TEST(CoreUtils, interpolate_legacy_speed_api) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Speed> y_values{Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   using LegacyInterpolator = Units::Speed (*)(int, Units::Length, const std::vector<double> &,
+                                               const std::vector<Units::Speed> &);
+   const LegacyInterpolator interpolate = &CoreUtils::LinearlyInterpolate;
+   const double expected = (Units::MetersPerSecondSpeed(y_values[0]).value() + 100.0) / 2.0;
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(interpolate(1, Units::NauticalMilesLength(0.5),
+                                                                     x_values, y_values)).value());
+   // A braced list must still resolve to the original non-template overload.
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate(
+                                   1, Units::NauticalMilesLength(0.5), x_values,
+                                   {Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)})).value());
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate<Units::Speed>(
+                                   1, Units::NauticalMilesLength(0.5), x_values, y_values)).value());
+}
+
+TEST(CoreUtils, interpolate_typed_quantities) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Length> lengths{Units::FeetLength(100), Units::MetersLength(100)};
+   const auto length = CoreUtils::LinearlyInterpolate(1, Units::NauticalMilesLength(0.5), x_values, lengths);
+   EXPECT_DOUBLE_EQ((Units::MetersLength(lengths[0]).value() + 100.0) / 2.0,
+                    Units::MetersLength(length).value());
+
+   const std::vector<Units::Time> times{Units::SecondsTime(10), Units::SecondsTime(30)};
+   const auto time = CoreUtils::LinearlyInterpolate(1, Units::NauticalMilesLength(0.5), x_values, times);
+   EXPECT_DOUBLE_EQ(20.0, Units::SecondsTime(time).value());
+
+   const std::vector<Units::FeetLength> feet{Units::FeetLength(100), Units::FeetLength(300)};
+   const auto feet_result = CoreUtils::LinearlyInterpolate(1, Units::NauticalMilesLength(0.5), x_values, feet);
+   EXPECT_DOUBLE_EQ(200.0, feet_result.value());
+
+   const std::vector<Units::KnotsSpeed> knots{Units::KnotsSpeed(100), Units::KnotsSpeed(300)};
+   const auto knots_result = CoreUtils::LinearlyInterpolate(1, Units::NauticalMilesLength(0.5), x_values, knots);
+   EXPECT_DOUBLE_EQ(200.0, knots_result.value());
+}
+
+TEST(CoreUtils, interpolate_typed_boundaries_and_errors) {
+   const std::vector<double> x_values{0.0, 1.0, 2.0};
+   const std::vector<Units::SecondsTime> y_values{
+         Units::SecondsTime(10), Units::SecondsTime(20), Units::SecondsTime(30)};
+   EXPECT_DOUBLE_EQ(10.0, CoreUtils::LinearlyInterpolate(1, Units::MetersLength(0), x_values, y_values).value());
+   EXPECT_DOUBLE_EQ(20.0, CoreUtils::LinearlyInterpolate(1, Units::MetersLength(1), x_values, y_values).value());
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(-1, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(0, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(3, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(1, Units::MetersLength(-0.5), x_values, y_values), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(2, Units::MetersLength(3), x_values, y_values), std::domain_error);
+   // Preserve the existing tolerance for extrapolation just past the last interval.
+   EXPECT_NEAR(30.1, CoreUtils::LinearlyInterpolate(2, Units::MetersLength(2.01), x_values, y_values).value(), 1e-12);
 }
 
 TEST(CoreUtils, interpolate_domain_error) {

@@ -24,6 +24,7 @@
 #include <scalar/Length.h>
 #include <scalar/Time.h>
 
+#include <concepts>
 #include <limits>
 #include <list>
 #include <string>
@@ -64,13 +65,34 @@ class CoreUtils {
                                      const std::vector<double> &y_values);
 
    /**
-    * Linear interpolator for speed-typed y_values.
+    * Deprecated after 0.2.0; use the template implementation. Linear interpolator for speed-typed y_values.
     *
     * @see LinearlyInterpolate
     */
    static Units::Speed LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
                                            const std::vector<double> &x_values,
                                            const std::vector<Units::Speed> &y_values);
+
+   /**
+    * Linear interpolator for typed y_values. x_values are expressed in meters.
+    * Supports both base quantities and specific units without discarding their dimensions.
+    *
+    * @see LinearlyInterpolate
+   */
+   template <typename T>
+      requires std::derived_from<
+            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
+   static T LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
+                                const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      const double x_m = Units::MetersLength(x_interpolation_value).value();
+      ValidateInterpolation(upper_index, x_m, x_values);
+      const double v2 = x_values[upper_index];
+      const double v1 = x_values[upper_index - 1];
+      const T &o2 = y_values[upper_index];
+      const T &o1 = y_values[upper_index - 1];
+      return T(((o2 - o1) / (v2 - v1)) * (x_m - v1) + o1);
+   }
 
    /**
     * @param xyLoc1: first x,y pair
@@ -141,6 +163,9 @@ class CoreUtils {
    }
 
   private:
+   static void ValidateInterpolation(int upper_index, double x_interpolation_value,
+                                      const std::vector<double> &x_values);
+
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CoreUtils"))};
    inline static Units::NauticalMilesLength MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH{Units::infinity()};
 

@@ -49,6 +49,16 @@ int CoreUtils::FindNearestIndex(const double &value_to_find, const vector<double
 
 double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_value,
                                       const std::vector<double> &x_values, const std::vector<double> &y_values) {
+   ValidateInterpolation(upper_index, x_interpolation_value, x_values);
+   const double v2 = x_values[upper_index];
+   const double v1 = x_values[upper_index - 1];
+   const double o2 = y_values[upper_index];
+   const double o1 = y_values[upper_index - 1];
+   return ((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1;
+}
+
+void CoreUtils::ValidateInterpolation(int upper_index, double x_interpolation_value,
+                                       const std::vector<double> &x_values) {
    if (upper_index < 1 || upper_index >= x_values.size()) {
       char msg[200];
       snprintf(msg, sizeof(msg), "upper_index (%d) is not between 1 and %d", upper_index,
@@ -59,8 +69,6 @@ double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_va
 
    const double v2 = x_values[upper_index];
    const double v1 = x_values[upper_index - 1];
-   const double o2 = y_values[upper_index];
-   const double o1 = y_values[upper_index - 1];
 
    if ((x_interpolation_value - v1) * (x_interpolation_value - v2) > 0) {
       char msg[200];
@@ -74,8 +82,6 @@ double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_va
          throw domain_error(msg);
       }
    }
-
-   return ((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1;
 }
 
 Units::Speed CoreUtils::LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
