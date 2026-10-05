@@ -236,6 +236,15 @@ TEST(VerticalPathUtils, interpolate_typed_speeds) {
 }
 
 TEST(VerticalPathUtils, upper_bound_lookup) {
+   const std::vector<double> samples{0.0, 1.0, 1.0, 2.0};
+   EXPECT_EQ(0, VerticalPathUtils::FindUpperBoundIndex(-1.0, samples));
+   EXPECT_EQ(1, VerticalPathUtils::FindUpperBoundIndex(0.0, samples));
+   EXPECT_EQ(3, VerticalPathUtils::FindUpperBoundIndex(1.0, samples));
+   EXPECT_EQ(3, VerticalPathUtils::FindUpperBoundIndex(1.5, samples));
+   EXPECT_EQ(4, VerticalPathUtils::FindUpperBoundIndex(2.0, samples));
+   EXPECT_EQ(4, VerticalPathUtils::FindUpperBoundIndex(3.0, samples));
+   EXPECT_EQ(0, VerticalPathUtils::FindUpperBoundIndex(1.0, {}));
+
    auto path = MakeInterpolationTestPath();
    EXPECT_EQ(0, VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(-1)).resolved_index);
    EXPECT_EQ(1, VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(0)).resolved_index);
