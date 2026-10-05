@@ -19,9 +19,7 @@
 
 #include "public/CoreUtils.h"
 
-#include <cfloat>
-#include <cstdio>
-#include <iomanip>
+#include <format>
 #include <list>
 #include <stdexcept>
 #include <utility>
@@ -60,9 +58,8 @@ double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_va
 void CoreUtils::ValidateInterpolation(int upper_index, double x_interpolation_value,
                                        const std::vector<double> &x_values) {
    if (upper_index < 1 || upper_index >= x_values.size()) {
-      char msg[200];
-      snprintf(msg, sizeof(msg), "upper_index (%d) is not between 1 and %d", upper_index,
-               static_cast<int>(x_values.size() - 1));
+      const auto msg = std::format("upper_index ({}) is not between 1 and {}", upper_index,
+                                   static_cast<int>(x_values.size() - 1));
       LOG4CPLUS_FATAL(m_logger, msg);
       throw out_of_range(msg);
    }
@@ -71,8 +68,7 @@ void CoreUtils::ValidateInterpolation(int upper_index, double x_interpolation_va
    const double v1 = x_values[upper_index - 1];
 
    if ((x_interpolation_value - v1) * (x_interpolation_value - v2) > 0) {
-      char msg[200];
-      snprintf(msg, sizeof(msg), "ratio (%lf) is not between %lf and %lf.", x_interpolation_value, v1, v2);
+      const auto msg = std::format("ratio ({:.6f}) is not between {:.6f} and {:.6f}.", x_interpolation_value, v1, v2);
 
       double ratio = (x_interpolation_value - v1) / (x_interpolation_value - v2);
       if (upper_index + 1 == x_values.size() && (ratio < .1 || ratio > 10)) {

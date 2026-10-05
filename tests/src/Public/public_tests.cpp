@@ -38,6 +38,8 @@
 #include "public/ScenarioUtils.h"
 #include "public/SimulationTime.h"
 #include "public/VectorDifferenceWindEvaluator.h"
+#include "public/VerticalPath.h"
+#include "public/VerticalPathUtils.h"
 #include "public/Wgs84PrecalcWaypoint.h"
 #include "public/WindZero.h"
 #include "utility/CustomUnits.h"
@@ -53,6 +55,7 @@ namespace mitre::oss::simcore::test {
 template <typename T>
 concept SupportsTypedInterpolation = requires(const std::vector<double> &x_values, const std::vector<T> &y_values) {
    CoreUtils::LinearlyInterpolate<T>(1, Units::MetersLength(0.5), x_values, y_values);
+   CoreUtils::LinearlyInterpolate<T>(1, Units::SecondsTime(0.5), x_values, y_values);
 };
 
 static_assert(SupportsTypedInterpolation<Units::Speed>);
@@ -146,6 +149,64 @@ TEST(CoreUtils, interpolate_typed_boundaries_and_errors) {
    EXPECT_THROW(CoreUtils::LinearlyInterpolate(2, Units::MetersLength(3), x_values, y_values), std::domain_error);
    // Preserve the existing tolerance for extrapolation just past the last interval.
    EXPECT_NEAR(30.1, CoreUtils::LinearlyInterpolate(2, Units::MetersLength(2.01), x_values, y_values).value(), 1e-12);
+}
+
+TEST(CoreUtils, interpolate_typed_quantities_over_time) {
+   const std::vector<double> x_values{0.0, 60.0, 120.0};
+   const std::vector<Units::Speed> speeds{
+         Units::KnotsSpeed(100), Units::KnotsSpeed(200), Units::KnotsSpeed(300)};
+   const auto speed = CoreUtils::LinearlyInterpolate(2, Units::MinutesTime(1.5), x_values, speeds);
+   EXPECT_NEAR(250.0, Units::KnotsSpeed(speed).value(), 1e-12);
+   const std::vector<Units::FeetLength> lengths{
+         Units::FeetLength(100), Units::FeetLength(200), Units::FeetLength(300)};
+   EXPECT_DOUBLE_EQ(250.0, CoreUtils::LinearlyInterpolate(2, Units::MinutesTime(1.5), x_values, lengths).value());
+   EXPECT_DOUBLE_EQ(100.0, CoreUtils::LinearlyInterpolate(1, Units::SecondsTime(0), x_values, lengths).value());
+   EXPECT_DOUBLE_EQ(300.0, CoreUtils::LinearlyInterpolate(2, Units::MinutesTime(2), x_values, lengths).value());
+   EXPECT_NEAR(301.0, CoreUtils::LinearlyInterpolate(2, Units::SecondsTime(120.6), x_values, lengths).value(), 1e-12);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(0, Units::SecondsTime(30), x_values, lengths), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(3, Units::SecondsTime(30), x_values, lengths), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(1, Units::SecondsTime(-30), x_values, lengths), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolate(2, Units::MinutesTime(3), x_values, lengths), std::domain_error);
+}
+
+TEST(VerticalPathUtils, interpolate_typed_speeds) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1852.0};
+   path.altitude_m = {0.0, 100.0};
+   path.cas_mps = {100.0, 200.0};
+   path.mach = {0.4, 0.6};
+   path.altitude_rate_mps = {0.0, 2.0};
+   path.true_airspeed = {Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   path.tas_rate_mps = {0.0, 2.0};
+   path.theta_radians = {0.0, 0.1};
+   path.gs_mps = {100.0, 200.0};
+   path.time_to_go_sec = {0.0, 10.0};
+   path.mass_kg = {10000.0, 20000.0};
+   path.wind_velocity_east = {Units::MetersPerSecondSpeed(-10), Units::MetersPerSecondSpeed(20)};
+   path.wind_velocity_north = {Units::KnotsSpeed(-10), Units::KnotsSpeed(-20)};
+   path.flap_setting.resize(2, bada_utils::FlapConfiguration::UNDEFINED);
+   path.algorithm_type.resize(2, VerticalPath::PredictionAlgorithmType::UNDETERMINED);
+
+   const auto data = VerticalPathUtils::GetInterpolatedPathData(path, Units::NauticalMilesLength(0.5));
+   EXPECT_EQ(1, data.resolved_index);
+   EXPECT_DOUBLE_EQ((Units::MetersPerSecondSpeed(path.true_airspeed[0]).value() + 100.0) / 2.0,
+                    Units::MetersPerSecondSpeed(data.true_airspeed).value());
+   EXPECT_DOUBLE_EQ(5.0, data.wind_velocity_east.value());
+   EXPECT_NEAR(-15.0, Units::KnotsSpeed(data.wind_velocity_north).value(), 1e-12);
+
+   // Time and distance lookups use the same samples, including the existing boundary handling.
+   for (const double seconds : {-1.0, 0.0, 5.0, 10.01}) {
+      const auto time_data = VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(seconds));
+      const auto distance_data = VerticalPathUtils::GetInterpolatedPathData(path, Units::MetersLength(seconds * 185.2));
+      EXPECT_EQ(distance_data.resolved_index, time_data.resolved_index);
+      EXPECT_NEAR(Units::MetersPerSecondSpeed(distance_data.true_airspeed).value(),
+                  Units::MetersPerSecondSpeed(time_data.true_airspeed).value(), 1e-12);
+      EXPECT_NEAR(distance_data.wind_velocity_east.value(), time_data.wind_velocity_east.value(), 1e-12);
+      EXPECT_NEAR(distance_data.wind_velocity_north.value(), time_data.wind_velocity_north.value(), 1e-12);
+   }
+   // FindNearestIndex returns past the last sample on an exact match; retain the existing exception.
+   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(10)), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(20)), std::domain_error);
 }
 
 TEST(CoreUtils, interpolate_domain_error) {

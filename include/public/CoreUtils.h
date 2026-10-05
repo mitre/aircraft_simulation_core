@@ -85,13 +85,21 @@ class CoreUtils {
                            T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
    static T LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
                                 const std::vector<double> &x_values, const std::vector<T> &y_values) {
-      const double x_m = Units::MetersLength(x_interpolation_value).value();
-      ValidateInterpolation(upper_index, x_m, x_values);
-      const double v2 = x_values[upper_index];
-      const double v1 = x_values[upper_index - 1];
-      const T &o2 = y_values[upper_index];
-      const T &o1 = y_values[upper_index - 1];
-      return T(((o2 - o1) / (v2 - v1)) * (x_m - v1) + o1);
+      return InterpolateTyped(upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values);
+   }
+
+   /**
+    * Linear interpolator for typed y_values over time. x_values are expressed in seconds.
+    *
+    * @see LinearlyInterpolate
+    */
+   template <typename T>
+      requires std::derived_from<
+            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
+   static T LinearlyInterpolate(int upper_index, Units::Time x_interpolation_value,
+                                const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return InterpolateTyped(upper_index, Units::SecondsTime(x_interpolation_value).value(), x_values, y_values);
    }
 
    /**
@@ -163,6 +171,17 @@ class CoreUtils {
    }
 
   private:
+   template <typename T>
+   static T InterpolateTyped(int upper_index, double x_interpolation_value,
+                             const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      ValidateInterpolation(upper_index, x_interpolation_value, x_values);
+      const double v2 = x_values[upper_index];
+      const double v1 = x_values[upper_index - 1];
+      const T &o2 = y_values[upper_index];
+      const T &o1 = y_values[upper_index - 1];
+      return T(((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1);
+   }
+
    static void ValidateInterpolation(int upper_index, double x_interpolation_value,
                                       const std::vector<double> &x_values);
 
