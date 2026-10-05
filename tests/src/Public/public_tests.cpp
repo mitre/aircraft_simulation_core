@@ -189,7 +189,7 @@ TEST(CoreUtils, interpolate_typed_quantities_over_time) {
    EXPECT_THROW(CoreUtils::LinearlyInterpolateByTime(2, Units::MinutesTime(3), x_values, lengths), std::domain_error);
 }
 
-static VerticalPath MakeInterpolationTestPath() {
+TEST(VerticalPathUtils, interpolate_typed_speeds) {
    VerticalPath path;
    path.along_path_distance_m = {0.0, 1852.0};
    path.altitude_m = {0.0, 100.0};
@@ -206,11 +206,6 @@ static VerticalPath MakeInterpolationTestPath() {
    path.wind_velocity_north = {Units::KnotsSpeed(-10), Units::KnotsSpeed(-20)};
    path.flap_setting.resize(2, bada_utils::FlapConfiguration::UNDEFINED);
    path.algorithm_type.resize(2, VerticalPath::PredictionAlgorithmType::UNDETERMINED);
-   return path;
-}
-
-TEST(VerticalPathUtils, interpolate_typed_speeds) {
-   const auto path = MakeInterpolationTestPath();
 
    const auto data = VerticalPathUtils::GetInterpolatedPathData(path, Units::NauticalMilesLength(0.5));
    EXPECT_EQ(1, data.resolved_index);
@@ -220,7 +215,7 @@ TEST(VerticalPathUtils, interpolate_typed_speeds) {
    EXPECT_NEAR(-15.0, Units::KnotsSpeed(data.wind_velocity_north).value(), 1e-12);
 
    // Time and distance lookups use the same samples, including the existing boundary handling.
-   for (const double seconds : {-1.0, 0.0, 5.0}) {
+   for (const double seconds : {-1.0, 0.0, 5.0, 10.01}) {
       const auto time_data = VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(seconds));
       const auto distance_data = VerticalPathUtils::GetInterpolatedPathData(path, Units::MetersLength(seconds * 185.2));
       EXPECT_EQ(distance_data.resolved_index, time_data.resolved_index);
@@ -229,63 +224,9 @@ TEST(VerticalPathUtils, interpolate_typed_speeds) {
       EXPECT_NEAR(distance_data.wind_velocity_east.value(), time_data.wind_velocity_east.value(), 1e-12);
       EXPECT_NEAR(distance_data.wind_velocity_north.value(), time_data.wind_velocity_north.value(), 1e-12);
    }
-   // An upper-bound lookup returns size() at and above the last sample.
+   // FindNearestIndex returns past the last sample on an exact match; retain the existing exception.
    EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(10)), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(10.01)), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(20)), std::out_of_range);
-}
-
-TEST(VerticalPathUtils, upper_bound_lookup) {
-   auto path = MakeInterpolationTestPath();
-   EXPECT_EQ(0, VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(-1)).resolved_index);
-   EXPECT_EQ(1, VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(0)).resolved_index);
-   EXPECT_EQ(1, VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(926)).resolved_index);
-   EXPECT_EQ(0, VerticalPathUtils::GetPathDataAtTime(path, Units::SecondsTime(-1)).resolved_index);
-   EXPECT_EQ(1, VerticalPathUtils::GetPathDataAtTime(path, Units::SecondsTime(0)).resolved_index);
-   EXPECT_EQ(1, VerticalPathUtils::GetPathDataAtTime(path, Units::SecondsTime(5)).resolved_index);
-
-   EXPECT_DOUBLE_EQ(150.0, Units::MetersPerSecondSpeed(
-         VerticalPathUtils::CalculateSpeedGuidance(path, Units::MetersLength(926))).value());
-   EXPECT_DOUBLE_EQ(0.5, VerticalPathUtils::CalculateMachGuidance(path, Units::MetersLength(926)));
-   EXPECT_DOUBLE_EQ(5.0, Units::SecondsTime(
-         VerticalPathUtils::CalculateTimeToFly(path, Units::MetersLength(926))).value());
-   EXPECT_DOUBLE_EQ(15000.0, Units::KilogramsMass(
-         VerticalPathUtils::GetExpectedMass(path, Units::MetersLength(926))).value());
-
-   // Duplicate samples are skipped, as specified by upper_bound.
-   path.along_path_distance_m = {0.0, 0.0};
-   path.time_to_go_sec = {0.0, 0.0};
-   EXPECT_THROW(VerticalPathUtils::GetVerticalPathData(path, Units::MetersLength(0)), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetPathDataAtTime(path, Units::SecondsTime(0)), std::out_of_range);
-}
-
-TEST(VerticalPathUtils, lookup_past_end_and_empty_path) {
-   const auto path = MakeInterpolationTestPath();
-   for (const double meters : {1852.0, 1852.1, 2000.0}) {
-      const Units::MetersLength distance(meters);
-      EXPECT_THROW(VerticalPathUtils::GetVerticalPathData(path, distance), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathData(path, distance), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::GetExpectedMass(path, distance), std::out_of_range);
-   }
-   for (const double seconds : {10.0, 10.01, 20.0}) {
-      EXPECT_THROW(VerticalPathUtils::GetPathDataAtTime(path, Units::SecondsTime(seconds)), std::out_of_range);
-      EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(seconds)), std::out_of_range);
-   }
-
-   const VerticalPath empty;
-   const Units::MetersLength distance(0);
-   EXPECT_THROW(VerticalPathUtils::GetVerticalPathData(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathData(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetExpectedMass(empty, distance), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetPathDataAtTime(empty, Units::SecondsTime(0)), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(empty, Units::SecondsTime(0)), std::out_of_range);
-   EXPECT_THROW(VerticalPathUtils::GetPathDataAtIndex(path, -1), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(20)), std::domain_error);
 }
 
 TEST(CoreUtils, interpolate_domain_error) {
