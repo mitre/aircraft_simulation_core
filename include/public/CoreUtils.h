@@ -66,9 +66,9 @@ class CoreUtils {
                                      const std::vector<double> &y_values);
 
    /**
-    * Deprecated after 0.2.0; use the template implementation. Linear interpolator for speed-typed y_values.
+    * Deprecated after 0.2.0; use LinearlyInterpolateByDistance. Linear interpolator for speed-typed y_values.
     *
-    * @see LinearlyInterpolate
+    * @see LinearlyInterpolateByDistance
     */
    static Units::Speed LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
                                            const std::vector<double> &x_values,
@@ -84,7 +84,7 @@ class CoreUtils {
       requires std::derived_from<
             T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
                            T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
+   static T LinearlyInterpolateByDistance(int upper_index, Units::Length x_interpolation_value,
                                 const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return InterpolateTyped(upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values);
    }
@@ -98,7 +98,7 @@ class CoreUtils {
       requires std::derived_from<
             T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
                            T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyInterpolate(int upper_index, Units::Time x_interpolation_value,
+   static T LinearlyInterpolateByTime(int upper_index, Units::Time x_interpolation_value,
                                 const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return InterpolateTyped(upper_index, Units::SecondsTime(x_interpolation_value).value(), x_values, y_values);
    }
@@ -175,7 +175,7 @@ class CoreUtils {
    template <typename T>
    static T InterpolateTyped(int upper_index, double x_interpolation_value,
                              const std::vector<double> &x_values, const std::vector<T> &y_values) {
-      ValidateInterpolation(upper_index, x_interpolation_value, x_values);
+      ValidateInterpolationElseThrow(upper_index, x_interpolation_value, x_values);
       const double v2 = x_values[upper_index];
       const double v1 = x_values[upper_index - 1];
       const T &o2 = y_values[upper_index];
@@ -183,7 +183,7 @@ class CoreUtils {
       return T(((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1);
    }
 
-   static void ValidateInterpolation(int upper_index, double x_interpolation_value,
+   static void ValidateInterpolationElseThrow(int upper_index, double x_interpolation_value,
                                       const std::vector<double> &x_values);
 
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CoreUtils"))};
