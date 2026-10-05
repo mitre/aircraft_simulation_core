@@ -62,29 +62,17 @@ namespace mitre::oss::simcore
                   VerticalPath::PredictionAlgorithmType algorithm_type{VerticalPath::PredictionAlgorithmType::UNDETERMINED};
             };
 
-            /**
-             * When allow_extrapolation is true, use the first or last interval outside the sampled range.
-             * Extrapolation requires two samples with distinct distances in the selected interval.
-             * Otherwise, retain the first value below the range and throw at or above its upper end.
-             */
             static Units::Time CalculateTimeToFly(const VerticalPath &vertical_path,
                                                   Units::Length estimated_distance_to_path_end,
                                                   bool allow_extrapolation = false);
 
             static Units::Speed CalculateSpeedGuidance(const VerticalPath &vertical_path,
-                                                       Units::Length estimated_distance_to_path_end);
-
-            /** @see CalculateTimeToFly for allow_extrapolation behavior. */
-            static Units::Speed CalculateSpeedGuidance(const VerticalPath &vertical_path,
                                                        Units::Length estimated_distance_to_path_end,
-                                                       bool allow_extrapolation);
+                                                       bool allow_extrapolation = false);
 
-            static double CalculateMachGuidance(const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end);
-
-            /** @see CalculateTimeToFly for allow_extrapolation behavior. */
             static double CalculateMachGuidance(const VerticalPath &vertical_path,
-                                                 Units::Length estimated_distance_to_path_end,
-                                                 bool allow_extrapolation);
+                                                Units::Length estimated_distance_to_path_end,
+                                                bool allow_extrapolation = false);
 
             static Units::Mass GetExpectedMass(const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end);
 
@@ -291,12 +279,6 @@ mitre::oss::simcore::VerticalPathUtils::GetInterpolatedPathDataAtTime(const Vert
 }
 
 inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidance(
-    const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end)
-{
-      return CalculateSpeedGuidance(vertical_path, estimated_distance_to_path_end, false);
-}
-
-inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidance(
     const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end,
     bool allow_extrapolation)
 {
@@ -328,12 +310,6 @@ inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidan
 }
 
 inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
-    const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end)
-{
-      return CalculateMachGuidance(vertical_path, estimated_distance_to_path_end, false);
-}
-
-inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
     const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end,
     bool allow_extrapolation)
 {
@@ -357,8 +333,8 @@ inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
       else
       {
             return CoreUtils::LinearlyInterpolate(reference_lookup_index,
-                                                   Units::MetersLength(estimated_distance_to_path_end).value(),
-                                                   vertical_path.along_path_distance_m, vertical_path.mach);
+                                                  Units::MetersLength(estimated_distance_to_path_end).value(),
+                                                  vertical_path.along_path_distance_m, vertical_path.mach);
       }
 
       throw std::out_of_range("Unable to calculate mach guidance; estimated distance is out of range and extrapolation is not allowed.");
