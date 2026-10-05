@@ -20,9 +20,11 @@
 #pragma once
 
 #include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
+#include <log4cplus/tchar.h>
 #include <scalar/Length.h>
+#include <scalar/Speed.h>
 #include <scalar/Time.h>
+#include <scalar/Unit.h>
 
 #include <concepts>
 #include <limits>
@@ -31,9 +33,8 @@
 #include <utility>
 #include <vector>
 
-#include "public/AircraftState.h"
-#include "public/HorizontalPath.h"
 #include "public/LineOnEllipsoid.h"
+#include "public/Waypoint.h"
 
 namespace mitre::oss::simcore {
 

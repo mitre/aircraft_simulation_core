@@ -19,15 +19,22 @@
 
 #include "public/CoreUtils.h"
 
+#include <log4cplus/loggingmacros.h>
+#include <scalar/Length.h>
+#include <scalar/Speed.h>
+#include <scalar/Unit.h>
+
+#include <algorithm>
 #include <format>
 #include <list>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "public/GeolibUtils.h"
 #include "public/LatitudeLongitudePoint.h"
-#include "public/SimulationTime.h"
+#include "public/LineOnEllipsoid.h"
+#include "public/Waypoint.h"
 
 using namespace std;
 using namespace mitre::oss::simcore;
@@ -108,7 +115,6 @@ const int CoreUtils::SignOfValue(double value) { return (((value) == (0)) ? 0 : 
 
 std::list<Waypoint> CoreUtils::ShortenLongLegs(const std::list<Waypoint> &ordered_waypoints,
                                                Units::Length maximum_allowable_length) {
-   using namespace geolib_idealab;
    using namespace mitre::oss::simcore;
 
    std::list<Waypoint> replacement_waypoints = {};
@@ -145,7 +151,6 @@ std::vector<Waypoint> CoreUtils::ShortenLongLegs(const std::vector<Waypoint> &or
 
 std::list<Waypoint> CoreUtils::GetIntermediateWaypointsForLongLeg(const mitre::oss::simcore::LineOnEllipsoid &line_on_ellipsoid,
                                                                   Units::Length maximum_allowable_single_leg_distance) {
-   using namespace geolib_idealab;
    using namespace mitre::oss::simcore;
 
    Units::NauticalMilesLength distance_to_end_point(line_on_ellipsoid.GetShapeLength());

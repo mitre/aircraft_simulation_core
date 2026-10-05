@@ -19,13 +19,21 @@
 
 #pragma once
 
+#include <scalar/Acceleration.h>
+#include <scalar/Angle.h>
 #include <scalar/Length.h>
+#include <scalar/Mass.h>
 #include <scalar/Speed.h>
 #include <scalar/Time.h>
+#include <scalar/Unit.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <vector>
 
+#include "public/BadaUtils.h"
 #include "public/CoreUtils.h"
+#include "public/VerticalPath.h"
 
 namespace mitre::oss::simcore {
 struct VerticalPathUtils {

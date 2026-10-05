@@ -18,30 +18,50 @@
 // ****************************************************************************
 
 #include <gtest/gtest.h>
+#include <scalar/Angle.h>
+#include <scalar/Area.h>
+#include <scalar/Length.h>
+#include <scalar/SignedAngle.h>
+#include <scalar/Speed.h>
+#include <scalar/Temperature.h>
+#include <scalar/Time.h>
+#include <scalar/Unit.h>
+#include <scalar/UnsignedAngle.h>
 
+#include <cmath>
 #include <cstdio>
+#include <exception>
 #include <memory>
+#include <numbers>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "public/AircraftCalculations.h"
+#include "public/AircraftState.h"
 #include "public/AlongPathDistanceCalculator.h"
+#include "public/BadaUtils.h"
 #include "public/CoreUtils.h"
 #include "public/CustomMath.h"
+#include "public/DMatrix.h"
+#include "public/DVector.h"
 #include "public/DirectionOfFlightCourseCalculator.h"
 #include "public/EuclideanWaypointMonitor.h"
 #include "public/FlightEnvelopeSpeedLimiter.h"
-#include "public/Guidance.h"
+#include "public/HorizontalPath.h"
 #include "public/HorizontalPathTracker.h"
 #include "public/InvalidIndexException.h"
+#include "public/LatitudeLongitudePoint.h"
 #include "public/PositionCalculator.h"
 #include "public/ScenarioUtils.h"
 #include "public/SimulationTime.h"
-#include "public/VectorDifferenceWindEvaluator.h"
 #include "public/VerticalPath.h"
 #include "public/VerticalPathUtils.h"
+#include "public/Waypoint.h"
+#include "public/WeatherPrediction.h"
 #include "public/Wgs84PrecalcWaypoint.h"
-#include "public/WindZero.h"
+#include "utility/BoundedValue.h"
 #include "utility/CustomUnits.h"
 #include "utils/public/OldCustomMathUtils.h"
 #include "utils/public/PublicUtils.h"
@@ -312,17 +332,17 @@ TEST(AircraftCalculations, anglebetweenvectors) {
    EXPECT_NEAR(expectedAngle0.value(), actual.value(), tol.value());
 
    // positive 45
-   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(M_PI / 4);
+   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(std::numbers::pi / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
-         Units::MetersLength(sqrt(2)), Units::MetersLength(sqrt(2)));
+         Units::MetersLength(std::sqrt(2)), Units::MetersLength(std::sqrt(2)));
    EXPECT_NEAR(expectedAngle1.value(), actual.value(), tol.value());
 
    // negative 45
-   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(M_PI / 4);
+   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(std::numbers::pi / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
-         Units::MetersLength(sqrt(2)), Units::MetersLength(-sqrt(2)));
+         Units::MetersLength(std::sqrt(2)), Units::MetersLength(-std::sqrt(2)));
    EXPECT_NEAR(expectedAngle2.value(), actual.value(), tol.value());
 }
 
@@ -632,10 +652,10 @@ TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_increme
 }
 
 TEST(CustomMath, atan3_values) {
-   EXPECT_DOUBLE_EQ(atan3(5, 5), M_PI * .25);
-   EXPECT_DOUBLE_EQ(atan3(5, -5), M_PI * .75);
-   EXPECT_DOUBLE_EQ(atan3(-5, -5), M_PI * 1.25);
-   EXPECT_DOUBLE_EQ(atan3(-5, 5), M_PI * 1.75);
+   EXPECT_DOUBLE_EQ(atan3(5, 5), std::numbers::pi * .25);
+   EXPECT_DOUBLE_EQ(atan3(5, -5), std::numbers::pi * .75);
+   EXPECT_DOUBLE_EQ(atan3(-5, -5), std::numbers::pi * 1.25);
+   EXPECT_DOUBLE_EQ(atan3(-5, 5), std::numbers::pi * 1.75);
 }
 
 TEST(CustomMath, quantize) {
@@ -673,7 +693,7 @@ TEST(RandomGenerator, uniformSample) {
       s3 += x * x2;
       s4 += x2 * x2;
    }
-   double ee = sqrt(1 / (double)n);
+   double ee = std::sqrt(1 / (double)n);
    double m1 = s1 / n;
    EXPECT_NEAR(.5, m1, ee);
    double m2 = s2 / n;
