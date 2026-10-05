@@ -66,7 +66,7 @@ class CoreUtils {
                                      const std::vector<double> &y_values);
 
    /**
-    * Deprecated after 0.2.0; use LinearlyInterpolateByDistance. Linear interpolator for speed-typed y_values.
+    * Deprecated after 2.0.0; use LinearlyInterpolateByDistance. Linear interpolator for speed-typed y_values.
     *
     * @see LinearlyInterpolateByDistance
     */
