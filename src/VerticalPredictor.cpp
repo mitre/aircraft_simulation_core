@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "public/CoreUtils.h"
-#include "public/VerticalPathUtils.h"
 
 using namespace std;
 using namespace mitre::oss::simcore;
@@ -183,7 +182,7 @@ Guidance VerticalPredictor::CalculateGuidanceCommands(const AircraftState &state
    if (distance_remaining.value() <= fabs(m_vertical_path.along_path_distance_m.back())) {
       // Get index.
       m_current_trajectory_index =
-            VerticalPathUtils::FindUpperBoundIndex(distance_remaining.value(), m_vertical_path.along_path_distance_m);
+            CoreUtils::FindNearestIndex(distance_remaining.value(), m_vertical_path.along_path_distance_m);
 
       // Set _next values.
       if (m_current_trajectory_index == 0) {

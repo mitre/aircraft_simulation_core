@@ -90,11 +90,12 @@ struct VerticalPathUtils {
    static std::vector<mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet> ConvertToPathDataSet(
          const VerticalPath &vertical_path);
 
+  private:
    /**
     * Returns the index of the first sample strictly greater than value_to_find.
     * Samples must be sorted in ascending order. Returns size() when no such sample exists.
     */
-   static int FindUpperBoundIndex(double value_to_find, const std::vector<double> &samples) {
+   static int FindNearestIndex(double value_to_find, const std::vector<double> &samples) {
       return static_cast<int>(std::ranges::distance(samples.begin(), std::ranges::upper_bound(samples, value_to_find)));
    }
 };
@@ -105,7 +106,7 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
                                                                   Units::Length estimated_distance_to_path_end) {
    const Units::MetersLength distance_to_go{estimated_distance_to_path_end};
    const auto reference_lookup_index =
-         FindUpperBoundIndex(distance_to_go.value(), vertical_path.along_path_distance_m);
+         FindNearestIndex(distance_to_go.value(), vertical_path.along_path_distance_m);
    return GetPathDataAtIndex(vertical_path, reference_lookup_index);
 }
 
@@ -114,7 +115,7 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
                                                                 Units::Time time_to_go) {
    const Units::SecondsTime seconds_to_go{time_to_go};
    const auto reference_lookup_index =
-         FindUpperBoundIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
+         FindNearestIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
    return GetPathDataAtIndex(vertical_path, reference_lookup_index);
 }
 
@@ -171,7 +172,7 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
                                                                       Units::Length estimated_distance_to_path_end) {
    const Units::MetersLength distance_to_go{estimated_distance_to_path_end};
    const auto reference_lookup_index =
-         FindUpperBoundIndex(distance_to_go.value(), vertical_path.along_path_distance_m);
+         FindNearestIndex(distance_to_go.value(), vertical_path.along_path_distance_m);
 
    if (reference_lookup_index < 1) {
       return GetPathDataAtIndex(vertical_path, reference_lookup_index);
@@ -221,7 +222,7 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
                                                                             Units::Time time_to_go) {
    const Units::SecondsTime seconds_to_go{time_to_go};
    const auto reference_lookup_index =
-         FindUpperBoundIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
+         FindNearestIndex(seconds_to_go.value(), vertical_path.time_to_go_sec);
    if (reference_lookup_index < 1) {
       return GetPathDataAtIndex(vertical_path, reference_lookup_index);
    }
@@ -262,7 +263,7 @@ inline mitre::oss::simcore::VerticalPathUtils::VerticalPathDataSet
 
 inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidance(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
-   auto reference_lookup_index = FindUpperBoundIndex(
+   auto reference_lookup_index = FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
 
    Units::Speed cas_guidance = Units::zero();
@@ -279,7 +280,7 @@ inline Units::Speed mitre::oss::simcore::VerticalPathUtils::CalculateSpeedGuidan
 
 inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
-   auto reference_lookup_index = FindUpperBoundIndex(
+   auto reference_lookup_index = FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
 
    double mach_guidance = 0;
@@ -296,7 +297,7 @@ inline double mitre::oss::simcore::VerticalPathUtils::CalculateMachGuidance(
 
 inline Units::Time mitre::oss::simcore::VerticalPathUtils::CalculateTimeToFly(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
-   auto reference_lookup_index = FindUpperBoundIndex(
+   auto reference_lookup_index = FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
 
    Units::Time time_to_fly = Units::zero();
@@ -313,7 +314,7 @@ inline Units::Time mitre::oss::simcore::VerticalPathUtils::CalculateTimeToFly(
 
 inline Units::Mass mitre::oss::simcore::VerticalPathUtils::GetExpectedMass(
       const VerticalPath &vertical_path, Units::Length estimated_distance_to_path_end) {
-   auto reference_lookup_index = FindUpperBoundIndex(
+   auto reference_lookup_index = FindNearestIndex(
          Units::MetersLength(estimated_distance_to_path_end).value(), vertical_path.along_path_distance_m);
 
    Units::Mass mass = Units::zero();
