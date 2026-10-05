@@ -29,6 +29,7 @@
 #include <scalar/UnsignedAngle.h>
 
 #include <cmath>
+#include <concepts>
 #include <cstdio>
 #include <exception>
 #include <memory>
@@ -87,6 +88,21 @@ static_assert(!SupportsTypedInterpolation<double>);
 static_assert(!SupportsTypedInterpolation<int>);
 static_assert(!SupportsTypedInterpolation<std::string>);
 
+template <typename T>
+concept SupportsTypedExtrapolation = requires(const std::vector<double> &x_values, const std::vector<T> &y_values) {
+   { CoreUtils::LinearlyExtrapolateByDistance<T>(1, Units::MetersLength(2), x_values, y_values) } -> std::same_as<T>;
+   { CoreUtils::LinearlyExtrapolateByTime<T>(1, Units::SecondsTime(2), x_values, y_values) } -> std::same_as<T>;
+};
+
+static_assert(SupportsTypedExtrapolation<Units::Speed>);
+static_assert(SupportsTypedExtrapolation<Units::Length>);
+static_assert(SupportsTypedExtrapolation<Units::Time>);
+static_assert(SupportsTypedExtrapolation<Units::FeetLength>);
+static_assert(SupportsTypedExtrapolation<Units::KnotsSpeed>);
+static_assert(!SupportsTypedExtrapolation<double>);
+static_assert(!SupportsTypedExtrapolation<int>);
+static_assert(!SupportsTypedExtrapolation<std::string>);
+
 class TestHorizontalPathTracker : public HorizontalPathTracker {
    // A mock implementation that allows us to get at protected methods
   public:
@@ -117,6 +133,68 @@ TEST(CoreUtils, interpolate_trivial) {
    // Test
    double y_actual = CoreUtils::LinearlyInterpolate(upper_index, value, x_vals, y_vals);
    ASSERT_EQ(y_expected, y_actual);
+}
+
+TEST(CoreUtils, extrapolate_scalar_selected_interval) {
+   const std::vector<double> x_values{0.0, 10.0, 20.0};
+   const std::vector<double> y_values{10.0, 30.0, 70.0};
+   EXPECT_DOUBLE_EQ(-10.0, CoreUtils::LinearlyExtrapolate(1, -10.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(50.0, CoreUtils::LinearlyExtrapolate(1, 20.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(110.0, CoreUtils::LinearlyExtrapolate(2, 30.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(-10.0, CoreUtils::LinearlyExtrapolate(2, 0.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(10.0, CoreUtils::LinearlyExtrapolate(1, 0.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(30.0, CoreUtils::LinearlyExtrapolate(1, 10.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(20.0, CoreUtils::LinearlyExtrapolate(1, 5.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(3.0, CoreUtils::LinearlyExtrapolate(1, 100.0, {0.0, 1.0}, {3.0, 3.0}));
+   EXPECT_DOUBLE_EQ(40.0, CoreUtils::LinearlyExtrapolate(1, -10.0, {10.0, 0.0}, {0.0, 20.0}));
+}
+
+TEST(CoreUtils, extrapolate_typed_by_distance) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Speed> speeds{Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   const double initial_speed = Units::MetersPerSecondSpeed(speeds[0]).value();
+   const auto upper = CoreUtils::LinearlyExtrapolateByDistance(1, Units::NauticalMilesLength(2), x_values, speeds);
+   const auto lower = CoreUtils::LinearlyExtrapolateByDistance(1, Units::NauticalMilesLength(-1), x_values, speeds);
+   EXPECT_NEAR(200.0 - initial_speed, Units::MetersPerSecondSpeed(upper).value(), 1e-12);
+   EXPECT_NEAR(2.0 * initial_speed - 100.0, Units::MetersPerSecondSpeed(lower).value(), 1e-12);
+
+   const std::vector<Units::FeetLength> feet{Units::FeetLength(100), Units::FeetLength(300)};
+   EXPECT_DOUBLE_EQ(500.0, CoreUtils::LinearlyExtrapolateByDistance(
+         1, Units::NauticalMilesLength(2), x_values, feet).value());
+   const std::vector<Units::Time> times{Units::SecondsTime(10), Units::SecondsTime(20)};
+   EXPECT_DOUBLE_EQ(30.0, Units::SecondsTime(CoreUtils::LinearlyExtrapolateByDistance(
+         1, Units::NauticalMilesLength(2), x_values, times)).value());
+}
+
+TEST(CoreUtils, extrapolate_typed_by_time) {
+   const std::vector<double> x_values{0.0, 60.0};
+   const std::vector<Units::KnotsSpeed> speeds{Units::KnotsSpeed(100), Units::KnotsSpeed(200)};
+   EXPECT_NEAR(300.0, CoreUtils::LinearlyExtrapolateByTime(1, Units::MinutesTime(2), x_values, speeds).value(), 1e-12);
+   EXPECT_NEAR(0.0, CoreUtils::LinearlyExtrapolateByTime(1, Units::MinutesTime(-1), x_values, speeds).value(), 1e-12);
+   const std::vector<Units::Length> lengths{Units::FeetLength(100), Units::FeetLength(300)};
+   EXPECT_NEAR(500.0, Units::FeetLength(CoreUtils::LinearlyExtrapolateByTime(
+         1, Units::MinutesTime(2), x_values, lengths)).value(), 1e-12);
+}
+
+TEST(CoreUtils, extrapolate_invalid_inputs) {
+   const std::vector<double> x_values{0.0, 1.0};
+   const std::vector<double> y_values{10.0, 20.0};
+   for (const int index : {-1, 0, 2}) {
+      EXPECT_THROW(CoreUtils::LinearlyExtrapolate(index, 2.0, x_values, y_values), std::out_of_range);
+   }
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {}, {}), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {0.0}, {10.0}), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, x_values, {10.0}), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, x_values, {10.0, 20.0, 30.0}), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {1.0, 1.0}, y_values), std::domain_error);
+
+   const std::vector<Units::SecondsTime> times{Units::SecondsTime(10), Units::SecondsTime(20)};
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(0, Units::MetersLength(2), x_values, times), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(1, Units::MetersLength(2), {0.0}, times), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(1, Units::MetersLength(2), {1.0, 1.0}, times), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(2, Units::SecondsTime(2), x_values, times), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(1, Units::SecondsTime(2), {0.0}, times), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(1, Units::SecondsTime(2), {1.0, 1.0}, times), std::domain_error);
 }
 
 TEST(CoreUtils, interpolate_legacy_speed_api) {

@@ -27,6 +27,7 @@
 #include <scalar/Unit.h>
 
 #include <concepts>
+#include <cstddef>
 #include <limits>
 #include <list>
 #include <string>
@@ -104,6 +105,47 @@ class CoreUtils {
    }
 
    /**
+    * Extend the line through samples upper_index - 1 and upper_index to x_extrapolation_value.
+    * Queries inside or outside that interval are accepted; the interval is selected by the caller.
+    * x_values and y_values must have equal sizes, with at least two samples.
+    *
+    * @throws std::out_of_range if upper_index does not select two samples
+    * @throws std::invalid_argument if the vector sizes differ
+    * @throws std::domain_error if the selected x-values are equal
+    */
+   static double LinearlyExtrapolate(int upper_index, double x_extrapolation_value,
+                                     const std::vector<double> &x_values, const std::vector<double> &y_values);
+
+   /**
+    * Linear extrapolation of typed y_values by distance. x_values are expressed in meters.
+    * Returns the same Units type as the samples, including specific units.
+    *
+    * @see LinearlyExtrapolate
+    */
+   template <typename T>
+      requires std::derived_from<
+            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
+   static T LinearlyExtrapolateByDistance(int upper_index, Units::Length x_extrapolation_value,
+                                         const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return ExtrapolateTyped(upper_index, Units::MetersLength(x_extrapolation_value).value(), x_values, y_values);
+   }
+
+   /**
+    * Linear extrapolation of typed y_values by time. x_values are expressed in seconds.
+    *
+    * @see LinearlyExtrapolate
+    */
+   template <typename T>
+      requires std::derived_from<
+            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
+   static T LinearlyExtrapolateByTime(int upper_index, Units::Time x_extrapolation_value,
+                                     const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return ExtrapolateTyped(upper_index, Units::SecondsTime(x_extrapolation_value).value(), x_values, y_values);
+   }
+
+   /**
     * @param xyLoc1: first x,y pair
     * @param xyLoc2  second x,y pair
     * @return The Euclidean straight line distance between the two points.
@@ -172,6 +214,20 @@ class CoreUtils {
    }
 
   private:
+   template <typename T>
+   static T ExtrapolateTyped(int upper_index, double x_extrapolation_value,
+                             const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      ValidateExtrapolationElseThrow(upper_index, x_values, y_values.size());
+      const double v2 = x_values[upper_index];
+      const double v1 = x_values[upper_index - 1];
+      const T &o2 = y_values[upper_index];
+      const T &o1 = y_values[upper_index - 1];
+      return T(((o2 - o1) / (v2 - v1)) * (x_extrapolation_value - v1) + o1);
+   }
+
+   static void ValidateExtrapolationElseThrow(int upper_index, const std::vector<double> &x_values,
+                                             std::size_t y_values_size);
+
    template <typename T>
    static T InterpolateTyped(int upper_index, double x_interpolation_value,
                              const std::vector<double> &x_values, const std::vector<T> &y_values) {

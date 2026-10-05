@@ -25,6 +25,7 @@
 #include <scalar/Unit.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <format>
 #include <list>
 #include <stdexcept>
@@ -97,6 +98,24 @@ Units::Speed CoreUtils::LinearlyInterpolate(int upper_index, Units::Length x_int
    std::for_each(y_values.begin(), y_values.end(), insert_speed_as_double);
    return Units::MetersPerSecondSpeed(LinearlyInterpolate(
          upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values_as_double));
+}
+
+double CoreUtils::LinearlyExtrapolate(int upper_index, double x_extrapolation_value,
+                                      const std::vector<double> &x_values, const std::vector<double> &y_values) {
+   return ExtrapolateTyped(upper_index, x_extrapolation_value, x_values, y_values);
+}
+
+void CoreUtils::ValidateExtrapolationElseThrow(int upper_index, const std::vector<double> &x_values,
+                                              std::size_t y_values_size) {
+   if (x_values.size() != y_values_size) {
+      throw std::invalid_argument("Linear extrapolation requires equal x and y vector sizes");
+   }
+   if (upper_index < 1 || static_cast<std::size_t>(upper_index) >= x_values.size()) {
+      throw std::out_of_range("Linear extrapolation upper_index must select two samples");
+   }
+   if (x_values[upper_index] == x_values[upper_index - 1]) {
+      throw std::domain_error("Linear extrapolation requires distinct x-values in the selected interval");
+   }
 }
 
 const Units::Length CoreUtils::CalculateEuclideanDistance(const std::pair<Units::Length, Units::Length> &xyLoc1,
