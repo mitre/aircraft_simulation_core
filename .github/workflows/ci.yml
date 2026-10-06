@@ -4,8 +4,38 @@ on:
   push:
     branches: [main, master]
   pull_request:
+    branches: [main, master]
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  version:
+    name: Version policy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test release policy
+        run: python3 -m unittest discover -s .scripts/tests -v
+      - name: Check CMake version
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: |
+          if [ "$EVENT" = pull_request ] || [ "$EVENT" = merge_group ]; then
+            python3 .scripts/release_policy.py --base "$BASE_SHA"
+          else
+            python3 .scripts/release_policy.py
+          fi
+
   cppcheck:
     name: Cppcheck
     runs-on: ubuntu-latest
@@ -55,32 +85,20 @@ jobs:
         run: echo "### [Open the cppcheck report]($REPORT_URL)" >> "$GITHUB_STEP_SUMMARY"
 
   build-and-test:
-    name: ${{ matrix.os }} / ${{ matrix.build_type }}
-    runs-on: ${{ matrix.os }}
+    uses: ./.github/workflows/build.yml
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        build_type: [Release]
-
+  required:
+    name: CI required
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: [version, cppcheck, build-and-test]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Show tool versions
+      - name: Require every validation job to pass
+        env:
+          VERSION_RESULT: ${{ needs.version.result }}
+          CPPCHECK_RESULT: ${{ needs.cppcheck.result }}
+          BUILD_RESULT: ${{ needs.build-and-test.result }}
         run: |
-          cmake --version
-          c++ --version
-
-      - name: Configure
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-      - name: Build
-        run: |
-          cmake --build build --target simcore_public_tests --parallel
-
-      - name: Test
-        run: |
-          ctest --test-dir build --output-on-failure --parallel 2
+          test "$VERSION_RESULT" = success
+          test "$CPPCHECK_RESULT" = success
+          test "$BUILD_RESULT" = success
