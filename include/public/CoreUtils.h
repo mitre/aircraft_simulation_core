@@ -26,11 +26,11 @@
 #include <scalar/Time.h>
 #include <scalar/Unit.h>
 
-#include <concepts>
 #include <cstddef>
 #include <limits>
 #include <list>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -40,6 +40,16 @@
 namespace mitre::oss::simcore {
 
 class CoreUtils {
+   template <typename T>
+   using UnitBase = Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                                T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>;
+
+   // Match derived_from: accept the unit itself and public, unambiguous derived units.
+   template <typename T>
+   using EnableUnit = std::enable_if_t<std::is_base_of_v<UnitBase<T>, T> &&
+                                           std::is_convertible_v<const volatile T *, const volatile UnitBase<T> *>,
+                                     T>;
+
   public:
    inline static const std::string INTERMEDIATE_WAYPOINT_ROOT_NAME{"intermediate"};
 
@@ -82,10 +92,7 @@ class CoreUtils {
     * @see LinearlyInterpolate
    */
    template <typename T>
-      requires std::derived_from<
-            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
-                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyInterpolateByDistance(int upper_index, Units::Length x_interpolation_value,
+   static EnableUnit<T> LinearlyInterpolateByDistance(int upper_index, Units::Length x_interpolation_value,
                                 const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return InterpolateTyped(upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values);
    }
@@ -96,10 +103,7 @@ class CoreUtils {
     * @see LinearlyInterpolate
     */
    template <typename T>
-      requires std::derived_from<
-            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
-                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyInterpolateByTime(int upper_index, Units::Time x_interpolation_value,
+   static EnableUnit<T> LinearlyInterpolateByTime(int upper_index, Units::Time x_interpolation_value,
                                 const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return InterpolateTyped(upper_index, Units::SecondsTime(x_interpolation_value).value(), x_values, y_values);
    }
@@ -123,10 +127,7 @@ class CoreUtils {
     * @see LinearlyExtrapolate
     */
    template <typename T>
-      requires std::derived_from<
-            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
-                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyExtrapolateByDistance(int upper_index, Units::Length x_extrapolation_value,
+   static EnableUnit<T> LinearlyExtrapolateByDistance(int upper_index, Units::Length x_extrapolation_value,
                                          const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return ExtrapolateTyped(upper_index, Units::MetersLength(x_extrapolation_value).value(), x_values, y_values);
    }
@@ -137,10 +138,7 @@ class CoreUtils {
     * @see LinearlyExtrapolate
     */
    template <typename T>
-      requires std::derived_from<
-            T, Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
-                           T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>>
-   static T LinearlyExtrapolateByTime(int upper_index, Units::Time x_extrapolation_value,
+   static EnableUnit<T> LinearlyExtrapolateByTime(int upper_index, Units::Time x_extrapolation_value,
                                      const std::vector<double> &x_values, const std::vector<T> &y_values) {
       return ExtrapolateTyped(upper_index, Units::SecondsTime(x_extrapolation_value).value(), x_values, y_values);
    }

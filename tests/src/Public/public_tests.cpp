@@ -29,13 +29,12 @@
 #include <scalar/UnsignedAngle.h>
 
 #include <cmath>
-#include <concepts>
 #include <cstdio>
 #include <exception>
 #include <memory>
-#include <numbers>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -64,6 +63,7 @@
 #include "public/Wgs84PrecalcWaypoint.h"
 #include "utility/BoundedValue.h"
 #include "utility/CustomUnits.h"
+#include "utility/UtilityConstants.h"
 #include "utils/public/OldCustomMathUtils.h"
 #include "utils/public/PublicUtils.h"
 
@@ -73,35 +73,61 @@ using namespace mitre::oss::simcore;
 
 namespace mitre::oss::simcore::test {
 
-template <typename T>
-concept SupportsTypedInterpolation = requires(const std::vector<double> &x_values, const std::vector<T> &y_values) {
-   CoreUtils::LinearlyInterpolateByDistance<T>(1, Units::MetersLength(0.5), x_values, y_values);
-   CoreUtils::LinearlyInterpolateByTime<T>(1, Units::SecondsTime(0.5), x_values, y_values);
-};
-
-static_assert(SupportsTypedInterpolation<Units::Speed>);
-static_assert(SupportsTypedInterpolation<Units::Length>);
-static_assert(SupportsTypedInterpolation<Units::Time>);
-static_assert(SupportsTypedInterpolation<Units::FeetLength>);
-static_assert(SupportsTypedInterpolation<Units::KnotsSpeed>);
-static_assert(!SupportsTypedInterpolation<double>);
-static_assert(!SupportsTypedInterpolation<int>);
-static_assert(!SupportsTypedInterpolation<std::string>);
+template <typename T, typename = void>
+struct SupportsTypedInterpolation : std::false_type {};
 
 template <typename T>
-concept SupportsTypedExtrapolation = requires(const std::vector<double> &x_values, const std::vector<T> &y_values) {
-   { CoreUtils::LinearlyExtrapolateByDistance<T>(1, Units::MetersLength(2), x_values, y_values) } -> std::same_as<T>;
-   { CoreUtils::LinearlyExtrapolateByTime<T>(1, Units::SecondsTime(2), x_values, y_values) } -> std::same_as<T>;
-};
+struct SupportsTypedInterpolation<
+      T, std::void_t<decltype(CoreUtils::LinearlyInterpolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>())),
+                     decltype(CoreUtils::LinearlyInterpolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>>
+   : std::bool_constant<
+            std::is_same_v<T, decltype(CoreUtils::LinearlyInterpolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))> &&
+            std::is_same_v<T, decltype(CoreUtils::LinearlyInterpolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>> {};
 
-static_assert(SupportsTypedExtrapolation<Units::Speed>);
-static_assert(SupportsTypedExtrapolation<Units::Length>);
-static_assert(SupportsTypedExtrapolation<Units::Time>);
-static_assert(SupportsTypedExtrapolation<Units::FeetLength>);
-static_assert(SupportsTypedExtrapolation<Units::KnotsSpeed>);
-static_assert(!SupportsTypedExtrapolation<double>);
-static_assert(!SupportsTypedExtrapolation<int>);
-static_assert(!SupportsTypedExtrapolation<std::string>);
+static_assert(SupportsTypedInterpolation<Units::Speed>::value);
+static_assert(SupportsTypedInterpolation<Units::Length>::value);
+static_assert(SupportsTypedInterpolation<Units::Time>::value);
+static_assert(SupportsTypedInterpolation<Units::FeetLength>::value);
+static_assert(SupportsTypedInterpolation<Units::KnotsSpeed>::value);
+static_assert(!SupportsTypedInterpolation<double>::value);
+static_assert(!SupportsTypedInterpolation<int>::value);
+static_assert(!SupportsTypedInterpolation<std::string>::value);
+
+template <typename T, typename = void>
+struct SupportsTypedExtrapolation : std::false_type {};
+
+template <typename T>
+struct SupportsTypedExtrapolation<
+      T, std::void_t<decltype(CoreUtils::LinearlyExtrapolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>())),
+                     decltype(CoreUtils::LinearlyExtrapolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>>
+   : std::bool_constant<
+            std::is_same_v<T, decltype(CoreUtils::LinearlyExtrapolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))> &&
+            std::is_same_v<T, decltype(CoreUtils::LinearlyExtrapolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>> {};
+
+static_assert(SupportsTypedExtrapolation<Units::Speed>::value);
+static_assert(SupportsTypedExtrapolation<Units::Length>::value);
+static_assert(SupportsTypedExtrapolation<Units::Time>::value);
+static_assert(SupportsTypedExtrapolation<Units::FeetLength>::value);
+static_assert(SupportsTypedExtrapolation<Units::KnotsSpeed>::value);
+static_assert(!SupportsTypedExtrapolation<double>::value);
+static_assert(!SupportsTypedExtrapolation<int>::value);
+static_assert(!SupportsTypedExtrapolation<std::string>::value);
 
 class TestHorizontalPathTracker : public HorizontalPathTracker {
    // A mock implementation that allows us to get at protected methods
@@ -133,6 +159,23 @@ TEST(CoreUtils, interpolate_trivial) {
    // Test
    double y_actual = CoreUtils::LinearlyInterpolate(upper_index, value, x_vals, y_vals);
    ASSERT_EQ(y_expected, y_actual);
+}
+
+TEST(CoreUtils, interpolation_error_messages) {
+   const std::vector<double> x_values{0.0, 1.0, 2.0};
+   const std::vector<double> y_values{0.0, 10.0, 20.0};
+   try {
+      CoreUtils::LinearlyInterpolate(0, 0.5, x_values, y_values);
+      FAIL() << "Expected an invalid index to throw";
+   } catch (const std::out_of_range &error) {
+      EXPECT_STREQ("upper_index (0) is not between 1 and 2", error.what());
+   }
+   try {
+      CoreUtils::LinearlyInterpolate(1, 1.25, x_values, y_values);
+      FAIL() << "Expected a value outside the selected interval to throw";
+   } catch (const std::domain_error &error) {
+      EXPECT_STREQ("ratio (1.250000) is not between 0.000000 and 1.000000.", error.what());
+   }
 }
 
 TEST(CoreUtils, extrapolate_scalar_selected_interval) {
@@ -504,14 +547,14 @@ TEST(AircraftCalculations, anglebetweenvectors) {
    EXPECT_NEAR(expectedAngle0.value(), actual.value(), tol.value());
 
    // positive 45
-   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(std::numbers::pi / 4);
+   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(constants::PI / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
          Units::MetersLength(std::sqrt(2)), Units::MetersLength(std::sqrt(2)));
    EXPECT_NEAR(expectedAngle1.value(), actual.value(), tol.value());
 
    // negative 45
-   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(std::numbers::pi / 4);
+   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(constants::PI / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
          Units::MetersLength(std::sqrt(2)), Units::MetersLength(-std::sqrt(2)));
@@ -824,10 +867,10 @@ TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_increme
 }
 
 TEST(CustomMath, atan3_values) {
-   EXPECT_DOUBLE_EQ(atan3(5, 5), std::numbers::pi * .25);
-   EXPECT_DOUBLE_EQ(atan3(5, -5), std::numbers::pi * .75);
-   EXPECT_DOUBLE_EQ(atan3(-5, -5), std::numbers::pi * 1.25);
-   EXPECT_DOUBLE_EQ(atan3(-5, 5), std::numbers::pi * 1.75);
+   EXPECT_DOUBLE_EQ(atan3(5, 5), constants::PI * .25);
+   EXPECT_DOUBLE_EQ(atan3(5, -5), constants::PI * .75);
+   EXPECT_DOUBLE_EQ(atan3(-5, -5), constants::PI * 1.25);
+   EXPECT_DOUBLE_EQ(atan3(-5, 5), constants::PI * 1.75);
 }
 
 TEST(CustomMath, quantize) {

@@ -103,8 +103,8 @@ namespace mitre::oss::simcore
              */
             static int FindUpperBoundIndex(double value_to_find, const std::vector<double> &samples)
             {
-                  return static_cast<int>(std::ranges::distance(
-                      samples.begin(), std::ranges::upper_bound(samples, value_to_find)));
+                  return static_cast<int>(std::distance(
+                      samples.begin(), std::upper_bound(samples.begin(), samples.end(), value_to_find)));
             }
       };
 } // namespace mitre::oss::simcore

@@ -26,8 +26,10 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <format>
+#include <iomanip>
 #include <list>
+#include <locale>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -66,8 +68,11 @@ double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_va
 void CoreUtils::ValidateInterpolationElseThrow(int upper_index, double x_interpolation_value,
                                        const std::vector<double> &x_values) {
    if (upper_index < 1 || upper_index >= x_values.size()) {
-      const auto msg = std::format("upper_index ({}) is not between 1 and {}", upper_index,
-                                   static_cast<int>(x_values.size() - 1));
+      std::ostringstream message;
+      message.imbue(std::locale::classic());
+      message << "upper_index (" << upper_index << ") is not between 1 and "
+              << static_cast<int>(x_values.size() - 1);
+      const auto msg = message.str();
       LOG4CPLUS_FATAL(m_logger, msg);
       throw out_of_range(msg);
    }
@@ -76,7 +81,11 @@ void CoreUtils::ValidateInterpolationElseThrow(int upper_index, double x_interpo
    const double v1 = x_values[upper_index - 1];
 
    if ((x_interpolation_value - v1) * (x_interpolation_value - v2) > 0) {
-      const auto msg = std::format("ratio ({:.6f}) is not between {:.6f} and {:.6f}.", x_interpolation_value, v1, v2);
+      std::ostringstream message;
+      message.imbue(std::locale::classic());
+      message << std::fixed << std::setprecision(6) << "ratio (" << x_interpolation_value << ") is not between "
+              << v1 << " and " << v2 << ".";
+      const auto msg = message.str();
 
       double ratio = (x_interpolation_value - v1) / (x_interpolation_value - v2);
       if (upper_index + 1 == x_values.size() && (ratio < .1 || ratio > 10)) {
