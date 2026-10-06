@@ -54,6 +54,8 @@ class CoreUtils {
    inline static const std::string INTERMEDIATE_WAYPOINT_ROOT_NAME{"intermediate"};
 
    /**
+    * Deprecated after 2.0.0.
+    * 
     * Find the index of a value in a vector. Uses STL upper_bound(), but with one modified return.
     *
     * @param value_to_find: value to search for
