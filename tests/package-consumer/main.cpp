@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+static_assert(__cplusplus == 201703L, "The installed package consumer must compile as C++17");
+
 int main() {
    using mitre::oss::simcore::CoreUtils;
    if (std::string(AAESIM_VERSION_STR) != EXPECTED_VERSION || !std::filesystem::exists(".")) {
