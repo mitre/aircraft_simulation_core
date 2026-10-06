@@ -19,17 +19,25 @@
 
 #include "public/CoreUtils.h"
 
-#include <cfloat>
-#include <cstdio>
+#include <log4cplus/loggingmacros.h>
+#include <scalar/Length.h>
+#include <scalar/Speed.h>
+#include <scalar/Unit.h>
+
+#include <algorithm>
+#include <cstddef>
 #include <iomanip>
 #include <list>
+#include <locale>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "public/GeolibUtils.h"
 #include "public/LatitudeLongitudePoint.h"
-#include "public/SimulationTime.h"
+#include "public/LineOnEllipsoid.h"
+#include "public/Waypoint.h"
 
 using namespace std;
 using namespace mitre::oss::simcore;
@@ -49,22 +57,35 @@ int CoreUtils::FindNearestIndex(const double &value_to_find, const vector<double
 
 double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_value,
                                       const std::vector<double> &x_values, const std::vector<double> &y_values) {
+   ValidateInterpolationElseThrow(upper_index, x_interpolation_value, x_values);
+   const double v2 = x_values[upper_index];
+   const double v1 = x_values[upper_index - 1];
+   const double o2 = y_values[upper_index];
+   const double o1 = y_values[upper_index - 1];
+   return ((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1;
+}
+
+void CoreUtils::ValidateInterpolationElseThrow(int upper_index, double x_interpolation_value,
+                                       const std::vector<double> &x_values) {
    if (upper_index < 1 || upper_index >= x_values.size()) {
-      char msg[200];
-      snprintf(msg, sizeof(msg), "upper_index (%d) is not between 1 and %d", upper_index,
-               static_cast<int>(x_values.size() - 1));
+      std::ostringstream message;
+      message.imbue(std::locale::classic());
+      message << "upper_index (" << upper_index << ") is not between 1 and "
+              << static_cast<int>(x_values.size() - 1);
+      const auto msg = message.str();
       LOG4CPLUS_FATAL(m_logger, msg);
       throw out_of_range(msg);
    }
 
    const double v2 = x_values[upper_index];
    const double v1 = x_values[upper_index - 1];
-   const double o2 = y_values[upper_index];
-   const double o1 = y_values[upper_index - 1];
 
    if ((x_interpolation_value - v1) * (x_interpolation_value - v2) > 0) {
-      char msg[200];
-      snprintf(msg, sizeof(msg), "ratio (%lf) is not between %lf and %lf.", x_interpolation_value, v1, v2);
+      std::ostringstream message;
+      message.imbue(std::locale::classic());
+      message << std::fixed << std::setprecision(6) << "ratio (" << x_interpolation_value << ") is not between "
+              << v1 << " and " << v2 << ".";
+      const auto msg = message.str();
 
       double ratio = (x_interpolation_value - v1) / (x_interpolation_value - v2);
       if (upper_index + 1 == x_values.size() && (ratio < .1 || ratio > 10)) {
@@ -74,8 +95,6 @@ double CoreUtils::LinearlyInterpolate(int upper_index, double x_interpolation_va
          throw domain_error(msg);
       }
    }
-
-   return ((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1;
 }
 
 Units::Speed CoreUtils::LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
@@ -88,6 +107,24 @@ Units::Speed CoreUtils::LinearlyInterpolate(int upper_index, Units::Length x_int
    std::for_each(y_values.begin(), y_values.end(), insert_speed_as_double);
    return Units::MetersPerSecondSpeed(LinearlyInterpolate(
          upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values_as_double));
+}
+
+double CoreUtils::LinearlyExtrapolate(int upper_index, double x_extrapolation_value,
+                                      const std::vector<double> &x_values, const std::vector<double> &y_values) {
+   return ExtrapolateTyped(upper_index, x_extrapolation_value, x_values, y_values);
+}
+
+void CoreUtils::ValidateExtrapolationElseThrow(int upper_index, const std::vector<double> &x_values,
+                                              std::size_t y_values_size) {
+   if (x_values.size() != y_values_size) {
+      throw std::invalid_argument("Linear extrapolation requires equal x and y vector sizes");
+   }
+   if (upper_index < 1 || static_cast<std::size_t>(upper_index) >= x_values.size()) {
+      throw std::out_of_range("Linear extrapolation upper_index must select two samples");
+   }
+   if (x_values[upper_index] == x_values[upper_index - 1]) {
+      throw std::domain_error("Linear extrapolation requires distinct x-values in the selected interval");
+   }
 }
 
 const Units::Length CoreUtils::CalculateEuclideanDistance(const std::pair<Units::Length, Units::Length> &xyLoc1,
@@ -106,7 +143,6 @@ const int CoreUtils::SignOfValue(double value) { return (((value) == (0)) ? 0 : 
 
 std::list<Waypoint> CoreUtils::ShortenLongLegs(const std::list<Waypoint> &ordered_waypoints,
                                                Units::Length maximum_allowable_length) {
-   using namespace geolib_idealab;
    using namespace mitre::oss::simcore;
 
    std::list<Waypoint> replacement_waypoints = {};
@@ -143,7 +179,6 @@ std::vector<Waypoint> CoreUtils::ShortenLongLegs(const std::vector<Waypoint> &or
 
 std::list<Waypoint> CoreUtils::GetIntermediateWaypointsForLongLeg(const mitre::oss::simcore::LineOnEllipsoid &line_on_ellipsoid,
                                                                   Units::Length maximum_allowable_single_leg_distance) {
-   using namespace geolib_idealab;
    using namespace mitre::oss::simcore;
 
    Units::NauticalMilesLength distance_to_end_point(line_on_ellipsoid.GetShapeLength());

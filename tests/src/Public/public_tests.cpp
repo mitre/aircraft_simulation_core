@@ -18,29 +18,52 @@
 // ****************************************************************************
 
 #include <gtest/gtest.h>
+#include <scalar/Angle.h>
+#include <scalar/Area.h>
+#include <scalar/Length.h>
+#include <scalar/SignedAngle.h>
+#include <scalar/Speed.h>
+#include <scalar/Temperature.h>
+#include <scalar/Time.h>
+#include <scalar/Unit.h>
+#include <scalar/UnsignedAngle.h>
 
+#include <cmath>
 #include <cstdio>
+#include <exception>
 #include <memory>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include "public/AircraftCalculations.h"
+#include "public/AircraftState.h"
 #include "public/AlongPathDistanceCalculator.h"
+#include "public/BadaUtils.h"
 #include "public/CoreUtils.h"
 #include "public/CustomMath.h"
+#include "public/DMatrix.h"
+#include "public/DVector.h"
 #include "public/DirectionOfFlightCourseCalculator.h"
 #include "public/EuclideanWaypointMonitor.h"
 #include "public/FlightEnvelopeSpeedLimiter.h"
-#include "public/Guidance.h"
+#include "public/HorizontalPath.h"
 #include "public/HorizontalPathTracker.h"
 #include "public/InvalidIndexException.h"
+#include "public/LatitudeLongitudePoint.h"
 #include "public/PositionCalculator.h"
 #include "public/ScenarioUtils.h"
 #include "public/SimulationTime.h"
-#include "public/VectorDifferenceWindEvaluator.h"
+#include "public/VerticalPath.h"
+#include "public/VerticalPathUtils.h"
+#include "public/Waypoint.h"
+#include "public/WeatherPrediction.h"
 #include "public/Wgs84PrecalcWaypoint.h"
-#include "public/WindZero.h"
+#include "utility/BoundedValue.h"
 #include "utility/CustomUnits.h"
+#include "utility/UtilityConstants.h"
 #include "utils/public/OldCustomMathUtils.h"
 #include "utils/public/PublicUtils.h"
 
@@ -49,6 +72,62 @@ using namespace mitre::oss::simcore::test::utils;
 using namespace mitre::oss::simcore;
 
 namespace mitre::oss::simcore::test {
+
+template <typename T, typename = void>
+struct SupportsTypedInterpolation : std::false_type {};
+
+template <typename T>
+struct SupportsTypedInterpolation<
+      T, std::void_t<decltype(CoreUtils::LinearlyInterpolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>())),
+                     decltype(CoreUtils::LinearlyInterpolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>>
+   : std::bool_constant<
+            std::is_same_v<T, decltype(CoreUtils::LinearlyInterpolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))> &&
+            std::is_same_v<T, decltype(CoreUtils::LinearlyInterpolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>> {};
+
+static_assert(SupportsTypedInterpolation<Units::Speed>::value);
+static_assert(SupportsTypedInterpolation<Units::Length>::value);
+static_assert(SupportsTypedInterpolation<Units::Time>::value);
+static_assert(SupportsTypedInterpolation<Units::FeetLength>::value);
+static_assert(SupportsTypedInterpolation<Units::KnotsSpeed>::value);
+static_assert(!SupportsTypedInterpolation<double>::value);
+static_assert(!SupportsTypedInterpolation<int>::value);
+static_assert(!SupportsTypedInterpolation<std::string>::value);
+
+template <typename T, typename = void>
+struct SupportsTypedExtrapolation : std::false_type {};
+
+template <typename T>
+struct SupportsTypedExtrapolation<
+      T, std::void_t<decltype(CoreUtils::LinearlyExtrapolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>())),
+                     decltype(CoreUtils::LinearlyExtrapolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>>
+   : std::bool_constant<
+            std::is_same_v<T, decltype(CoreUtils::LinearlyExtrapolateByDistance<T>(
+               1, Units::MetersLength(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))> &&
+            std::is_same_v<T, decltype(CoreUtils::LinearlyExtrapolateByTime<T>(
+               1, Units::SecondsTime(0.5), std::declval<const std::vector<double> &>(),
+               std::declval<const std::vector<T> &>()))>> {};
+
+static_assert(SupportsTypedExtrapolation<Units::Speed>::value);
+static_assert(SupportsTypedExtrapolation<Units::Length>::value);
+static_assert(SupportsTypedExtrapolation<Units::Time>::value);
+static_assert(SupportsTypedExtrapolation<Units::FeetLength>::value);
+static_assert(SupportsTypedExtrapolation<Units::KnotsSpeed>::value);
+static_assert(!SupportsTypedExtrapolation<double>::value);
+static_assert(!SupportsTypedExtrapolation<int>::value);
+static_assert(!SupportsTypedExtrapolation<std::string>::value);
 
 class TestHorizontalPathTracker : public HorizontalPathTracker {
    // A mock implementation that allows us to get at protected methods
@@ -80,6 +159,289 @@ TEST(CoreUtils, interpolate_trivial) {
    // Test
    double y_actual = CoreUtils::LinearlyInterpolate(upper_index, value, x_vals, y_vals);
    ASSERT_EQ(y_expected, y_actual);
+}
+
+TEST(CoreUtils, interpolation_error_messages) {
+   const std::vector<double> x_values{0.0, 1.0, 2.0};
+   const std::vector<double> y_values{0.0, 10.0, 20.0};
+   try {
+      CoreUtils::LinearlyInterpolate(0, 0.5, x_values, y_values);
+      FAIL() << "Expected an invalid index to throw";
+   } catch (const std::out_of_range &error) {
+      EXPECT_STREQ("upper_index (0) is not between 1 and 2", error.what());
+   }
+   try {
+      CoreUtils::LinearlyInterpolate(1, 1.25, x_values, y_values);
+      FAIL() << "Expected a value outside the selected interval to throw";
+   } catch (const std::domain_error &error) {
+      EXPECT_STREQ("ratio (1.250000) is not between 0.000000 and 1.000000.", error.what());
+   }
+}
+
+TEST(CoreUtils, extrapolate_scalar_selected_interval) {
+   const std::vector<double> x_values{0.0, 10.0, 20.0};
+   const std::vector<double> y_values{10.0, 30.0, 70.0};
+   EXPECT_DOUBLE_EQ(-10.0, CoreUtils::LinearlyExtrapolate(1, -10.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(50.0, CoreUtils::LinearlyExtrapolate(1, 20.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(110.0, CoreUtils::LinearlyExtrapolate(2, 30.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(-10.0, CoreUtils::LinearlyExtrapolate(2, 0.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(10.0, CoreUtils::LinearlyExtrapolate(1, 0.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(30.0, CoreUtils::LinearlyExtrapolate(1, 10.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(20.0, CoreUtils::LinearlyExtrapolate(1, 5.0, x_values, y_values));
+   EXPECT_DOUBLE_EQ(3.0, CoreUtils::LinearlyExtrapolate(1, 100.0, {0.0, 1.0}, {3.0, 3.0}));
+   EXPECT_DOUBLE_EQ(40.0, CoreUtils::LinearlyExtrapolate(1, -10.0, {10.0, 0.0}, {0.0, 20.0}));
+}
+
+TEST(CoreUtils, extrapolate_typed_by_distance) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Speed> speeds{Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   const double initial_speed = Units::MetersPerSecondSpeed(speeds[0]).value();
+   const auto upper = CoreUtils::LinearlyExtrapolateByDistance(1, Units::NauticalMilesLength(2), x_values, speeds);
+   const auto lower = CoreUtils::LinearlyExtrapolateByDistance(1, Units::NauticalMilesLength(-1), x_values, speeds);
+   EXPECT_NEAR(200.0 - initial_speed, Units::MetersPerSecondSpeed(upper).value(), 1e-12);
+   EXPECT_NEAR(2.0 * initial_speed - 100.0, Units::MetersPerSecondSpeed(lower).value(), 1e-12);
+
+   const std::vector<Units::FeetLength> feet{Units::FeetLength(100), Units::FeetLength(300)};
+   EXPECT_DOUBLE_EQ(500.0, CoreUtils::LinearlyExtrapolateByDistance(
+         1, Units::NauticalMilesLength(2), x_values, feet).value());
+   const std::vector<Units::Time> times{Units::SecondsTime(10), Units::SecondsTime(20)};
+   EXPECT_DOUBLE_EQ(30.0, Units::SecondsTime(CoreUtils::LinearlyExtrapolateByDistance(
+         1, Units::NauticalMilesLength(2), x_values, times)).value());
+}
+
+TEST(CoreUtils, extrapolate_typed_by_time) {
+   const std::vector<double> x_values{0.0, 60.0};
+   const std::vector<Units::KnotsSpeed> speeds{Units::KnotsSpeed(100), Units::KnotsSpeed(200)};
+   EXPECT_NEAR(300.0, CoreUtils::LinearlyExtrapolateByTime(1, Units::MinutesTime(2), x_values, speeds).value(), 1e-12);
+   EXPECT_NEAR(0.0, CoreUtils::LinearlyExtrapolateByTime(1, Units::MinutesTime(-1), x_values, speeds).value(), 1e-12);
+   const std::vector<Units::Length> lengths{Units::FeetLength(100), Units::FeetLength(300)};
+   EXPECT_NEAR(500.0, Units::FeetLength(CoreUtils::LinearlyExtrapolateByTime(
+         1, Units::MinutesTime(2), x_values, lengths)).value(), 1e-12);
+}
+
+TEST(CoreUtils, extrapolate_invalid_inputs) {
+   const std::vector<double> x_values{0.0, 1.0};
+   const std::vector<double> y_values{10.0, 20.0};
+   for (const int index : {-1, 0, 2}) {
+      EXPECT_THROW(CoreUtils::LinearlyExtrapolate(index, 2.0, x_values, y_values), std::out_of_range);
+   }
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {}, {}), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {0.0}, {10.0}), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, x_values, {10.0}), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, x_values, {10.0, 20.0, 30.0}), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolate(1, 2.0, {1.0, 1.0}, y_values), std::domain_error);
+
+   const std::vector<Units::SecondsTime> times{Units::SecondsTime(10), Units::SecondsTime(20)};
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(0, Units::MetersLength(2), x_values, times), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(1, Units::MetersLength(2), {0.0}, times), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByDistance(1, Units::MetersLength(2), {1.0, 1.0}, times), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(2, Units::SecondsTime(2), x_values, times), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(1, Units::SecondsTime(2), {0.0}, times), std::invalid_argument);
+   EXPECT_THROW(CoreUtils::LinearlyExtrapolateByTime(1, Units::SecondsTime(2), {1.0, 1.0}, times), std::domain_error);
+}
+
+TEST(CoreUtils, interpolate_legacy_speed_api) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Speed> y_values{Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   using LegacyInterpolator = Units::Speed (*)(int, Units::Length, const std::vector<double> &,
+                                               const std::vector<Units::Speed> &);
+   const LegacyInterpolator interpolate = &CoreUtils::LinearlyInterpolate;
+   const double expected = (Units::MetersPerSecondSpeed(y_values[0]).value() + 100.0) / 2.0;
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(interpolate(1, Units::NauticalMilesLength(0.5),
+                                                                     x_values, y_values)).value());
+   // A braced list must still resolve to the original non-template overload.
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolate(
+                                   1, Units::NauticalMilesLength(0.5), x_values,
+                                   {Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)})).value());
+   EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(CoreUtils::LinearlyInterpolateByDistance(
+                                   1, Units::NauticalMilesLength(0.5), x_values, y_values)).value());
+}
+
+TEST(CoreUtils, interpolate_typed_quantities) {
+   const std::vector<double> x_values{0.0, 1852.0};
+   const std::vector<Units::Length> lengths{Units::FeetLength(100), Units::MetersLength(100)};
+   const auto length = CoreUtils::LinearlyInterpolateByDistance(1, Units::NauticalMilesLength(0.5), x_values, lengths);
+   EXPECT_DOUBLE_EQ((Units::MetersLength(lengths[0]).value() + 100.0) / 2.0,
+                    Units::MetersLength(length).value());
+
+   const std::vector<Units::Time> times{Units::SecondsTime(10), Units::SecondsTime(30)};
+   const auto time = CoreUtils::LinearlyInterpolateByDistance(1, Units::NauticalMilesLength(0.5), x_values, times);
+   EXPECT_DOUBLE_EQ(20.0, Units::SecondsTime(time).value());
+
+   const std::vector<Units::FeetLength> feet{Units::FeetLength(100), Units::FeetLength(300)};
+   const auto feet_result = CoreUtils::LinearlyInterpolateByDistance(1, Units::NauticalMilesLength(0.5), x_values, feet);
+   EXPECT_DOUBLE_EQ(200.0, feet_result.value());
+
+   const std::vector<Units::KnotsSpeed> knots{Units::KnotsSpeed(100), Units::KnotsSpeed(300)};
+   const auto knots_result = CoreUtils::LinearlyInterpolateByDistance(1, Units::NauticalMilesLength(0.5), x_values, knots);
+   EXPECT_DOUBLE_EQ(200.0, knots_result.value());
+}
+
+TEST(CoreUtils, interpolate_typed_boundaries_and_errors) {
+   const std::vector<double> x_values{0.0, 1.0, 2.0};
+   const std::vector<Units::SecondsTime> y_values{
+         Units::SecondsTime(10), Units::SecondsTime(20), Units::SecondsTime(30)};
+   EXPECT_DOUBLE_EQ(10.0, CoreUtils::LinearlyInterpolateByDistance(1, Units::MetersLength(0), x_values, y_values).value());
+   EXPECT_DOUBLE_EQ(20.0, CoreUtils::LinearlyInterpolateByDistance(1, Units::MetersLength(1), x_values, y_values).value());
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByDistance(-1, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByDistance(0, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByDistance(3, Units::MetersLength(0.5), x_values, y_values), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByDistance(1, Units::MetersLength(-0.5), x_values, y_values), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByDistance(2, Units::MetersLength(3), x_values, y_values), std::domain_error);
+   // Preserve the existing tolerance for extrapolation just past the last interval.
+   EXPECT_NEAR(30.1, CoreUtils::LinearlyInterpolateByDistance(2, Units::MetersLength(2.01), x_values, y_values).value(), 1e-12);
+}
+
+TEST(CoreUtils, interpolate_typed_quantities_over_time) {
+   const std::vector<double> x_values{0.0, 60.0, 120.0};
+   const std::vector<Units::Speed> speeds{
+         Units::KnotsSpeed(100), Units::KnotsSpeed(200), Units::KnotsSpeed(300)};
+   const auto speed = CoreUtils::LinearlyInterpolateByTime(2, Units::MinutesTime(1.5), x_values, speeds);
+   EXPECT_NEAR(250.0, Units::KnotsSpeed(speed).value(), 1e-12);
+   const std::vector<Units::FeetLength> lengths{
+         Units::FeetLength(100), Units::FeetLength(200), Units::FeetLength(300)};
+   EXPECT_DOUBLE_EQ(250.0, CoreUtils::LinearlyInterpolateByTime(2, Units::MinutesTime(1.5), x_values, lengths).value());
+   EXPECT_DOUBLE_EQ(100.0, CoreUtils::LinearlyInterpolateByTime(1, Units::SecondsTime(0), x_values, lengths).value());
+   EXPECT_DOUBLE_EQ(300.0, CoreUtils::LinearlyInterpolateByTime(2, Units::MinutesTime(2), x_values, lengths).value());
+   EXPECT_NEAR(301.0, CoreUtils::LinearlyInterpolateByTime(2, Units::SecondsTime(120.6), x_values, lengths).value(), 1e-12);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByTime(0, Units::SecondsTime(30), x_values, lengths), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByTime(3, Units::SecondsTime(30), x_values, lengths), std::out_of_range);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByTime(1, Units::SecondsTime(-30), x_values, lengths), std::domain_error);
+   EXPECT_THROW(CoreUtils::LinearlyInterpolateByTime(2, Units::MinutesTime(3), x_values, lengths), std::domain_error);
+}
+
+TEST(VerticalPathUtils, interpolate_typed_speeds) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1852.0};
+   path.altitude_m = {0.0, 100.0};
+   path.cas_mps = {100.0, 200.0};
+   path.mach = {0.4, 0.6};
+   path.altitude_rate_mps = {0.0, 2.0};
+   path.true_airspeed = {Units::KnotsSpeed(100), Units::MetersPerSecondSpeed(100)};
+   path.tas_rate_mps = {0.0, 2.0};
+   path.theta_radians = {0.0, 0.1};
+   path.gs_mps = {100.0, 200.0};
+   path.time_to_go_sec = {0.0, 10.0};
+   path.mass_kg = {10000.0, 20000.0};
+   path.wind_velocity_east = {Units::MetersPerSecondSpeed(-10), Units::MetersPerSecondSpeed(20)};
+   path.wind_velocity_north = {Units::KnotsSpeed(-10), Units::KnotsSpeed(-20)};
+   path.flap_setting.resize(2, bada_utils::FlapConfiguration::UNDEFINED);
+   path.algorithm_type.resize(2, VerticalPath::PredictionAlgorithmType::UNDETERMINED);
+
+   const auto data = VerticalPathUtils::GetInterpolatedPathData(path, Units::NauticalMilesLength(0.5));
+   EXPECT_EQ(1, data.resolved_index);
+   EXPECT_DOUBLE_EQ((Units::MetersPerSecondSpeed(path.true_airspeed[0]).value() + 100.0) / 2.0,
+                    Units::MetersPerSecondSpeed(data.true_airspeed).value());
+   EXPECT_DOUBLE_EQ(5.0, data.wind_velocity_east.value());
+   EXPECT_NEAR(-15.0, Units::KnotsSpeed(data.wind_velocity_north).value(), 1e-12);
+
+   // Time and distance lookups use the same samples, including the existing boundary handling.
+   for (const double seconds : {-1.0, 0.0, 5.0, 10.01}) {
+      const auto time_data = VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(seconds));
+      const auto distance_data = VerticalPathUtils::GetInterpolatedPathData(path, Units::MetersLength(seconds * 185.2));
+      EXPECT_EQ(distance_data.resolved_index, time_data.resolved_index);
+      EXPECT_NEAR(Units::MetersPerSecondSpeed(distance_data.true_airspeed).value(),
+                  Units::MetersPerSecondSpeed(time_data.true_airspeed).value(), 1e-12);
+      EXPECT_NEAR(distance_data.wind_velocity_east.value(), time_data.wind_velocity_east.value(), 1e-12);
+      EXPECT_NEAR(distance_data.wind_velocity_north.value(), time_data.wind_velocity_north.value(), 1e-12);
+   }
+   // FindNearestIndex returns past the last sample on an exact match; retain the existing exception.
+   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(10)), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::GetInterpolatedPathDataAtTime(path, Units::SecondsTime(20)), std::domain_error);
+}
+
+TEST(VerticalPathUtils, guidance_upper_bound_lookup) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1.0, 1.0, 2.0};
+   path.cas_mps = {10.0, 20.0, 30.0, 50.0};
+   path.mach = {0.1, 0.2, 0.3, 0.5};
+   path.time_to_go_sec = {10.0, 20.0, 30.0, 50.0};
+
+   for (const double meters : {-0.5, 0.0}) {
+      const Units::MetersLength distance(meters);
+      EXPECT_DOUBLE_EQ(10.0, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance)).value());
+      EXPECT_DOUBLE_EQ(0.1, VerticalPathUtils::CalculateMachGuidance(path, distance));
+      EXPECT_DOUBLE_EQ(10.0, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, distance)).value());
+   }
+
+   // An exact match skips duplicate samples and uses the next interval.
+   for (const double meters : {1.0, 1.5}) {
+      const Units::MetersLength distance(meters);
+      const double expected = 30.0 + (meters - 1.0) * 20.0;
+      EXPECT_DOUBLE_EQ(expected, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance)).value());
+      EXPECT_NEAR(expected / 100.0, VerticalPathUtils::CalculateMachGuidance(path, distance), 1e-12);
+      EXPECT_DOUBLE_EQ(expected, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, distance)).value());
+   }
+
+   for (const double meters : {2.0, 2.01, 3.0}) {
+      const Units::MetersLength distance(meters);
+      EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance), std::out_of_range);
+      EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance), std::out_of_range);
+      EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance), std::out_of_range);
+   }
+
+   const VerticalPath empty;
+   const Units::MetersLength distance(0);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(empty, distance), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(empty, distance), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(empty, distance), std::out_of_range);
+}
+
+TEST(VerticalPathUtils, guidance_optional_extrapolation) {
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 1852.0, 3704.0};
+   path.cas_mps = {10.0, 30.0, 70.0};
+   path.mach = {0.1, 0.3, 0.7};
+   path.time_to_go_sec = {10.0, 30.0, 70.0};
+
+   // Different slopes at each end verify that the appropriate endpoint interval is used.
+   for (const auto &[nautical_miles, expected] : std::vector<std::pair<double, double>>{
+              {-1.0, -10.0}, {0.0, 10.0}, {0.5, 20.0}, {1.0, 30.0}, {2.0, 70.0}, {3.0, 110.0}}) {
+      const Units::NauticalMilesLength distance(nautical_miles);
+      EXPECT_NEAR(expected, Units::MetersPerSecondSpeed(
+            VerticalPathUtils::CalculateSpeedGuidance(path, distance, true)).value(), 1e-12);
+      EXPECT_NEAR(expected / 100.0, VerticalPathUtils::CalculateMachGuidance(path, distance, true), 1e-12);
+      EXPECT_NEAR(expected, Units::SecondsTime(
+            VerticalPathUtils::CalculateTimeToFly(path, distance, true)).value(), 1e-12);
+   }
+
+   const Units::NauticalMilesLength below(-1);
+   EXPECT_DOUBLE_EQ(10.0, Units::MetersPerSecondSpeed(
+         VerticalPathUtils::CalculateSpeedGuidance(path, below, false)).value());
+   EXPECT_DOUBLE_EQ(0.1, VerticalPathUtils::CalculateMachGuidance(path, below, false));
+   EXPECT_DOUBLE_EQ(10.0, Units::SecondsTime(VerticalPathUtils::CalculateTimeToFly(path, below, false)).value());
+   const Units::NauticalMilesLength above(3);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, above, false), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, above, false), std::out_of_range);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, above, false), std::out_of_range);
+}
+
+TEST(VerticalPathUtils, guidance_extrapolation_requires_two_distinct_samples) {
+   for (const std::vector<double> &samples : std::vector<std::vector<double>>{{}, {0.0}}) {
+      VerticalPath path;
+      path.along_path_distance_m = samples;
+      path.cas_mps = samples;
+      path.mach = samples;
+      path.time_to_go_sec = samples;
+      for (const double meters : {-1.0, 1.0}) {
+         const Units::MetersLength distance(meters);
+         EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance, true), std::out_of_range);
+         EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance, true), std::out_of_range);
+         EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance, true), std::out_of_range);
+      }
+   }
+
+   VerticalPath path;
+   path.along_path_distance_m = {0.0, 0.0};
+   path.cas_mps = {10.0, 20.0};
+   path.mach = {0.1, 0.2};
+   path.time_to_go_sec = {10.0, 20.0};
+   const Units::MetersLength distance(1);
+   EXPECT_THROW(VerticalPathUtils::CalculateSpeedGuidance(path, distance, true), std::domain_error);
+   EXPECT_THROW(VerticalPathUtils::CalculateMachGuidance(path, distance, true), std::domain_error);
+   EXPECT_THROW(VerticalPathUtils::CalculateTimeToFly(path, distance, true), std::domain_error);
 }
 
 TEST(CoreUtils, interpolate_domain_error) {
@@ -185,17 +547,17 @@ TEST(AircraftCalculations, anglebetweenvectors) {
    EXPECT_NEAR(expectedAngle0.value(), actual.value(), tol.value());
 
    // positive 45
-   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(M_PI / 4);
+   const Units::SignedRadiansAngle expectedAngle1 = Units::SignedRadiansAngle(constants::PI / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
-         Units::MetersLength(sqrt(2)), Units::MetersLength(sqrt(2)));
+         Units::MetersLength(std::sqrt(2)), Units::MetersLength(std::sqrt(2)));
    EXPECT_NEAR(expectedAngle1.value(), actual.value(), tol.value());
 
    // negative 45
-   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(M_PI / 4);
+   const Units::SignedRadiansAngle expectedAngle2 = Units::SignedRadiansAngle(constants::PI / 4);
    actual = AircraftCalculations::ComputeAngleBetweenVectors(
          Units::ZERO_LENGTH, Units::ZERO_LENGTH, Units::MetersLength(1), Units::MetersLength(0),
-         Units::MetersLength(sqrt(2)), Units::MetersLength(-sqrt(2)));
+         Units::MetersLength(std::sqrt(2)), Units::MetersLength(-std::sqrt(2)));
    EXPECT_NEAR(expectedAngle2.value(), actual.value(), tol.value());
 }
 
@@ -505,10 +867,10 @@ TEST(AlongPathDistanceCalculator, check_for_throw_when_invalid_call_made_increme
 }
 
 TEST(CustomMath, atan3_values) {
-   EXPECT_DOUBLE_EQ(atan3(5, 5), M_PI * .25);
-   EXPECT_DOUBLE_EQ(atan3(5, -5), M_PI * .75);
-   EXPECT_DOUBLE_EQ(atan3(-5, -5), M_PI * 1.25);
-   EXPECT_DOUBLE_EQ(atan3(-5, 5), M_PI * 1.75);
+   EXPECT_DOUBLE_EQ(atan3(5, 5), constants::PI * .25);
+   EXPECT_DOUBLE_EQ(atan3(5, -5), constants::PI * .75);
+   EXPECT_DOUBLE_EQ(atan3(-5, -5), constants::PI * 1.25);
+   EXPECT_DOUBLE_EQ(atan3(-5, 5), constants::PI * 1.75);
 }
 
 TEST(CustomMath, quantize) {
@@ -546,7 +908,7 @@ TEST(RandomGenerator, uniformSample) {
       s3 += x * x2;
       s4 += x2 * x2;
    }
-   double ee = sqrt(1 / (double)n);
+   double ee = std::sqrt(1 / (double)n);
    double m1 = s1 / n;
    EXPECT_NEAR(.5, m1, ee);
    double m2 = s2 / n;
