@@ -41,6 +41,10 @@ Then, coordinate frame transformations are used to derive 3-dimensional motion o
 
 👨‍💻 If you need the software implementation, [read the docs](./docs/README.md).
 
+## Releases
+
+See [the release workflow](docs/RELEASING.md) for required MR version bumps, manual stable/RC tags, packages, and GitHub repository settings.
+
 ## Build
 
 Configure and build the public test executable with CMake:

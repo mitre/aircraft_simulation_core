@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(aircraft_simulation_core VERSION 2.0.0 LANGUAGES CXX)
+project(aircraft_simulation_core VERSION 2.1.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -102,6 +102,15 @@ if(PROJECT_VERSION_TWEAK)
 else()
    set(SIMCORE_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 endif()
+set(SIMCORE_RELEASE_TAG "" CACHE STRING "Full release identity, e.g. 2.0.1-rc.1")
+if(SIMCORE_RELEASE_TAG)
+   string(REPLACE "." "\\." SIMCORE_RELEASE_VERSION_PATTERN "${PROJECT_VERSION}")
+   if(PROJECT_VERSION_TWEAK OR NOT SIMCORE_RELEASE_TAG MATCHES
+         "^${SIMCORE_RELEASE_VERSION_PATTERN}(-rc\\.[1-9][0-9]*)?$")
+      message(FATAL_ERROR "SIMCORE_RELEASE_TAG must match the project version, optionally with -rc.N")
+   endif()
+   set(SIMCORE_VERSION "${SIMCORE_RELEASE_TAG}")
+endif()
 message("-- Generating build for ${PROJECT_NAME} version ${SIMCORE_VERSION}")
 configure_file(
    ${PROJECT_SOURCE_DIR}/cmake/build_info.h.in
@@ -188,7 +197,7 @@ set_target_properties(simcore PROPERTIES
    EXPORT_NAME simcore
    POSITION_INDEPENDENT_CODE ON
 )
-target_compile_features(simcore PUBLIC cxx_std_20)
+target_compile_features(simcore PUBLIC cxx_std_17)
 target_include_directories(simcore
    PUBLIC
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

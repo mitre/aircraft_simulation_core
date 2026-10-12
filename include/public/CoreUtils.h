@@ -20,27 +20,42 @@
 #pragma once
 
 #include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
+#include <log4cplus/tchar.h>
 #include <scalar/Length.h>
+#include <scalar/Speed.h>
 #include <scalar/Time.h>
+#include <scalar/Unit.h>
 
+#include <cstddef>
 #include <limits>
 #include <list>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "public/AircraftState.h"
-#include "public/HorizontalPath.h"
 #include "public/LineOnEllipsoid.h"
+#include "public/Waypoint.h"
 
 namespace mitre::oss::simcore {
 
 class CoreUtils {
+   template <typename T>
+   using UnitBase = Units::Unit<typename T::ValueType, T::massExp, T::lengthExp, T::timeExp, T::currentExp,
+                                T::temperatureExp, T::amountExp, T::intensityExp, T::angleExp>;
+
+   // Match derived_from: accept the unit itself and public, unambiguous derived units.
+   template <typename T>
+   using EnableUnit = std::enable_if_t<std::is_base_of_v<UnitBase<T>, T> &&
+                                           std::is_convertible_v<const volatile T *, const volatile UnitBase<T> *>,
+                                     T>;
+
   public:
    inline static const std::string INTERMEDIATE_WAYPOINT_ROOT_NAME{"intermediate"};
 
    /**
+    * Deprecated after 2.0.0.
+    * 
     * Find the index of a value in a vector. Uses STL upper_bound(), but with one modified return.
     *
     * @param value_to_find: value to search for
@@ -64,13 +79,71 @@ class CoreUtils {
                                      const std::vector<double> &y_values);
 
    /**
-    * Linear interpolator for speed-typed y_values.
+    * Deprecated after 2.0.0; use LinearlyInterpolateByDistance. Linear interpolator for speed-typed y_values.
     *
-    * @see LinearlyInterpolate
+    * @see LinearlyInterpolateByDistance
     */
    static Units::Speed LinearlyInterpolate(int upper_index, Units::Length x_interpolation_value,
                                            const std::vector<double> &x_values,
                                            const std::vector<Units::Speed> &y_values);
+
+   /**
+    * Linear interpolator for typed y_values. x_values are expressed in meters.
+    * Supports both base quantities and specific units without discarding their dimensions.
+    *
+    * @see LinearlyInterpolate
+   */
+   template <typename T>
+   static EnableUnit<T> LinearlyInterpolateByDistance(int upper_index, Units::Length x_interpolation_value,
+                                const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return InterpolateTyped(upper_index, Units::MetersLength(x_interpolation_value).value(), x_values, y_values);
+   }
+
+   /**
+    * Linear interpolator for typed y_values over time. x_values are expressed in seconds.
+    *
+    * @see LinearlyInterpolate
+    */
+   template <typename T>
+   static EnableUnit<T> LinearlyInterpolateByTime(int upper_index, Units::Time x_interpolation_value,
+                                const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return InterpolateTyped(upper_index, Units::SecondsTime(x_interpolation_value).value(), x_values, y_values);
+   }
+
+   /**
+    * Extend the line through samples upper_index - 1 and upper_index to x_extrapolation_value.
+    * Queries inside or outside that interval are accepted; the interval is selected by the caller.
+    * x_values and y_values must have equal sizes, with at least two samples.
+    *
+    * @throws std::out_of_range if upper_index does not select two samples
+    * @throws std::invalid_argument if the vector sizes differ
+    * @throws std::domain_error if the selected x-values are equal
+    */
+   static double LinearlyExtrapolate(int upper_index, double x_extrapolation_value,
+                                     const std::vector<double> &x_values, const std::vector<double> &y_values);
+
+   /**
+    * Linear extrapolation of typed y_values by distance. x_values are expressed in meters.
+    * Returns the same Units type as the samples, including specific units.
+    *
+    * @see LinearlyExtrapolate
+    */
+   template <typename T>
+   static EnableUnit<T> LinearlyExtrapolateByDistance(int upper_index, Units::Length x_extrapolation_value,
+                                         const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return ExtrapolateTyped(upper_index, Units::MetersLength(x_extrapolation_value).value(), x_values, y_values);
+   }
+
+   /**
+    * Linear extrapolation of typed y_values by time. x_values are expressed in seconds.
+    *
+    * @see LinearlyExtrapolate
+    */
+   template <typename T>
+   static EnableUnit<T> LinearlyExtrapolateByTime(int upper_index, Units::Time x_extrapolation_value,
+                                     const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      return ExtrapolateTyped(upper_index, Units::SecondsTime(x_extrapolation_value).value(), x_values, y_values);
+   }
 
    /**
     * @param xyLoc1: first x,y pair
@@ -141,6 +214,34 @@ class CoreUtils {
    }
 
   private:
+   template <typename T>
+   static T ExtrapolateTyped(int upper_index, double x_extrapolation_value,
+                             const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      ValidateExtrapolationElseThrow(upper_index, x_values, y_values.size());
+      const double v2 = x_values[upper_index];
+      const double v1 = x_values[upper_index - 1];
+      const T &o2 = y_values[upper_index];
+      const T &o1 = y_values[upper_index - 1];
+      return T(((o2 - o1) / (v2 - v1)) * (x_extrapolation_value - v1) + o1);
+   }
+
+   static void ValidateExtrapolationElseThrow(int upper_index, const std::vector<double> &x_values,
+                                             std::size_t y_values_size);
+
+   template <typename T>
+   static T InterpolateTyped(int upper_index, double x_interpolation_value,
+                             const std::vector<double> &x_values, const std::vector<T> &y_values) {
+      ValidateInterpolationElseThrow(upper_index, x_interpolation_value, x_values);
+      const double v2 = x_values[upper_index];
+      const double v1 = x_values[upper_index - 1];
+      const T &o2 = y_values[upper_index];
+      const T &o1 = y_values[upper_index - 1];
+      return T(((o2 - o1) / (v2 - v1)) * (x_interpolation_value - v1) + o1);
+   }
+
+   static void ValidateInterpolationElseThrow(int upper_index, double x_interpolation_value,
+                                      const std::vector<double> &x_values);
+
    inline static log4cplus::Logger m_logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("CoreUtils"))};
    inline static Units::NauticalMilesLength MAXIMUM_ALLOWABLE_SINGLE_LEG_LENGTH{Units::infinity()};
 
