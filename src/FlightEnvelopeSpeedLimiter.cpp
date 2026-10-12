@@ -19,11 +19,6 @@
 
 #include "public/FlightEnvelopeSpeedLimiter.h"
 
-#include <algorithm>
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
-
 using namespace mitre::oss::simcore;
 
 const Units::Speed FlightEnvelopeSpeedLimiter::MINIMUM_IAS_LIMIT = Units::KnotsSpeed(150);

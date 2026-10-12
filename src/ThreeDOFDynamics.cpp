@@ -22,11 +22,8 @@
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 
-#include <cmath>
 #include <iomanip>
 #include <memory>
-#include <sstream>
-#include <stdexcept>
 #include <utility>
 
 #include "nlohmann/json.hpp"
