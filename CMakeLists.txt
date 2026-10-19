@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(aircraft_simulation_core VERSION 2.1.1 LANGUAGES CXX)
+project(aircraft_simulation_core VERSION 2.1.2 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
