@@ -27,6 +27,7 @@
 
 #include "BadaUtils.h"
 #include "utility/CustomUnits.h"
+#include "utility/BoundedValue.h"
 
 namespace mitre::oss::simcore {
 
@@ -38,7 +39,7 @@ struct DynamicsState {
    Units::MetersLength h{};
    Units::MetersPerSecondSpeed v_true_airspeed{};
    Units::KnotsSpeed v_indicated_airspeed{};
-   double mach{0};
+   BoundedValue<double, 0, 1> mach{0};
    Units::SignedAngle psi{};
    Units::RadiansAngle phi{};
    Units::RadiansAngle gamma;  // aircraft flight-path angle (rad) NOTE: for gamma, heading down is positive; heading

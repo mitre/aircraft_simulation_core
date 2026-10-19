@@ -88,6 +88,7 @@ DynamicsState ThreeDOFDynamics::Integrate(const Guidance &guidance,
             controller_response.second.k_roll, controller_response.second.k_speed_brake, controller_response.first);
    }
 
+
    // Integrate the state
    m_equations_of_motion_state.enu_x += m_equations_of_motion_state_derivative.enu_velocity_x * dt;
    m_equations_of_motion_state.enu_y += m_equations_of_motion_state_derivative.enu_velocity_y * dt;
